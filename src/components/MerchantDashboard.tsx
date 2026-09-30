@@ -6,7 +6,7 @@ import {
   Clock, ChefHat, Bike, AlertCircle, Plus, DollarSign, Calendar, Upload, QrCode, X,
   Camera, Image as ImageIcon, Trash2, Scissors, Volume2, VolumeX, Sun, Moon, Edit2,
   ChevronLeft, ChevronRight, CheckCircle2, Eye, TrendingUp, Filter, UtensilsCrossed,
-  CupSoda, Star, CreditCard, FileText, Sparkles, Package, BellRing
+  CupSoda, Star, CreditCard, FileText, Sparkles, Package, BellRing, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp
 } from 'lucide-react';
 import { Order, MenuItem, MenuItemOption, OptionGroup, OptionItem, MenuCategory, UserProfile, Shop, CreditTransaction } from '@/types';
 import { db, functions } from '@/lib/firebase';
@@ -241,6 +241,33 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
   const [showTopupContactModal, setShowTopupContactModal] = useState(false);
   const [showCreditHistoryModal, setShowCreditHistoryModal] = useState(false);
   const [creditTransactions, setCreditTransactions] = useState<CreditTransaction[]>([]);
+  const [collapsedOrderMap, setCollapsedOrderMap] = useState<{ [id: string]: boolean }>({});
+
+  const isOrderCollapsed = (order: Order) => {
+    if (collapsedOrderMap[order.id] !== undefined) {
+      return collapsedOrderMap[order.id];
+    }
+    // Completed and cancelled orders default to collapsed to save vertical scrolling
+    return order.status === 'completed' || order.status === 'cancelled';
+  };
+
+  const toggleOrderCollapse = (orderId: string, currentStatus?: string) => {
+    setCollapsedOrderMap((prev) => {
+      const currentVal = prev[orderId] !== undefined ? prev[orderId] : (currentStatus === 'completed' || currentStatus === 'cancelled');
+      return {
+        ...prev,
+        [orderId]: !currentVal,
+      };
+    });
+  };
+
+  const toggleAllOrders = (collapse: boolean, ordersList: Order[]) => {
+    const updated: { [id: string]: boolean } = {};
+    ordersList.forEach((o) => {
+      updated[o.id] = collapse;
+    });
+    setCollapsedOrderMap((prev) => ({ ...prev, ...updated }));
+  };
 
   // Realtime listener for platform GP settings
   useEffect(() => {
@@ -1496,7 +1523,35 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
             )}
           </div>
 
-          {/* Orders List / Empty State */}
+          {/* Controls Bar for Orders */}
+          {displayedOrders.length > 0 && (
+            <div className="flex items-center justify-between px-1 text-xs text-gray-500 mb-1">
+              <span className="font-bold text-gray-700">
+                รายการออเดอร์ ({displayedOrders.length} บิล)
+              </span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => toggleAllOrders(true, displayedOrders)}
+                  className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold text-[11px] transition active:scale-95 flex items-center gap-1 cursor-pointer shadow-2xs"
+                  title="ย่อแถบออเดอร์ทั้งหมดเพื่อดูภาพรวม"
+                >
+                  <ChevronsUp className="w-3.5 h-3.5 text-gray-500" />
+                  <span>ย่อทั้งหมด</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => toggleAllOrders(false, displayedOrders)}
+                  className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200/80 rounded-xl font-bold text-[11px] transition active:scale-95 flex items-center gap-1 cursor-pointer shadow-2xs"
+                  title="ขยายรายละเอียดอาหารทุกออเดอร์"
+                >
+                  <ChevronsDown className="w-3.5 h-3.5 text-amber-600" />
+                  <span>ขยายทั้งหมด</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {displayedOrders.length === 0 ? (
             orderFilterTab === 'active' ? (
               <div className="bg-white rounded-3xl p-6 sm:p-8 text-center border border-gray-100 shadow-xs space-y-4">
@@ -1565,6 +1620,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
               {displayedOrders.map((order) => {
               const isCompleted = order.status === 'completed';
               const isCancelled = order.status === 'cancelled';
+              const collapsed = isOrderCollapsed(order);
 
               return (
                 <div
@@ -1575,21 +1631,24 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                       : order.status === 'pending'
                       ? 'border-amber-400 ring-2 ring-amber-100'
                       : isCompleted
-                      ? 'border-gray-100 opacity-90'
+                      ? 'border-gray-200/80 bg-gray-50/30'
                       : 'border-orange-200'
                   }`}
                 >
                   {/* Order Card Header */}
-                  <div className="flex items-center justify-between border-b border-gray-100 pb-2">
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-black text-sm text-gray-800">
+                  <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
+                    <div
+                      onClick={() => toggleOrderCollapse(order.id, order.status)}
+                      className="cursor-pointer group flex-1"
+                    >
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-black text-base text-gray-900 group-hover:text-amber-600 transition">
                           #{formatOrderCode(order)}
                         </span>
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          className={`text-[10px] sm:text-[11px] font-extrabold px-2 py-0.5 rounded-full ${
                             order.has_unread_message
-                              ? 'bg-amber-500 text-white font-extrabold animate-bounce'
+                              ? 'bg-amber-500 text-white animate-bounce shadow-xs'
                               : order.status === 'pending'
                               ? 'bg-amber-100 text-amber-800 animate-pulse'
                               : order.status === 'cooking'
@@ -1648,7 +1707,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                             updateDoc(doc(db, 'orders', order.id), { has_unread_message: false }).catch(() => {});
                           }
                         }}
-                        className={`relative w-8 h-8 rounded-xl flex items-center justify-center border transition active:scale-95 ${
+                        className={`relative w-8 h-8 rounded-xl flex items-center justify-center border transition active:scale-95 cursor-pointer ${
                           order.has_unread_message
                             ? 'bg-amber-500 text-white border-amber-600 shadow-md animate-pulse ring-2 ring-amber-300'
                             : 'bg-amber-50 hover:bg-amber-100 text-amber-600 border border-amber-200'
@@ -1659,6 +1718,16 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                         {order.has_unread_message && (
                           <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-white animate-ping" />
                         )}
+                      </button>
+
+                      {/* Expand / Collapse Button */}
+                      <button
+                        type="button"
+                        onClick={() => toggleOrderCollapse(order.id, order.status)}
+                        className="w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition active:scale-95 cursor-pointer"
+                        title={collapsed ? 'ขยายดูรายการอาหาร' : 'ย่อแถบ'}
+                      >
+                        {collapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
                       </button>
                     </div>
                   </div>
@@ -1690,92 +1759,150 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                     </div>
                   )}
 
-                  {/* Items list */}
-                  <div className="bg-gray-50 rounded-2xl p-2.5 text-xs space-y-1.5">
-                    {order.items?.map((item, idx) => (
-                      <div key={idx} className="flex justify-between items-start text-gray-800">
-                        <div>
-                          <span>
-                            <span className="font-bold">{item.quantity}x</span> {item.name}
+                  {/* Collapsed Compact Preview */}
+                  {collapsed ? (
+                    <div
+                      onClick={() => toggleOrderCollapse(order.id, order.status)}
+                      className="bg-amber-50/40 hover:bg-amber-50 border border-amber-200/80 rounded-2xl p-3 transition cursor-pointer flex items-center justify-between gap-2 shadow-2xs group"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-black text-xs text-amber-700 bg-white px-2 py-0.5 rounded-md border border-amber-200 shadow-2xs">
+                            {order.items?.reduce((s, it) => s + it.quantity, 0)} รายการ
                           </span>
-                          {item.selected_options && item.selected_options.length > 0 && (
-                            <div className="text-[11px] text-amber-800 font-medium pl-3">
-                              {item.selected_options.map((opt, oIdx) => (
-                                <span key={oIdx} className="block">
-                                  ↳ + {opt.name} {opt.price > 0 ? `(+${opt.price} ฿)` : ''}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                          {item.note && <p className="text-amber-700 ml-3 italic text-[11px]">({item.note})</p>}
+                          <span className="font-extrabold text-xs sm:text-sm text-gray-900 truncate">
+                            {order.items?.map(it => `${it.quantity}x ${it.name}`).join(', ')}
+                          </span>
                         </div>
-                        <span className="font-semibold">{orderItemUnitPrice(item) * item.quantity} ฿</span>
+                        <div className="text-[11px] text-gray-600 truncate mt-1 flex items-center gap-1">
+                          <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
+                          <span>ส่ง: {order.delivery_address || 'ไม่ระบุที่อยู่'}</span>
+                        </div>
                       </div>
-                    ))}
-                    <div className="pt-1.5 mt-1 border-t border-gray-200 flex justify-between font-bold text-gray-700">
-                      <span>ยอดรวมอาหาร (รวมค่าส่ง {(order.delivery_fee ?? 0) === 0 ? 'ส่งฟรี' : `${order.delivery_fee} บ.`})</span>
-                      <span className="text-amber-600 text-sm font-black">{order.total_amount} ฿</span>
-                    </div>
-                  </div>
-
-                  {/* Delivery Location & Google Maps Link */}
-                  <div className="bg-amber-50/50 rounded-2xl p-2.5 border border-amber-100 text-xs space-y-1.5">
-                    <div className="flex items-start gap-1.5 text-gray-700">
-                      <MapPin className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-                      <div>
-                        <span className="font-bold">ที่อยู่จัดส่ง: </span>
-                        <span>{order.delivery_address}</span>
+                      <div className="text-right shrink-0 pl-2 border-l border-amber-200/70">
+                        <span className="font-black text-amber-600 text-sm sm:text-base block">{order.total_amount} ฿</span>
+                        <span className="text-[10px] text-amber-700 font-bold group-hover:underline flex items-center justify-end gap-0.5 mt-0.5">
+                          <span>แตะขยาย</span>
+                          <ChevronDown className="w-3 h-3" />
+                        </span>
                       </div>
                     </div>
+                  ) : (
+                    <>
+                      {/* Items list with Enlarged & Clear Typography */}
+                      <div className="bg-[#FFFDF9] border border-amber-200/80 rounded-2xl p-3 sm:p-3.5 space-y-2.5 shadow-2xs">
+                        {order.items?.map((item, idx) => (
+                          <div key={idx} className="pb-2.5 border-b border-amber-100 last:border-b-0 last:pb-0">
+                            <div className="flex justify-between items-start gap-2">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="inline-flex items-center justify-center bg-amber-500 text-white font-black text-xs sm:text-sm px-2 py-0.5 rounded-lg shadow-2xs">
+                                    {item.quantity}x
+                                  </span>
+                                  <span className="font-black text-sm sm:text-base text-gray-900 leading-tight">
+                                    {item.name}
+                                  </span>
+                                </div>
 
-                    {/* Google Maps 1-Click Navigation */}
-                    {order.location && (
-                      <a
-                        href={`https://www.google.com/maps/dir/?api=1&destination=${order.location.lat},${order.location.lng}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs shadow-xs transition active:scale-95"
-                      >
-                        <Navigation className="w-3.5 h-3.5" />
-                        เปิด Google Maps นำทาง
-                      </a>
-                    )}
+                                {item.selected_options && item.selected_options.length > 0 && (
+                                  <div className="mt-1.5 pl-2.5 border-l-2 border-amber-400 space-y-1">
+                                    {item.selected_options.map((opt, oIdx) => (
+                                      <div key={oIdx} className="text-xs font-bold text-amber-950 flex items-center gap-1.5 flex-wrap">
+                                        <span className="text-amber-500 font-black">•</span>
+                                        <span>{opt.name}</span>
+                                        {opt.price > 0 && (
+                                          <span className="text-amber-700 text-[11px] font-extrabold bg-amber-100/70 px-1.5 py-0.2 rounded">
+                                            +{opt.price} ฿
+                                          </span>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
 
-                    <div className="text-gray-500 text-[11px] pt-1">
-                      วิธีจ่าย: <span className="font-bold text-gray-700">
-                        {order.payment_method === 'transfer_chat'
-                          ? 'โอนเงินผ่านแชทก่อนทำ'
-                          : order.payment_method === 'cash'
-                          ? 'เงินสด'
-                          : 'สแกน QR ปลายทาง'}
-                      </span>
-                      {order.cash_change_note && ` (${order.cash_change_note})`}
-                    </div>
-                  </div>
+                                {item.note && (
+                                  <div className="mt-1.5 bg-rose-50 border border-rose-200 text-rose-800 px-2.5 py-1 rounded-xl text-xs font-bold inline-flex items-center gap-1.5">
+                                    <span className="bg-rose-500 text-white text-[10px] px-1.5 py-0.2 rounded-md font-black">
+                                      หมายเหตุ
+                                    </span>
+                                    <span>{item.note}</span>
+                                  </div>
+                                )}
+                              </div>
 
-                  {/* Pending Order Notice for Merchant */}
-                  {order.status === 'pending' && (
-                    <div className="bg-amber-50 rounded-xl p-2 border border-amber-200 text-[11px] text-amber-900 flex items-center justify-between gap-1.5">
-                      <span className="flex items-center gap-1 font-semibold">
-                        <CreditCard className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                        <span>รอตรวจสลิปโอนเงินในแชท</span>
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveChatOrder(order);
-                          if (order.has_unread_message) {
-                            updateDoc(doc(db, 'orders', order.id), { has_unread_message: false }).catch(() => {});
-                          }
-                        }}
-                        className="px-2 py-0.5 bg-amber-500 text-white rounded-lg font-bold hover:bg-amber-600 transition shrink-0"
-                      >
-                        เปิดแชท
-                      </button>
-                    </div>
+                              <span className="font-black text-sm sm:text-base text-gray-900 shrink-0">
+                                {orderItemUnitPrice(item) * item.quantity} ฿
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+
+                        <div className="pt-2 mt-1 border-t-2 border-amber-200/80 flex justify-between items-center font-bold text-gray-700">
+                          <span className="text-xs sm:text-sm">ยอดรวมอาหาร (รวมค่าส่ง {(order.delivery_fee ?? 0) === 0 ? 'ส่งฟรี' : `${order.delivery_fee} บ.`})</span>
+                          <span className="text-amber-600 text-base sm:text-lg font-black">{order.total_amount} ฿</span>
+                        </div>
+                      </div>
+
+                      {/* Delivery Location & Google Maps Link */}
+                      <div className="bg-amber-50/50 rounded-2xl p-2.5 border border-amber-100 text-xs space-y-1.5">
+                        <div className="flex items-start gap-1.5 text-gray-700">
+                          <MapPin className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold">ที่อยู่จัดส่ง: </span>
+                            <span className="font-semibold text-gray-900">{order.delivery_address}</span>
+                          </div>
+                        </div>
+
+                        {/* Google Maps 1-Click Navigation */}
+                        {order.location && (
+                          <a
+                            href={`https://www.google.com/maps/dir/?api=1&destination=${order.location.lat},${order.location.lng}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs shadow-xs transition active:scale-95"
+                          >
+                            <Navigation className="w-3.5 h-3.5" />
+                            เปิด Google Maps นำทาง
+                          </a>
+                        )}
+
+                        <div className="text-gray-500 text-[11px] pt-1">
+                          วิธีจ่าย: <span className="font-bold text-gray-700">
+                            {order.payment_method === 'transfer_chat'
+                              ? 'โอนเงินผ่านแชทก่อนทำ'
+                              : order.payment_method === 'cash'
+                              ? 'เงินสด'
+                              : 'สแกน QR ปลายทาง'}
+                          </span>
+                          {order.cash_change_note && ` (${order.cash_change_note})`}
+                        </div>
+                      </div>
+
+                      {/* Pending Order Notice for Merchant */}
+                      {order.status === 'pending' && (
+                        <div className="bg-amber-50 rounded-xl p-2 border border-amber-200 text-[11px] text-amber-900 flex items-center justify-between gap-1.5">
+                          <span className="flex items-center gap-1 font-semibold">
+                            <CreditCard className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                            <span>รอตรวจสลิปโอนเงินในแชท</span>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveChatOrder(order);
+                              if (order.has_unread_message) {
+                                updateDoc(doc(db, 'orders', order.id), { has_unread_message: false }).catch(() => {});
+                              }
+                            }}
+                            className="px-2 py-0.5 bg-amber-500 text-white rounded-lg font-bold hover:bg-amber-600 transition shrink-0 cursor-pointer"
+                          >
+                            เปิดแชท
+                          </button>
+                        </div>
+                      )}
+                    </>
                   )}
 
-                  {/* Action Buttons */}
+                  {/* Action Buttons (Always accessible or when needed) */}
                   {!isCompleted && !isCancelled && (
                     <div className="flex items-center gap-2 pt-1">
                       {order.status === 'pending' && (
@@ -1783,14 +1910,14 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                           <button
                             type="button"
                             onClick={() => updateOrderStatus(order.id, 'cancelled')}
-                            className="flex-1 py-2 rounded-xl border border-red-200 text-red-600 font-bold text-xs hover:bg-red-50 transition"
+                            className="flex-1 py-2.5 rounded-xl border border-red-200 text-red-600 font-bold text-xs hover:bg-red-50 transition cursor-pointer"
                           >
                             ปฏิเสธ
                           </button>
                           <button
                             type="button"
                             onClick={() => updateOrderStatus(order.id, 'cooking')}
-                            className="flex-2 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-1 transition"
+                            className="flex-2 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs sm:text-sm shadow-sm flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95"
                           >
                             <ChefHat className="w-4 h-4" /> รับออเดอร์ (เริ่มทำ)
                           </button>
@@ -1801,7 +1928,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                         <button
                           type="button"
                           onClick={() => updateOrderStatus(order.id, 'delivering')}
-                          className="w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-md flex items-center justify-center gap-1.5 transition"
+                          className="w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-black text-xs sm:text-sm shadow-md flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95"
                         >
                           <Bike className="w-4 h-4" /> ปรุงเสร็จแล้ว กำลังออกไปส่ง
                         </button>
@@ -1811,7 +1938,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                         <button
                           type="button"
                           onClick={() => updateOrderStatus(order.id, 'completed')}
-                          className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md flex items-center justify-center gap-1.5 transition"
+                          className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm shadow-md flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-95"
                         >
                           <Check className="w-4 h-4" /> ส่งถึงมือแล้ว + รับเงินเรียบร้อย
                         </button>
@@ -1837,7 +1964,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                             updateDoc(doc(db, 'orders', order.id), { has_unread_message: false }).catch(() => {});
                           }
                         }}
-                        className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold border transition active:scale-95 ${
+                        className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold border transition active:scale-95 cursor-pointer ${
                           order.has_unread_message
                             ? 'bg-amber-500 text-white border-amber-600 shadow-md animate-pulse'
                             : 'bg-white text-amber-700 border-amber-200 hover:bg-amber-50'

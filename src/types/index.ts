@@ -107,6 +107,7 @@ export interface OrderItem {
   shop_name?: string;
   shop_phone?: string;
   shop_delivery_fee?: number;
+  shop_location?: { lat: number; lng: number };
 }
 
 export interface Order {
@@ -127,6 +128,7 @@ export interface Order {
     lat: number;
     lng: number;
   };
+  distance_km?: number;
   items: OrderItem[];
   food_subtotal: number;
   delivery_fee: number; // 10 THB

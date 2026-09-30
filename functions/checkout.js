@@ -1,3 +1,23 @@
+function getDistanceKm(lat1, lon1, lat2, lon2) {
+  if (
+    typeof lat1 !== 'number' || typeof lon1 !== 'number' ||
+    typeof lat2 !== 'number' || typeof lon2 !== 'number' ||
+    !Number.isFinite(lat1) || !Number.isFinite(lon1) ||
+    !Number.isFinite(lat2) || !Number.isFinite(lon2)
+  ) {
+    return 0;
+  }
+  const R = 6371;
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 module.exports = function createCheckoutHandler(admin, functions, helpers = {}) {
   const db = admin.firestore();
   const sendShopBadge = helpers.sendShopBadge || (async () => {});
@@ -426,6 +446,23 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
           };
         }
 
+        // Authoritative 3 km Delivery Radius Validation
+        const orderLoc = orderReq.location || location || null;
+        let calculatedDistanceKm = null;
+        if (orderLoc && typeof orderLoc.lat === 'number' && typeof orderLoc.lng === 'number') {
+          const shopLoc = (shopData.location && typeof shopData.location.lat === 'number' && typeof shopData.location.lng === 'number')
+            ? shopData.location
+            : { lat: 15.8272, lng: 102.0298 };
+          const distKm = getDistanceKm(shopLoc.lat, shopLoc.lng, orderLoc.lat, orderLoc.lng);
+          calculatedDistanceKm = Math.round(distKm * 100) / 100;
+          if (distKm > 3.2) {
+            throw new functions.https.HttpsError(
+              'failed-precondition',
+              `จุดจัดส่งอยู่นอกพื้นที่บริการ (ระยะทาง ${distKm.toFixed(1)} กม. เกินรัศมี 3 กิโลเมตร)`
+            );
+          }
+        }
+
         const orderData = {
           order_number: assignedOrderNum,
           order_code: String(assignedOrderNum),
@@ -440,6 +477,7 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
           customer_phone: cleanPhone || (orderReq.customer_phone || customer_phone || '').trim(),
           delivery_address: (orderReq.delivery_address || delivery_address || '').trim(),
           location: orderReq.location || location || null,
+          distance_km: calculatedDistanceKm,
           items: verifiedItems,
           food_subtotal: shopFoodSubtotal,
           delivery_fee: deliveryFee,

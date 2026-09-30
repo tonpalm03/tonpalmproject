@@ -54,9 +54,9 @@ export function isLineTokenValid(): boolean {
 
 /**
  * Polls and waits for LIFF to populate and validate the ID token
- * Fast progressive polling (80ms intervals) for immediate responsiveness.
+ * Fast progressive polling (50ms intervals) for immediate responsiveness.
  */
-export async function getValidLineIdToken(maxAttempts: number = 25, intervalMs: number = 120): Promise<string | null> {
+export async function getValidLineIdToken(maxAttempts: number = 30, intervalMs: number = 50): Promise<string | null> {
   if (typeof window === 'undefined') return null;
 
   for (let i = 0; i < maxAttempts; i++) {

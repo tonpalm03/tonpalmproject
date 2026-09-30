@@ -3244,6 +3244,9 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
             <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-2xs">
               <MapPicker
                 location={shopLocation}
+                centerLocation={shopLocation}
+                maxRadiusKm={3.0}
+                showRadiusCircle={true}
                 onChange={(loc) => {
                   shopLocationDirtyRef.current = true;
                   setShopLocation(loc);

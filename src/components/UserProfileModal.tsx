@@ -231,7 +231,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                   onClick={handleRemoveAvatar}
                   disabled={isSaving}
                   className="absolute bottom-0 left-0 w-8 h-8 rounded-full bg-white hover:bg-rose-50 text-rose-600 shadow-lg flex items-center justify-center border-2 border-rose-500 active:scale-90 transition cursor-pointer"
-                  title="ลบรูปโปรไฟล์ (กลับไปใช้รูปเริ่มต้น)"
+                  title="ลบรูปโปรไฟล์"
                 >
                   <Trash2 className="w-4 h-4 text-rose-600" />
                 </button>
@@ -271,7 +271,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                 className="w-full py-2.5 px-4 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition active:scale-98 shadow-xs cursor-pointer"
               >
                 <Camera className="w-4 h-4 text-amber-600" />
-                <span>เปลี่ยนรูปโปรไฟล์ (ตัดขอบได้อิสระ)</span>
+                <span>เปลี่ยนรูปโปรไฟล์</span>
               </button>
 
               {isCustomAvatar(user.picture_url) && (
@@ -282,7 +282,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                   className="w-full py-2 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-98 shadow-xs cursor-pointer"
                 >
                   <Trash2 className="w-3.5 h-3.5 text-rose-600" />
-                  <span>ลบรูปโปรไฟล์ (ใช้รูปคนสีขาวเริ่มต้น)</span>
+                  <span>ลบรูปโปรไฟล์</span>
                 </button>
               )}
             </div>

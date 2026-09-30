@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { X, Trash2, Plus, Minus, MapPin, Navigation, Banknote, QrCode, ArrowRight, Store, Bike, Info, MessageCircle, Lock, ShoppingCart, AlertCircle, Home } from 'lucide-react';
+import React, { useState, useRef, useMemo } from 'react';
+import { X, Trash2, Plus, Minus, MapPin, Navigation, Banknote, QrCode, ArrowRight, Store, Bike, Info, MessageCircle, Lock, ShoppingCart, AlertCircle, AlertTriangle, CheckCircle2, Home } from 'lucide-react';
 import { useCart, ShopCartGroup } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { functions } from '@/lib/firebase';
@@ -9,7 +9,14 @@ import { httpsCallable } from 'firebase/functions';
 import { Order, PaymentMethod } from '@/types';
 import MapPicker from './MapPicker';
 import TermsModal from './TermsModal';
-import { getCurrentLocation, locationErrorMessage } from '@/lib/geolocation';
+import {
+  getCurrentLocation,
+  locationErrorMessage,
+  DEFAULT_CAMPUS_LOCATION,
+  MAX_DELIVERY_RADIUS_KM,
+  getDistanceKm,
+  formatDistance,
+} from '@/lib/geolocation';
 import { soundAlert } from '@/lib/soundAlert';
 
 
@@ -112,6 +119,16 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
     groupedItems.some(group => group.shop.id === user.shop_id)
   );
 
+  const shopCenterLocation = useMemo(() => {
+    return shopsInCart[0]?.location || DEFAULT_CAMPUS_LOCATION;
+  }, [shopsInCart]);
+
+  const deliveryDistanceKm = useMemo(() => {
+    return getDistanceKm(shopCenterLocation.lat, shopCenterLocation.lng, location.lat, location.lng);
+  }, [shopCenterLocation, location]);
+
+  const isDeliveryOutOfRange = deliveryDistanceKm > (MAX_DELIVERY_RADIUS_KM + 0.05);
+
   // 1. If not logged in, prompt to log in first!
   if (!user) {
     return (
@@ -177,7 +194,12 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
     setIsLocatingGPS(true);
     setErrorMsg('');
     try {
-      setLocation(await getCurrentLocation());
+      const pos = await getCurrentLocation();
+      setLocation(pos);
+      const dist = getDistanceKm(shopCenterLocation.lat, shopCenterLocation.lng, pos.lat, pos.lng);
+      if (dist > MAX_DELIVERY_RADIUS_KM) {
+        setErrorMsg(`พิกัด GPS ปัจจุบันของคุณ (${formatDistance(dist)}) อยู่นอกรัศมีบริการ ${MAX_DELIVERY_RADIUS_KM} กม. กรุณาเลื่อนหมุดมาอยู่ในเขตบริการ`);
+      }
     } catch (error) {
       setErrorMsg(locationErrorMessage(error));
     } finally {
@@ -211,6 +233,11 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
 
     if (hasOwnShopItems) {
       setErrorMsg('คุณไม่สามารถสั่งอาหารจากร้านของตนเองได้ กรุณาลบเมนูของร้านตนเองออกจากตะกร้าก่อนสั่งซื้อ (คุณสามารถสั่งอาหารจากร้านอื่นได้ตามปกติครับ)');
+      return;
+    }
+
+    if (isDeliveryOutOfRange) {
+      setErrorMsg(`ขออภัย จุดจัดส่งของคุณอยู่นอกพื้นที่บริการ (${formatDistance(deliveryDistanceKm)}) ระบบจำกัดระยะจัดส่งไม่เกิน ${MAX_DELIVERY_RADIUS_KM} กม. กรุณาเลื่อนหมุดมาอยู่ในเขตบริการ`);
       return;
     }
 
@@ -567,6 +594,9 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
             {/* Map Pinning Component */}
             <MapPicker
               location={location}
+              centerLocation={shopCenterLocation}
+              maxRadiusKm={MAX_DELIVERY_RADIUS_KM}
+              showRadiusCircle={true}
               onChange={(loc) => {
                 setLocation(loc);
                 if (addressMode === 'profile') setAddressMode('custom');
@@ -609,6 +639,21 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
               </label>
             </div>
           </div>
+
+          {/* Out of Service Radius Warning Alert */}
+          {isDeliveryOutOfRange && (
+            <div className="p-3.5 bg-rose-50 border-2 border-rose-200 rounded-2xl flex items-start gap-2.5 text-rose-900 shadow-2xs">
+              <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5 animate-bounce" />
+              <div className="space-y-1">
+                <p className="font-bold text-xs text-rose-900">
+                  จุดจัดส่งอยู่นอกรัศมีบริการ {MAX_DELIVERY_RADIUS_KM} กม. (ระยะทางปัจจุบัน: {formatDistance(deliveryDistanceKm)})
+                </p>
+                <p className="text-[11px] text-rose-700 leading-relaxed">
+                  ระบบเปิดรับออเดอร์เฉพาะในเขตบริการไม่เกิน 3 กิโลเมตรจากร้านค้า / มรภ.ชัยภูมิ เพื่อรักษาคุณภาพและความรวดเร็วในการจัดส่งอาหาร กรุณาเลื่อนหรือปักหมุดใหม่อีกครั้ง
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Payment Method */}
           <div className="space-y-2">
@@ -657,9 +702,9 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
             </p>
             <button
               type="submit"
-              disabled={isSubmitting || hasOwnShopItems}
+              disabled={isSubmitting || hasOwnShopItems || isDeliveryOutOfRange}
               className={`w-full py-3.5 rounded-2xl font-bold text-sm sm:text-base shadow-lg flex items-center justify-center gap-2 active:scale-98 transition ${
-                hasOwnShopItems
+                hasOwnShopItems || isDeliveryOutOfRange
                   ? 'bg-gray-300 shadow-none cursor-not-allowed text-gray-600'
                   : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-orange-500/25'
               }`}
@@ -667,11 +712,13 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
               <span>
                 {hasOwnShopItems
                   ? 'กรุณาลบเมนูร้านของตนเองออกก่อนสั่งซื้อ'
+                  : isDeliveryOutOfRange
+                  ? `จุดส่งเกิน 3 กม. (${formatDistance(deliveryDistanceKm)})`
                   : isSubmitting
                   ? 'กำลังส่งออเดอร์...'
                   : `ยืนยันสั่งซื้อ & ไปชำระเงิน (${total} บาท)`}
               </span>
-              {!hasOwnShopItems && <ArrowRight className="w-5 h-5" />}
+              {!hasOwnShopItems && !isDeliveryOutOfRange && <ArrowRight className="w-5 h-5" />}
             </button>
             <p className="text-center text-[11px] text-gray-400 mt-2">
               โอนชำระเงินกับร้านค้าผ่านแชทสดก่อนเริ่มปรุงอาหาร • ร้านค้าเป็นผู้จัดส่งเอง

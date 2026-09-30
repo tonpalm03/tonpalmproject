@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               if (!active()) return;
               setIsLiffAvailable(result.isInitialized);
               if (result.isLoggedIn) {
-                const idToken = await getValidLineIdToken(25, 120);
+                const idToken = await getValidLineIdToken(30, 50);
                 if (idToken) {
                   try {
                     const exchange = httpsCallable<{ idToken: string }, { token: string }>(functions, 'signInWithLine');
@@ -89,6 +89,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Fast immediate profile publication
         if (!active()) return;
+        localStorage.setItem('hchk_uid', firebaseUser.uid);
+
+        // Optimistic cached profile to eliminate loading latency on PC / Mobile
+        try {
+          const cachedRaw = localStorage.getItem('hchk_user_cache');
+          if (cachedRaw) {
+            const cached = JSON.parse(cachedRaw);
+            if (cached && cached.uid === firebaseUser.uid) {
+              setUser(cached);
+              setIsLoading(false);
+            }
+          }
+        } catch (_) {}
+
         const ref = doc(db, 'users', firebaseUser.uid);
 
         // Background non-blocking user doc baseline guarantee (only creates if missing)
@@ -116,7 +130,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             role: authority.role,
             created_at: new Date().toISOString(),
           };
-          setUser({ ...resolvedProfile, uid: firebaseUser.uid, role: authority.role, shop_id: authority.shop_id });
+          const fullUser = { ...resolvedProfile, uid: firebaseUser.uid, role: authority.role, shop_id: authority.shop_id };
+          setUser(fullUser);
+          localStorage.setItem('hchk_user_cache', JSON.stringify(fullUser));
           setIsLoading(false);
         };
         const fail = () => { if (active()) { generation++; stopListeners(); setUser(null); setIsLoading(false); setAuthError('ตรวจสอบสิทธิ์บัญชีไม่สำเร็จ กรุณาเข้าสู่ระบบใหม่'); } };
@@ -204,7 +220,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (initResult.isLoggedIn) {
-        const idToken = await getValidLineIdToken(25, 120);
+        const idToken = await getValidLineIdToken(30, 50);
         if (idToken) {
           try {
             const exchange = httpsCallable<{ idToken: string }, { token: string }>(functions, 'signInWithLine');

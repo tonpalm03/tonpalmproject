@@ -345,7 +345,7 @@ export default function HomePage() {
     if (hasGroups || hasLegacyOptions) {
       setSelectedShopForDetail(shop);
     } else {
-      addItem(item, { id: shop.id, name: shop.name, phone: shop.phone, delivery_fee: shop.delivery_fee });
+      addItem(item, { id: shop.id, name: shop.name, phone: shop.phone, delivery_fee: shop.delivery_fee, location: shop.location });
     }
   };
 

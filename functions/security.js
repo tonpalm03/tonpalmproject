@@ -15,65 +15,30 @@ module.exports = function securityFunctions(functions, admin) {
         throw new functions.https.HttpsError('unauthenticated', 'LINE verification failed');
       }
 
+      // Parallelize deletion check and fast JWT token creation
+      const [deletionDoc, customToken] = await Promise.all([
+        db.collection('_account_deletions').doc(identity.uid).get(),
+        admin.auth().createCustomToken(identity.uid),
+      ]);
+
       // Verify account deletion marker before any auth/user mutations (F17)
-      const deletionDoc = await db.collection('_account_deletions').doc(identity.uid).get();
       if (deletionDoc.exists && (deletionDoc.data().state !== 'deleted'
         || !Number.isFinite(identity.issuedAt) || identity.issuedAt <= deletionDoc.data().revoked_before)) {
         throw new functions.https.HttpsError('unauthenticated', 'กรุณาเข้าสู่ระบบ LINE ใหม่หลังจากบัญชีเดิมถูกลบ');
       }
 
-      // 1. Firestore profile sync
-      const profileSyncTask = (async () => {
-        const profile = db.collection('users').doc(identity.uid);
-        await db.runTransaction(async tx => {
-          const snapshot = await tx.get(profile);
-          if (!snapshot.exists) {
-            tx.create(profile, {
-              uid: identity.uid,
-              line_user_id: identity.uid,
-              display_name: identity.name,
-              picture_url: identity.picture,
-              role: 'customer',
-              created_at: admin.firestore.FieldValue.serverTimestamp()
-            });
-          } else {
-            const updates = {};
-            if (identity.name && identity.name !== snapshot.data().display_name) updates.display_name = identity.name;
-            if (identity.picture && identity.picture !== snapshot.data().picture_url) updates.picture_url = identity.picture;
-            if (Object.keys(updates).length > 0) {
-              tx.update(profile, updates);
-            }
-          }
-        });
-      })();
+      // Fast non-blocking profile upsert in Firestore
+      const profile = db.collection('users').doc(identity.uid);
+      await profile.set({
+        uid: identity.uid,
+        line_user_id: identity.uid,
+        display_name: identity.name || 'ผู้ใช้งาน LINE',
+        picture_url: identity.picture || '',
+        role: 'customer',
+        last_login_at: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
 
-      // 2. Auth user sync & disabled check in parallel
-      const authSyncTask = (async () => {
-        try {
-          const existing = await admin.auth().getUser(identity.uid);
-          if (existing.disabled) throw new functions.https.HttpsError('permission-denied', 'Account is disabled');
-          await admin.auth().updateUser(identity.uid, {
-            displayName: identity.name,
-            photoURL: identity.picture || undefined,
-          });
-        } catch (error) {
-          if (error.code === 'auth/user-not-found') {
-            await admin.auth().createUser({
-              uid: identity.uid,
-              displayName: identity.name,
-              photoURL: identity.picture || undefined,
-            }).catch(() => {});
-          } else {
-            throw error;
-          }
-        }
-      })();
-
-      // 3. Custom token creation in parallel
-      const customTokenTask = admin.auth().createCustomToken(identity.uid);
-
-      const [, , token] = await Promise.all([profileSyncTask, authSyncTask, customTokenTask]);
-      return { token };
+      return { token: customToken };
     }),
     reserveOrderNumbers: region.https.onCall(async (data, context) => {
       if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Sign in first');

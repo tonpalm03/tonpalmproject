@@ -112,7 +112,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
       }
       setSelectedGroupOptions(initialGroupSelections);
     } else {
-      addItem(item, { id: shop.id, name: shop.name, phone: shop.phone, delivery_fee: shop.delivery_fee });
+      addItem(item, { id: shop.id, name: shop.name, phone: shop.phone, delivery_fee: shop.delivery_fee, location: shop.location });
     }
   };
 
@@ -195,7 +195,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
 
     addItem(
       customizingItem,
-      { id: shop.id, name: shop.name, phone: shop.phone, delivery_fee: shop.delivery_fee },
+      { id: shop.id, name: shop.name, phone: shop.phone, delivery_fee: shop.delivery_fee, location: shop.location },
       customNote.trim(),
       allSelectedOptionsList,
       customQuantity

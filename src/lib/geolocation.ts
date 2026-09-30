@@ -38,3 +38,64 @@ export async function getCurrentLocation(): Promise<{ lat: number; lng: number }
     { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
   ));
 }
+
+// Platform / Campus centroid: มหาวิทยาลัยราชภัฏชัยภูมิ (มรภ.ชัยภูมิ)
+export const DEFAULT_CAMPUS_LOCATION = { lat: 15.8272, lng: 102.0298 };
+
+// Maximum delivery radius strictly enforced at 3.0 kilometers
+export const MAX_DELIVERY_RADIUS_KM = 3.0;
+
+/**
+ * Calculates the great-circle distance between two points on the Earth (Haversine formula in km)
+ */
+export function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  if (
+    typeof lat1 !== 'number' || typeof lon1 !== 'number' ||
+    typeof lat2 !== 'number' || typeof lon2 !== 'number' ||
+    !Number.isFinite(lat1) || !Number.isFinite(lon1) ||
+    !Number.isFinite(lat2) || !Number.isFinite(lon2)
+  ) {
+    return 0;
+  }
+  const R = 6371; // Earth's mean radius in km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+/**
+ * Formats a distance in kilometers into a friendly Thai label (e.g. "850 ม." or "2.4 กม.")
+ */
+export function formatDistance(km: number): string {
+  if (!Number.isFinite(km) || km <= 0) return '0 ม.';
+  if (km < 1) {
+    return `${Math.round(km * 1000)} ม.`;
+  }
+  return `${km.toFixed(1)} กม.`;
+}
+
+/**
+ * Validates whether a given pin coordinate is within the permitted delivery radius
+ */
+export function validateDeliveryRadius(
+  pinLocation: { lat: number; lng: number } | null | undefined,
+  centerLocation: { lat: number; lng: number } = DEFAULT_CAMPUS_LOCATION,
+  maxRadiusKm: number = MAX_DELIVERY_RADIUS_KM
+): { isValid: boolean; distanceKm: number; formattedDistance: string } {
+  if (!pinLocation || typeof pinLocation.lat !== 'number' || typeof pinLocation.lng !== 'number') {
+    return { isValid: true, distanceKm: 0, formattedDistance: '0 ม.' };
+  }
+  const distanceKm = getDistanceKm(centerLocation.lat, centerLocation.lng, pinLocation.lat, pinLocation.lng);
+  const isValid = distanceKm <= maxRadiusKm;
+  return {
+    isValid,
+    distanceKm: Math.round(distanceKm * 100) / 100,
+    formattedDistance: formatDistance(distanceKm),
+  };
+}
+

@@ -76,6 +76,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
             type="button"
             disabled={loading}
             onClick={async () => {
+              if (loading) return;
               setLoading(true);
               setError('');
               const res = await loginWithLine();
@@ -95,7 +96,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
             <svg className="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24">
               <path d="M12 2C6.48 2 2 5.91 2 10.74c0 2.94 1.67 5.53 4.25 7.03-.18.66-.67 2.42-.77 2.79-.12.46.17.45.36.33.15-.09 2.06-1.4 2.89-1.97.42.06.84.09 1.27.09 5.52 0 10-3.91 10-8.74S17.52 2 12 2z"/>
             </svg>
-            <span>{loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบด้วย LINE'}</span>
+            <span>{loading ? 'กำลังเชื่อมต่อ LINE...' : 'เข้าสู่ระบบด้วย LINE'}</span>
           </button>
 
           {/* LINE Login Tip & Direct Visual Guide */}

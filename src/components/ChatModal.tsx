@@ -6,8 +6,9 @@ import {
   Sparkles, QrCode, Copy, Check, CreditCard, Receipt, FileText, Download, Image as ImageIcon
 } from 'lucide-react';
 import { ChatMessage, UserRole } from '@/types';
-import { db } from '@/lib/firebase';
+import { db, functions } from '@/lib/firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, updateDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
+import { httpsCallable } from 'firebase/functions';
 import { soundAlert } from '@/lib/soundAlert';
 import UserAvatar from './UserAvatar';
 
@@ -358,6 +359,14 @@ export default function ChatModal({
         unreadUpdate.has_customer_unread_message = true;
       }
       await updateDoc(doc(db, 'orders', orderId), unreadUpdate).catch(console.warn);
+
+      // Trigger FCM push notification asynchronously if message from customer or admin
+      if (currentUser.role === 'customer' || currentUser.role === 'admin') {
+        const notifyFn = httpsCallable(functions, 'notifyChatMessage');
+        notifyFn({ orderId, text: textToSend || 'ส่งรูปภาพ', senderName: currentUser.name }).catch((err) => {
+          console.warn('notifyChatMessage callable fallback:', err);
+        });
+      }
     } catch (err) {
       console.warn('Direct message send fallback:', err);
       const fallbackMsg: ChatMessage & { is_failed?: boolean } = {

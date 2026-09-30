@@ -707,64 +707,67 @@ exports.sendOrderPush = functions.region('us-central1').https.onRequest((req, re
 });
 
 /**
- * Realtime Chat Message Push Notification Trigger
- * Listens for new messages on orders/{orderId}/messages/{messageId} and sends push alerts
+ * Authenticated chat message notification callable (us-central1)
  */
-exports.onChatMessageCreated = functions.region('asia-southeast3').firestore
-  .document('orders/{orderId}/messages/{messageId}')
-  .onCreate(async (snap, context) => {
-    const message = snap.data();
-    if (!message) return null;
-    const { orderId } = context.params;
-    const senderUid = message.sender_uid;
-    const senderRole = message.sender_role;
+exports.notifyChatMessage = region.runWith({ invoker: 'public' }).https.onCall(async (data, context) => {
+  if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Sign in required');
+  const orderId = data?.orderId;
+  const messageText = data?.text || 'ส่งรูปภาพ';
+  if (!orderId || typeof orderId !== 'string') {
+    throw new functions.https.HttpsError('invalid-argument', 'Missing orderId');
+  }
 
-    // Do not notify for system messages
-    if (senderUid === 'system') return null;
+  const orderDoc = await admin.firestore().collection('orders').doc(orderId).get();
+  if (!orderDoc.exists) throw new functions.https.HttpsError('not-found', 'Order not found');
+  const order = orderDoc.data();
 
-    try {
-      const orderSnap = await admin.firestore().collection('orders').doc(orderId).get();
-      if (!orderSnap.exists) return null;
-      const order = orderSnap.data();
+  const callerUid = context.auth.uid;
+  const isAdmin = await isCallerAdmin(callerUid);
+  const isMerchant = !isAdmin && await isCallerMerchantForShop(callerUid, order.shop_id);
+  const isCustomer = order.customer_uid === callerUid;
 
-      // If message sent by customer or admin, notify merchant devices
-      if (senderRole === 'customer' || senderRole === 'admin') {
-        const shopId = order.shop_id;
-        if (shopId) {
-          const tokens = await merchantTokens(shopId);
-          if (tokens.length > 0) {
-            const senderName = message.sender_name || 'ลูกค้า';
-            const title = `💬 ข้อความใหม่จาก ${senderName}`;
-            const body = `${message.text ? message.text.slice(0, 100) : '📷 ส่งรูปภาพ'} (ออเดอร์ #${order.order_number || orderId.slice(0, 5)})`;
+  if (!isAdmin && !isMerchant && !isCustomer) {
+    throw new functions.https.HttpsError('permission-denied', 'Unauthorized to notify for this order');
+  }
 
-            await admin.messaging().sendEachForMulticast({
-              tokens,
-              notification: { title, body },
-              data: {
-                orderId: String(orderId),
-                shopId: String(shopId),
-                type: 'CHAT_MESSAGE',
-                url: `/?order_id=${orderId}&open_chat=1`,
-              },
-              android: {
-                priority: 'high',
-                notification: {
-                  channelId: 'orders_channel',
-                  sound: 'default',
-                  defaultSound: true,
-                  defaultVibrateTimings: true,
-                  notificationPriority: 'PRIORITY_MAX',
-                  visibility: 'PUBLIC',
-                },
-              },
-            }).catch((err) => console.warn('Chat push multicast error:', err));
-          }
-        }
-      }
-    } catch (err) {
-      console.warn('onChatMessageCreated error:', err);
+  const shopId = order.shop_id;
+  if (!shopId) return { success: false, reason: 'no-shop' };
+
+  try {
+    const tokens = await merchantTokens(shopId);
+    if (tokens.length > 0) {
+      const senderName = data?.senderName || (isCustomer ? order.customer_name || 'ลูกค้า' : 'ผู้ดูแลระบบ');
+      const orderNumber = order.order_number ? `#${order.order_number}` : '';
+      const title = `💬 ข้อความใหม่จาก ${senderName}`;
+      const body = `${messageText.slice(0, 80)} (ออเดอร์ ${orderNumber || orderId.slice(0, 5)})`;
+
+      await admin.messaging().sendEachForMulticast({
+        tokens,
+        notification: { title, body },
+        data: {
+          orderId: String(orderId),
+          shopId: String(shopId),
+          type: 'CHAT_MESSAGE',
+          url: `/?order_id=${orderId}&open_chat=1`,
+        },
+        android: {
+          priority: 'high',
+          notification: {
+            channelId: 'orders_channel',
+            sound: 'default',
+            defaultSound: true,
+            defaultVibrateTimings: true,
+            notificationPriority: 'PRIORITY_MAX',
+            visibility: 'PUBLIC',
+          },
+        },
+      }).catch(err => console.warn('Chat push multicast error:', err));
     }
-    return null;
-  });
+    return { success: true };
+  } catch (err) {
+    console.error('Error in notifyChatMessage:', err);
+    return { success: false, error: err.message };
+  }
+});
 
 

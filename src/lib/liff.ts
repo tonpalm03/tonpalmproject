@@ -101,11 +101,27 @@ async function ensureLiffSdkInitialized(): Promise<boolean> {
     }
 
     try {
-      if (!liff.id) {
-        await liff.init({ liffId });
-      }
-      if (liff.ready) {
-        await liff.ready;
+      const initTask = (async () => {
+        if (!liff.id) {
+          await liff.init({ liffId });
+        }
+        if (liff.ready) {
+          await liff.ready;
+        }
+        return true;
+      })();
+
+      const timeoutTask = new Promise<boolean>((resolve) => {
+        setTimeout(() => {
+          console.warn('LINE LIFF init timed out after 8s');
+          resolve(false);
+        }, 8000);
+      });
+
+      const success = await Promise.race([initTask, timeoutTask]);
+      if (!success) {
+        sdkInitPromise = null;
+        return false;
       }
 
       // Clean up OAuth query parameters from URL without reloading

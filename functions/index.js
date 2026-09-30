@@ -102,8 +102,6 @@ async function isCallerAdmin(callerUid) {
   try {
     const accessSnap = await db.collection('access').doc(callerUid).get();
     if (accessSnap.exists && accessSnap.data().role === 'admin') return true;
-    const userSnap = await db.collection('users').doc(callerUid).get();
-    if (userSnap.exists && userSnap.data().role === 'admin') return true;
   } catch (err) {
     console.warn('isCallerAdmin check warning:', err);
   }
@@ -309,12 +307,23 @@ exports.topUpMerchantCredit = region.runWith({ invoker: 'public' }).https.onCall
     throw new functions.https.HttpsError('permission-denied', 'Admin access required');
   }
 
-  const { shopId, amount, note } = data || {};
+  const { shopId, amount, note, idempotencyKey } = data || {};
   if (!shopId || typeof amount !== 'number' || isNaN(amount) || amount === 0) {
     throw new functions.https.HttpsError('invalid-argument', 'Invalid shopId or amount');
   }
 
   const db = admin.firestore();
+  const trimmedIdemp = idempotencyKey && typeof idempotencyKey === 'string' ? idempotencyKey.trim() : null;
+  const idempRef = trimmedIdemp ? db.collection('_topup_requests').doc(trimmedIdemp) : null;
+
+  if (idempRef) {
+    const existingIdemp = await idempRef.get();
+    if (existingIdemp.exists) {
+      const prevData = existingIdemp.data();
+      return { success: true, newBalance: prevData.newBalance, is_open: prevData.is_open, alreadyProcessed: true };
+    }
+  }
+
   const shopRef = db.collection('shops').doc(shopId);
   const settingsRef = db.collection('system_settings').doc('general');
   const txRef = db.collection('credit_transactions').doc();
@@ -323,6 +332,16 @@ exports.topUpMerchantCredit = region.runWith({ invoker: 'public' }).https.onCall
   let finalIsOpen = true;
 
   await db.runTransaction(async tx => {
+    if (idempRef) {
+      const txIdempSnap = await tx.get(idempRef);
+      if (txIdempSnap.exists) {
+        const prevData = txIdempSnap.data();
+        finalBalance = prevData.newBalance;
+        finalIsOpen = prevData.is_open;
+        return;
+      }
+    }
+
     const [shopSnap, settingsSnap] = await Promise.all([
       tx.get(shopRef),
       tx.get(settingsRef)
@@ -358,6 +377,17 @@ exports.topUpMerchantCredit = region.runWith({ invoker: 'public' }).https.onCall
       created_by: callerUid,
       created_at: admin.firestore.FieldValue.serverTimestamp(),
     });
+
+    if (idempRef) {
+      tx.set(idempRef, {
+        shop_id: shopId,
+        amount,
+        newBalance: finalBalance,
+        is_open: finalIsOpen,
+        created_by: callerUid,
+        created_at: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    }
   });
 
   return { success: true, newBalance: finalBalance, is_open: finalIsOpen };
@@ -590,7 +620,10 @@ exports.updateMerchantCredentials = region.runWith({ invoker: 'public' }).https.
       await admin.auth().updateUser(ownerUid, authUpdates);
     } catch (authErr) {
       console.error('admin.auth().updateUser error:', authErr);
-      if (authErr.code === 'auth/user-not-found' && cleanEmail && newPassword) {
+      if (authErr.code === 'auth/user-not-found') {
+        if (!cleanEmail || !newPassword) {
+          throw new functions.https.HttpsError('invalid-argument', 'ไม่พบบัญชีเดิมในระบบ กรุณาระบุทั้งอีเมลและรหัสผ่านเพื่อสร้างบัญชีใหม่');
+        }
         const newUser = await admin.auth().createUser({
           email: cleanEmail,
           password: newPassword,
@@ -601,7 +634,10 @@ exports.updateMerchantCredentials = region.runWith({ invoker: 'public' }).https.
         throw new functions.https.HttpsError('internal', authErr.message || 'ไม่สามารถอัปเดตข้อมูลบัญชีผู้ใช้ได้');
       }
     }
-  } else if (cleanEmail && newPassword) {
+  } else {
+    if (!cleanEmail || !newPassword) {
+      throw new functions.https.HttpsError('invalid-argument', 'ร้านค้านี้ยังไม่มีบัญชีเจ้าของ กรุณาระบุทั้งอีเมลและรหัสผ่านเพื่อสร้างบัญชีใหม่');
+    }
     const newUser = await admin.auth().createUser({
       email: cleanEmail,
       password: newPassword,
@@ -609,6 +645,8 @@ exports.updateMerchantCredentials = region.runWith({ invoker: 'public' }).https.
     });
     ownerUid = newUser.uid;
   }
+
+  const batch = db.batch();
 
   // 2. Update admin_merchant_credentials
   const credRef = db.collection('admin_merchant_credentials').doc(shopId);
@@ -620,7 +658,7 @@ exports.updateMerchantCredentials = region.runWith({ invoker: 'public' }).https.
   if (ownerUid) credUpdates.owner_uid = ownerUid;
   if (cleanEmail) credUpdates.email = cleanEmail;
   if (newPassword) credUpdates.password = newPassword;
-  await credRef.set(credUpdates, { merge: true });
+  batch.set(credRef, credUpdates, { merge: true });
 
   // 3. Update shops doc
   const shopUpdates = {
@@ -628,25 +666,29 @@ exports.updateMerchantCredentials = region.runWith({ invoker: 'public' }).https.
   };
   if (cleanEmail) shopUpdates.merchant_email = cleanEmail;
   if (ownerUid && ownerUid !== shopData.owner_uid) shopUpdates.owner_uid = ownerUid;
-  await shopRef.update(shopUpdates);
+  batch.update(shopRef, shopUpdates);
 
   // 4. Update users doc and access doc if ownerUid exists
   if (ownerUid) {
     const userRef = db.collection('users').doc(ownerUid);
     const userUpdates = {
+      uid: ownerUid,
+      display_name: shopData.name || 'เจ้าของร้านค้า',
       role: 'merchant',
       shop_id: shopId,
       updated_at: admin.firestore.FieldValue.serverTimestamp(),
     };
     if (cleanEmail) userUpdates.email = cleanEmail;
-    if (newPassword) userUpdates.merchant_password = newPassword;
-    await userRef.set(userUpdates, { merge: true });
+    batch.set(userRef, userUpdates, { merge: true });
 
-    await db.collection('access').doc(ownerUid).set({
+    const accessRef = db.collection('access').doc(ownerUid);
+    batch.set(accessRef, {
       role: 'merchant',
       shop_id: shopId,
     }, { merge: true });
   }
+
+  await batch.commit();
 
   return {
     success: true,

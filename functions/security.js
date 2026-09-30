@@ -15,15 +15,17 @@ module.exports = function securityFunctions(functions, admin) {
         throw new functions.https.HttpsError('unauthenticated', 'LINE verification failed');
       }
 
-      // 1. Account deletion verification & Firestore profile sync in parallel
+      // Verify account deletion marker before any auth/user mutations (F17)
+      const deletionDoc = await db.collection('_account_deletions').doc(identity.uid).get();
+      if (deletionDoc.exists && (deletionDoc.data().state !== 'deleted'
+        || !Number.isFinite(identity.issuedAt) || identity.issuedAt <= deletionDoc.data().revoked_before)) {
+        throw new functions.https.HttpsError('unauthenticated', 'กรุณาเข้าสู่ระบบ LINE ใหม่หลังจากบัญชีเดิมถูกลบ');
+      }
+
+      // 1. Firestore profile sync
       const profileSyncTask = (async () => {
         const profile = db.collection('users').doc(identity.uid);
         await db.runTransaction(async tx => {
-          const deletion = await tx.get(db.collection('_account_deletions').doc(identity.uid));
-          if (deletion.exists && (deletion.data().state !== 'deleted'
-            || !Number.isFinite(identity.issuedAt) || identity.issuedAt <= deletion.data().revoked_before)) {
-            throw new functions.https.HttpsError('unauthenticated', 'กรุณาเข้าสู่ระบบ LINE ใหม่หลังจากบัญชีเดิมถูกลบ');
-          }
           const snapshot = await tx.get(profile);
           if (!snapshot.exists) {
             tx.create(profile, {

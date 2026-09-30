@@ -99,12 +99,29 @@ export default function ChatModal({
   onClose,
 }: ChatModalProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState(() => {
+    try {
+      return sessionStorage.getItem(`hchk_chat_draft_${orderId}`) || '';
+    } catch (_) {
+      return '';
+    }
+  });
   const [isSending, setIsSending] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isCompressing, setIsCompressing] = useState(false);
   const [selectedImageForView, setSelectedImageForView] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  // Sync draft
+  useEffect(() => {
+    try {
+      if (inputText) {
+        sessionStorage.setItem(`hchk_chat_draft_${orderId}`, inputText);
+      } else {
+        sessionStorage.removeItem(`hchk_chat_draft_${orderId}`);
+      }
+    } catch (_) {}
+  }, [inputText, orderId]);
 
   // Live shop payment info & order total fallback if not in props
   const [livePaymentInfo, setLivePaymentInfo] = useState<ShopPaymentInfo | null>(shopPaymentInfo || null);
@@ -309,8 +326,8 @@ export default function ChatModal({
       await updateDoc(doc(db, 'orders', orderId), unreadUpdate).catch(console.warn);
     } catch (err) {
       console.warn('Direct message send fallback:', err);
-      const fallbackMsg: ChatMessage = {
-        id: `local_${Date.now()}`,
+      const fallbackMsg: ChatMessage & { is_failed?: boolean } = {
+        id: `failed_${Date.now()}`,
         order_id: orderId,
         sender_uid: currentUser.uid,
         sender_name: currentUser.name,
@@ -320,6 +337,7 @@ export default function ChatModal({
         image_url: imageToSend || undefined,
         created_at: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         is_read: false,
+        is_failed: true,
       };
       setMessages((prev) => {
         const next = [...prev, fallbackMsg];
@@ -329,6 +347,11 @@ export default function ChatModal({
     } finally {
       setIsSending(false);
     }
+  };
+
+  const handleRetrySend = async (failedMsg: ChatMessage & { is_failed?: boolean }) => {
+    setMessages((prev) => prev.filter((m) => m.id !== failedMsg.id));
+    await sendMessageDirect(failedMsg.text || '', failedMsg.image_url);
   };
 
   const handleSend = async (e: React.FormEvent) => {
@@ -617,10 +640,24 @@ export default function ChatModal({
                   })()}
                 </div>
 
-                {/* Timestamp */}
-                <div className="text-[10px] text-gray-400 mt-0.5 px-1 flex items-center gap-1">
-                  <Clock className="w-2.5 h-2.5" />
-                  {msg.created_at}
+                {/* Timestamp & Status */}
+                <div className="text-[10px] text-gray-400 mt-0.5 px-1 flex items-center gap-1.5">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-2.5 h-2.5" />
+                    {msg.created_at}
+                  </span>
+                  {(msg as any).is_failed && isMe && (
+                    <span className="inline-flex items-center gap-1 text-red-600 font-medium">
+                      <span>• ส่งไม่สำเร็จ</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRetrySend(msg as any)}
+                        className="underline font-bold text-red-700 hover:text-red-900 cursor-pointer"
+                      >
+                        ลองใหม่
+                      </button>
+                    </span>
+                  )}
                 </div>
               </div>
             );

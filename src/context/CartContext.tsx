@@ -46,14 +46,17 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const getOptionsSignature = (opts?: MenuItemOption[]) => {
   if (!opts || opts.length === 0) return '';
-  return opts.map((o) => `${o.name}:${o.price}`).sort().join('|');
+  return opts
+    .map((o) => `${(o as any).group_id || (o as any).group_title || ''}:${(o as any).option_id || o.name}:${o.name}:${o.price}`)
+    .sort()
+    .join('|');
 };
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<OrderItem[]>([]);
   const isLoadedRef = useRef(false);
 
-  // Load cart from localStorage
+  // Load cart from localStorage and listen to reset events
   useEffect(() => {
     try {
       const saved = localStorage.getItem('hchk_cart');
@@ -70,6 +73,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     } finally {
       isLoadedRef.current = true;
     }
+
+    const handleAuthReset = () => {
+      setItems([]);
+    };
+
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'hchk_cart' && !e.newValue) {
+        setItems([]);
+      }
+    };
+
+    window.addEventListener('hchk_auth_reset', handleAuthReset);
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      window.removeEventListener('hchk_auth_reset', handleAuthReset);
+      window.removeEventListener('storage', handleStorage);
+    };
   }, []);
 
   // Save cart to localStorage only after initial load

@@ -170,7 +170,7 @@ test('a competing checkout key owned by another user is rejected', async () => {
 });
 
 test('multi-shop checkout preserves totals, payment details and sequential numbers on retry', async () => {
-  for (const paymentMethod of ['cash', 'scan_merchant']) {
+  for (const paymentMethod of ['cash', 'transfer_chat']) {
     const s = setup({ retryOnce: true, gpEnabled: false, deliveryFee: 10 });
     s.documents.set('shops/shop_2', { name: 'Shop 2', is_open: true, delivery_fee: 10 });
     s.documents.set('menu_items/menu_2', { name: 'Tea', shop_id: 'shop_2', price: 20, is_available: true });
@@ -273,7 +273,9 @@ test('checkoutOrder auto-creates payment message when shop has payment info', as
   shop.promptpay_number = '0812345678';
   shop.promptpay_qr_url = 'https://example.com/qr.png';
 
-  const res = await s.checkout(s.validOrderPayload('auto_qr_key'));
+  const payload = s.validOrderPayload('auto_qr_key');
+  payload.payment_method = 'transfer_chat';
+  const res = await s.checkout(payload);
   assert.equal(res.success, true);
   const orderId = res.orderIds[0];
   const order = res.orders[0];

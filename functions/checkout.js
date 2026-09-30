@@ -92,6 +92,13 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
       }
 
       // Verify unique shops
+      // Verify caller is not deleted (F03)
+      const callerDeletionSnap = await tx.get(db.collection('_account_deletions').doc(customerUid));
+      if (callerDeletionSnap.exists && callerDeletionSnap.data().state === 'deleted') {
+        throw new functions.https.HttpsError('unauthenticated', 'บัญชีผู้ใช้นี้ถูกลบแล้ว กรุณาเข้าสู่ระบบใหม่');
+      }
+
+      // Verify unique shops
       const uniqueShopIds = [...new Set(rawOrders.map(o => o.shop_id).filter(Boolean))];
       if (uniqueShopIds.length !== rawOrders.length) {
         throw new functions.https.HttpsError('invalid-argument', 'Duplicate shops in order requests');
@@ -115,7 +122,7 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
         );
       }
 
-      // Read all shops
+      // Read all shops and verify active status (F15)
       const shopSnaps = new Map();
       for (const shopId of uniqueShopIds) {
         const sRef = db.collection('shops').doc(shopId);
@@ -123,7 +130,18 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
         if (!sSnap.exists) {
           throw new functions.https.HttpsError('not-found', `Shop not found: ${shopId}`);
         }
-        shopSnaps.set(shopId, sSnap.data());
+        const sData = sSnap.data();
+        if (sData.is_open === false) {
+          throw new functions.https.HttpsError('failed-precondition', `ร้านค้าปิดให้บริการอยู่: ${sData.name || shopId}`);
+        }
+        if (sData.owner_uid) {
+          const ownerAccessSnap = await tx.get(db.collection('access').doc(sData.owner_uid));
+          const ownerDelSnap = await tx.get(db.collection('_account_deletions').doc(sData.owner_uid));
+          if ((ownerDelSnap.exists && ownerDelSnap.data().state === 'deleted') || (ownerAccessSnap.exists && ownerAccessSnap.data().role !== 'merchant')) {
+            throw new functions.https.HttpsError('failed-precondition', `ร้านค้ายังไม่พร้อมให้บริการในขณะนี้: ${sData.name || shopId}`);
+          }
+        }
+        shopSnaps.set(shopId, sData);
       }
 
       // Collect all menu_items to read
@@ -233,8 +251,8 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
                 }
               }
 
-              // 3. Fallback matching across all groups if no group was specified
-              if (!matchedOption) {
+              // 3. Fallback matching across all groups ONLY if no group was specified by client
+              if (!matchedOption && !opt.group_id && !opt.group_title) {
                 for (const grp of menuData.option_groups) {
                   if (grp && Array.isArray(grp.options)) {
                     const found = grp.options.find(o => o && o.name === opt.name);
@@ -247,8 +265,8 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
                 }
               }
 
-              // 4. Fallback to legacy menu options if any
-              if (!matchedOption && Array.isArray(menuData.options)) {
+              // 4. Fallback to legacy menu options if no group was specified
+              if (!matchedOption && !opt.group_id && !opt.group_title && Array.isArray(menuData.options)) {
                 matchedOption = menuData.options.find(o => o && o.name === opt.name);
               }
 
@@ -281,10 +299,13 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
               const selections = groupSelections.get(grp.id) || [];
               const groupLabel = grp.title || grp.name || 'ตัวเลือก';
 
+              // Ensure distinct options for min_select (F09)
+              const distinctSelections = new Set(selections.map(s => s.id || s.name));
+
               if (grp.required === true) {
                 const minReq = typeof grp.min_select === 'number' ? grp.min_select : 1;
-                if (selections.length < minReq) {
-                  throw new functions.https.HttpsError('invalid-argument', `กรุณาเลือก "${groupLabel}" ให้ครบถ้วน`);
+                if (distinctSelections.size < minReq) {
+                  throw new functions.https.HttpsError('invalid-argument', `กรุณาเลือก "${groupLabel}" ให้ครบ ${minReq} ตัวเลือกที่แตกต่างกัน`);
                 }
               }
 
@@ -338,6 +359,16 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
           });
         }
 
+        // Validate payment method (F10)
+        const allowedPaymentMethods = ['transfer_chat', 'cash'];
+        const selectedPaymentMethod = orderReq.payment_method || payment_method || 'transfer_chat';
+        if (!allowedPaymentMethods.includes(selectedPaymentMethod)) {
+          throw new functions.https.HttpsError('invalid-argument', `ไม่รองรับวิธีการชำระเงิน: ${selectedPaymentMethod}`);
+        }
+        if (selectedPaymentMethod === 'cash' && shopData.allow_cod === false) {
+          throw new functions.https.HttpsError('failed-precondition', `ร้าน "${shopData.name || shopId}" ไม่เปิดรับชำระเงินสดปลายทาง`);
+        }
+
         const shopDeliveryFee = typeof shopData.delivery_fee === 'number' && shopData.delivery_fee >= 0
           ? shopData.delivery_fee
           : 0;
@@ -348,8 +379,8 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
         nextOrderNum += 1;
         const assignedOrderNum = nextOrderNum;
 
-        // Auto-generate initial payment info & QR code message if shop has payment details
-        const hasPaymentInfo = Boolean(
+        // Auto-generate initial payment info & QR code message ONLY for transfer_chat (F10)
+        const hasPaymentInfo = selectedPaymentMethod === 'transfer_chat' && Boolean(
           (shopData.bank_name && String(shopData.bank_name).trim()) ||
           (shopData.bank_account_number && String(shopData.bank_account_number).trim()) ||
           (shopData.promptpay_number && String(shopData.promptpay_number).trim()) ||
@@ -414,8 +445,8 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
           delivery_fee: deliveryFee,
           total_amount: totalAmount,
           gp_amount: gpAmount,
-          payment_method: orderReq.payment_method || payment_method || 'transfer_chat',
-          cash_change_note: (orderReq.payment_method || payment_method) === 'cash' ? (orderReq.cash_change_note || cash_change_note || '') : null,
+          payment_method: selectedPaymentMethod,
+          cash_change_note: selectedPaymentMethod === 'cash' ? (orderReq.cash_change_note || cash_change_note || '') : null,
           status: 'pending',
           last_message: hasPaymentInfo ? '💳 ข้อมูลชำระเงินและ QR Code' : null,
           last_message_sender: hasPaymentInfo ? 'merchant' : null,
@@ -460,13 +491,18 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
     // Another request with this key may have committed while this one was running.
     if (result.request) return replayCheckout(result.request);
 
-    // Post-transaction badge and push notifications
+    // Post-transaction badge and push notifications (Awaited with Promise.allSettled - F13)
+    const notificationPromises = [];
     for (const shopId of [...new Set(result.shopIds)]) {
-      sendShopBadge(shopId).catch(err => console.warn('sendShopBadge error:', err));
+      notificationPromises.push(sendShopBadge(shopId).catch(err => console.warn('sendShopBadge error:', err)));
     }
 
     if (typeof helpers.notifyShopNewOrders === 'function') {
-      helpers.notifyShopNewOrders(result.orders).catch(err => console.warn('notifyShopNewOrders error:', err));
+      notificationPromises.push(helpers.notifyShopNewOrders(result.orders).catch(err => console.warn('notifyShopNewOrders error:', err)));
+    }
+
+    if (notificationPromises.length > 0) {
+      await Promise.allSettled(notificationPromises);
     }
 
     return {

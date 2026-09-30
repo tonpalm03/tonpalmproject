@@ -1243,24 +1243,30 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
   };
 
   const handleCleanupOrphanedOrders = async () => {
-    const existingShopIds = new Set(shops.map((s) => s.id));
-    const orphaned = orders.filter((o) => !existingShopIds.has(o.shop_id));
-    const transSnap = await getDocs(collection(db, 'credit_transactions'));
-    const orphanedTrans = transSnap.docs.filter((tDoc) => {
-      const data = tDoc.data();
-      return !existingShopIds.has(data.shop_id) || (data.order_id && !orders.some((o) => o.id === data.order_id));
-    });
-
-    if (orphaned.length === 0 && orphanedTrans.length === 0) {
-      alert('ไม่พบออเดอร์หรือรายการค่าบริการตกค้าง');
-      return;
-    }
-    if (!confirm(`พบข้อมูลตกค้าง:\n- ออเดอร์ของร้านที่ถูกลบ: ${orphaned.length} บิล\n- รายการค่าบริการ/เครดิตตกค้าง: ${orphanedTrans.length} รายการ\n\nยืนยันการล้างข้อมูลเหล่านี้และรีเซ็ตยอดขายให้เป็น 0 หรือไม่?`)) {
-      return;
-    }
-    setIsCleaningChats(true);
-    setCleanupStatusMessage(`กำลังล้างข้อมูลตกค้าง (${orphaned.length} บิล, ${orphanedTrans.length} ธุรกรรม)...`);
     try {
+      const [liveShopsSnap, liveOrdersSnap, transSnap] = await Promise.all([
+        getDocs(collection(db, 'shops')),
+        getDocs(collection(db, 'orders')),
+        getDocs(collection(db, 'credit_transactions')),
+      ]);
+
+      const existingShopIds = new Set(liveShopsSnap.docs.map((d) => d.id));
+      const liveOrders = liveOrdersSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
+      const orphaned = liveOrders.filter((o) => !existingShopIds.has(o.shop_id));
+      const orphanedTrans = transSnap.docs.filter((tDoc) => {
+        const data = tDoc.data();
+        return !existingShopIds.has(data.shop_id) || (data.order_id && !liveOrders.some((o) => o.id === data.order_id));
+      });
+
+      if (orphaned.length === 0 && orphanedTrans.length === 0) {
+        alert('ไม่พบออเดอร์หรือรายการค่าบริการตกค้าง');
+        return;
+      }
+      if (!confirm(`พบข้อมูลตกค้าง:\n- ออเดอร์ของร้านที่ถูกลบ: ${orphaned.length} บิล\n- รายการค่าบริการ/เครดิตตกค้าง: ${orphanedTrans.length} รายการ\n\nยืนยันการล้างข้อมูลเหล่านี้หรือไม่?`)) {
+        return;
+      }
+      setIsCleaningChats(true);
+      setCleanupStatusMessage(`กำลังล้างข้อมูลตกค้าง (${orphaned.length} บิล, ${orphanedTrans.length} ธุรกรรม)...`);
       for (const ord of orphaned) {
         try {
           const msgsSnap = await getDocs(collection(db, 'orders', ord.id, 'messages'));
@@ -1316,7 +1322,18 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
         await deleteDoc(doc(db, 'credit_transactions', tDoc.id));
       }
 
-      // 4. Reset counter and checkout requests
+      // 4. Reset shop sales_count and rating metrics
+      const shopsSnap = await getDocs(collection(db, 'shops'));
+      for (const sDoc of shopsSnap.docs) {
+        await updateDoc(doc(db, 'shops', sDoc.id), {
+          sales_count: 0,
+          total_sales: 0,
+          rating: 5.0,
+          review_count: 0,
+        }).catch(console.warn);
+      }
+
+      // 5. Reset counter and checkout requests
       try {
         await setDoc(doc(db, 'system_settings', 'order_counter'), {
           last_order_number: 1000,

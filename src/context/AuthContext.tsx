@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { X } from 'lucide-react';
 import { UserProfile, UserRole } from '@/types';
 import { db, auth } from '@/lib/firebase';
-import { doc, setDoc, onSnapshot, runTransaction } from 'firebase/firestore';
+import { doc, getDoc, setDoc, onSnapshot, runTransaction } from 'firebase/firestore';
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -26,14 +26,14 @@ interface AuthContextType {
   loginWithLine: () => Promise<{ success: boolean; redirecting?: boolean; error?: string }>;
   loginWithEmail: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
   registerWithEmail: (email: string, pass: string, name: string, phone: string) => Promise<{ success: boolean; error?: string }>;
-  updateUserPhone: (phone: string) => Promise<void>;
+  updateUserPhone: (phone: string) => Promise<{ success: boolean; error?: string }>;
   updateUserProfile: (updates: {
     display_name?: string;
     picture_url?: string;
     phone?: string;
     default_address?: string;
     default_location?: { lat: number; lng: number };
-  }) => Promise<void>;
+  }) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
 }
 
@@ -93,14 +93,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!active()) return;
         const ref = doc(db, 'users', firebaseUser.uid);
 
-        // Background non-blocking user doc baseline guarantee
-        setDoc(ref, {
-          uid: firebaseUser.uid,
-          display_name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'ผู้ใช้งาน',
-          picture_url: firebaseUser.photoURL || '',
-          role: 'customer',
-          last_active_at: new Date().toISOString(),
-        }, { merge: true }).catch((err) => console.warn('Background profile baseline check warning:', err));
+        // Background non-blocking user doc baseline guarantee (only creates if missing)
+        getDoc(ref).then((snap) => {
+          if (!snap.exists()) {
+            setDoc(ref, {
+              uid: firebaseUser.uid,
+              display_name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'ผู้ใช้งาน',
+              picture_url: firebaseUser.photoURL || '',
+              role: 'customer',
+              created_at: new Date().toISOString(),
+            }).catch((err) => console.warn('Background profile baseline check warning:', err));
+          }
+        }).catch((err) => console.warn('Background profile check error:', err));
 
         let profile: UserProfile | null = null;
         let accessReady = false;
@@ -254,15 +258,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const updateUserPhone = async (phone: string) => {
-    if (!user) return;
-    const updated = { ...user, phone };
+  const updateUserPhone = async (phone: string): Promise<{ success: boolean; error?: string }> => {
+    if (!user) return { success: false, error: 'ยังไม่ได้เข้าสู่ระบบ' };
+    const cleanPhone = phone.trim();
+    const updated = { ...user, phone: cleanPhone };
     setUser(updated);
     localStorage.setItem('hchk_user_cache', JSON.stringify(updated));
     try {
-      await setDoc(doc(db, 'users', user.uid), { phone }, { merge: true });
-    } catch (e) {
+      await setDoc(doc(db, 'users', user.uid), { phone: cleanPhone }, { merge: true });
+      return { success: true };
+    } catch (e: any) {
       console.warn('Phone update to Firestore failed:', e);
+      return { success: false, error: e?.message || 'บันทึกเบอร์โทรศัพท์ไม่สำเร็จ' };
     }
   };
 
@@ -272,15 +279,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     phone?: string;
     default_address?: string;
     default_location?: { lat: number; lng: number };
-  }) => {
-    if (!user) return;
-    const updated = { ...user, ...updates };
+  }): Promise<{ success: boolean; error?: string }> => {
+    if (!user) return { success: false, error: 'ยังไม่ได้เข้าสู่ระบบ' };
+    const allowedKeys = ['display_name', 'picture_url', 'phone', 'default_address', 'default_location'] as const;
+    const cleanUpdates: Record<string, any> = {};
+    for (const key of allowedKeys) {
+      if (key in updates && updates[key] !== undefined) {
+        cleanUpdates[key] = updates[key];
+      }
+    }
+    if (cleanUpdates.display_name !== undefined && !cleanUpdates.display_name.trim()) {
+      return { success: false, error: 'กรุณากรอกชื่อโปรไฟล์' };
+    }
+    const updated = { ...user, ...cleanUpdates };
     setUser(updated);
     localStorage.setItem('hchk_user_cache', JSON.stringify(updated));
     try {
-      await setDoc(doc(db, 'users', user.uid), updates, { merge: true });
-    } catch (e) {
+      await setDoc(doc(db, 'users', user.uid), cleanUpdates, { merge: true });
+      return { success: true };
+    } catch (e: any) {
       console.warn('Profile update to Firestore failed:', e);
+      return { success: false, error: e?.message || 'บันทึกข้อมูลไม่สำเร็จ' };
     }
   };
 
@@ -299,6 +318,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('hchk_user_cache');
     localStorage.removeItem('hchk_cart');   // BUG-03: clear cart so next user can't see it
     localStorage.removeItem('hchk_orders'); // clear order tracking too
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('hchk_auth_reset'));
+    }
     setUser(null);
   };
 

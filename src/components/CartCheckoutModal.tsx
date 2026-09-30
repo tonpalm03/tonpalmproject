@@ -35,24 +35,77 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
   } = useCart();
   const { user, updateUserPhone, updateUserProfile } = useAuth();
 
-  const [customerName, setCustomerName] = useState(user?.display_name || '');
-  const [customerPhone, setCustomerPhone] = useState(user?.phone || '');
-  const [deliveryAddress, setDeliveryAddress] = useState(user?.default_address || '');
-  const [location, setLocation] = useState<{ lat: number; lng: number }>(
-    user?.default_location || { lat: 15.8272, lng: 102.0298 }
-  );
-  const [addressMode, setAddressMode] = useState<'profile' | 'current' | 'custom'>(
-    user?.default_address ? 'profile' : 'custom'
-  );
+  const [customerName, setCustomerName] = useState(() => {
+    try {
+      const draft = sessionStorage.getItem('hchk_checkout_draft');
+      if (draft) return JSON.parse(draft).customerName || user?.display_name || '';
+    } catch (_) {}
+    return user?.display_name || '';
+  });
+  const [customerPhone, setCustomerPhone] = useState(() => {
+    try {
+      const draft = sessionStorage.getItem('hchk_checkout_draft');
+      if (draft) return JSON.parse(draft).customerPhone || user?.phone || '';
+    } catch (_) {}
+    return user?.phone || '';
+  });
+  const [deliveryAddress, setDeliveryAddress] = useState(() => {
+    try {
+      const draft = sessionStorage.getItem('hchk_checkout_draft');
+      if (draft) return JSON.parse(draft).deliveryAddress || user?.default_address || '';
+    } catch (_) {}
+    return user?.default_address || '';
+  });
+  const [location, setLocation] = useState<{ lat: number; lng: number }>(() => {
+    try {
+      const draft = sessionStorage.getItem('hchk_checkout_draft');
+      if (draft && JSON.parse(draft).location) return JSON.parse(draft).location;
+    } catch (_) {}
+    return user?.default_location || { lat: 15.8272, lng: 102.0298 };
+  });
+  const [addressMode, setAddressMode] = useState<'profile' | 'current' | 'custom'>(() => {
+    try {
+      const draft = sessionStorage.getItem('hchk_checkout_draft');
+      if (draft && JSON.parse(draft).addressMode) return JSON.parse(draft).addressMode;
+    } catch (_) {}
+    return user?.default_address ? 'profile' : 'custom';
+  });
   const [saveToProfile, setSaveToProfile] = useState(false);
   const [isLocatingGPS, setIsLocatingGPS] = useState(false);
 
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('transfer_chat');
-  const [cashChangeNote, setCashChangeNote] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(() => {
+    try {
+      const draft = sessionStorage.getItem('hchk_checkout_draft');
+      if (draft && JSON.parse(draft).paymentMethod) return JSON.parse(draft).paymentMethod;
+    } catch (_) {}
+    return 'transfer_chat';
+  });
+  const [cashChangeNote, setCashChangeNote] = useState(() => {
+    try {
+      const draft = sessionStorage.getItem('hchk_checkout_draft');
+      if (draft && JSON.parse(draft).cashChangeNote !== undefined) return JSON.parse(draft).cashChangeNote;
+    } catch (_) {}
+    return '';
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [showTerms, setShowTerms] = useState(false);
   const idempotencyKeyRef = useRef<string>(`idemp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`);
+
+  // Persist form draft across modal closes/refreshes
+  React.useEffect(() => {
+    try {
+      sessionStorage.setItem('hchk_checkout_draft', JSON.stringify({
+        customerName,
+        customerPhone,
+        deliveryAddress,
+        location,
+        addressMode,
+        paymentMethod,
+        cashChangeNote,
+      }));
+    } catch (_) {}
+  }, [customerName, customerPhone, deliveryAddress, location, addressMode, paymentMethod, cashChangeNote]);
 
   const hasOwnShopItems = Boolean(
     user && user.role === 'merchant' && user.shop_id &&
@@ -240,6 +293,9 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
       }
 
       clearCart();
+      try {
+        sessionStorage.removeItem('hchk_checkout_draft');
+      } catch (_) {}
       setIsSubmitting(false);
 
       if (createdOrders.length > 0) {

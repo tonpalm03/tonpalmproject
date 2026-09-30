@@ -50,15 +50,37 @@ export async function registerMerchantPushNotifications(shopId: string, received
       if (permission.receive === 'prompt' || permission.receive === 'prompt-with-rationale') permission = await PushNotifications.requestPermissions();
       if (permission.receive !== 'granted') return { supported: true, registered: false, error: 'ยังไม่ได้อนุญาตการแจ้งเตือน' };
       if (generation !== current) return { supported: true, registered: false };
-      await PushNotifications.removeAllListeners();
-      await PushNotifications.addListener('registration', async ({ value }) => {
-        if (generation !== current || auth.currentUser?.uid !== uid || !active) return;
-        try {
-          await setDoc(doc(db, 'shop_private', shopId, 'devices', uid), { tokens: arrayUnion(value), updated_at: serverTimestamp() }, { merge: true });
-          if (generation === current && active) active.token = value;
-        } catch { console.warn('Could not save private push registration'); }
+      let tokenSaved = false;
+      let tokenValue = '';
+      const tokenPromise = new Promise<{ registered: boolean; token?: string; error?: string }>((resolve) => {
+        const timeout = setTimeout(() => {
+          // If token hasn't arrived within 6 seconds, resolve gracefully so UI doesn't hang
+          resolve({ registered: tokenSaved, token: tokenValue || undefined });
+        }, 6000);
+
+        PushNotifications.addListener('registration', async ({ value }) => {
+          if (generation !== current || auth.currentUser?.uid !== uid || !active) return;
+          try {
+            await setDoc(doc(db, 'shop_private', shopId, 'devices', uid), { tokens: arrayUnion(value), updated_at: serverTimestamp() }, { merge: true });
+            if (generation === current && active) active.token = value;
+            tokenSaved = true;
+            tokenValue = value;
+            clearTimeout(timeout);
+            resolve({ registered: true, token: value });
+          } catch (e) {
+            console.warn('Could not save private push registration', e);
+            clearTimeout(timeout);
+            resolve({ registered: false, error: 'บันทึก Token อุปกรณ์ไม่สำเร็จ' });
+          }
+        });
+
+        PushNotifications.addListener('registrationError', (err) => {
+          console.warn('Push registration failed', err);
+          clearTimeout(timeout);
+          resolve({ registered: false, error: 'เกิดข้อผิดพลาดในการลงทะเบียนอุปกรณ์' });
+        });
       });
-      await PushNotifications.addListener('registrationError', () => { console.warn('Push registration failed'); });
+
       await PushNotifications.addListener('pushNotificationReceived', notification => {
         if (generation !== current || auth.currentUser?.uid !== uid) return;
         soundAlert.playOrderChime(); onReceived?.(notification);
@@ -68,7 +90,8 @@ export async function registerMerchantPushNotifications(shopId: string, received
       });
       if (generation !== current) return { supported: true, registered: false };
       await PushNotifications.register();
-      return { supported: true, registered: true };
+      const tokenResult = await tokenPromise;
+      return { supported: true, ...tokenResult };
     } catch { return { supported: true, registered: false, error: 'เปิดแจ้งเตือนไม่สำเร็จ กรุณาลองใหม่' }; }
   })();
   const result = await setup;

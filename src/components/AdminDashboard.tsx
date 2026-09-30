@@ -1387,8 +1387,8 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
       {/* Admin Header */}
       <div className="bg-gradient-to-r from-slate-900 via-rose-950 to-slate-900 rounded-3xl p-5 text-white shadow-xl flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center border border-rose-500/30 text-2xl">
-            
+          <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center border border-rose-500/30 shrink-0">
+            <ShieldCheck className="w-6 h-6 text-rose-400" />
           </div>
           <div>
             <span className="text-[10px] bg-rose-500/30 text-rose-300 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">

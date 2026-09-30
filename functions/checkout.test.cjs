@@ -496,7 +496,7 @@ test('checkoutOrder allows merchant to order from another shop', async () => {
   assert.equal(res.orders[0].shop_id, 'shop_1');
 });
 
-test('checkoutOrder validates 2 km delivery radius (accepts within 2 km and saves distance_km)', async () => {
+test('checkoutOrder validates default 1 km delivery radius (accepts within 1 km and saves distance_km)', async () => {
   const s = setup();
   // Shop at Chaiyaphum campus: 15.8272, 102.0298
   s.documents.set('shops/shop_1', {
@@ -508,17 +508,17 @@ test('checkoutOrder validates 2 km delivery radius (accepts within 2 km and save
     location: { lat: 15.8272, lng: 102.0298 }
   });
 
-  const payload = s.validOrderPayload('within_radius_key');
-  // Pin dropped ~1.1 km away
-  payload.location = { lat: 15.8372, lng: 102.0298 };
+  const payload = s.validOrderPayload('within_default_radius_key');
+  // Pin dropped ~0.55 km away
+  payload.location = { lat: 15.8322, lng: 102.0298 };
 
   const res = await s.checkout(payload);
   assert.equal(res.success, true);
   assert.equal(typeof res.orders[0].distance_km, 'number');
-  assert.ok(res.orders[0].distance_km <= 2.0);
+  assert.ok(res.orders[0].distance_km <= 1.0);
 });
 
-test('checkoutOrder rejects order when delivery location exceeds 2 km radius', async () => {
+test('checkoutOrder rejects order when delivery location exceeds default 1 km radius', async () => {
   const s = setup();
   s.documents.set('shops/shop_1', {
     name: 'Shop 1',
@@ -529,13 +529,44 @@ test('checkoutOrder rejects order when delivery location exceeds 2 km radius', a
     location: { lat: 15.8272, lng: 102.0298 }
   });
 
-  const payload = s.validOrderPayload('out_of_radius_key');
-  // Pin dropped ~11 km away
-  payload.location = { lat: 15.9272, lng: 102.0298 };
+  const payload = s.validOrderPayload('out_of_default_radius_key');
+  // Pin dropped ~2.2 km away
+  payload.location = { lat: 15.8472, lng: 102.0298 };
 
   await assert.rejects(
     async () => s.checkout(payload),
-    (err) => err.code === 'failed-precondition' && err.message.includes('เกินรัศมี 2 กิโลเมตร')
+    (err) => err.code === 'failed-precondition' && err.message.includes('เกินรัศมีที่ร้านกำหนด 1 กิโลเมตร')
+  );
+});
+
+test('checkoutOrder respects shop custom delivery_radius_km', async () => {
+  const s = setup();
+  s.documents.set('shops/shop_1', {
+    name: 'Custom Radius Shop',
+    is_open: true,
+    credit_balance: 50,
+    phone: '0812345678',
+    delivery_fee: 10,
+    delivery_radius_km: 3.0,
+    location: { lat: 15.8272, lng: 102.0298 }
+  });
+
+  const payload = s.validOrderPayload('within_custom_radius_key');
+  // Pin dropped ~2.2 km away (allowed by 3.0 km custom radius)
+  payload.location = { lat: 15.8472, lng: 102.0298 };
+
+  const res = await s.checkout(payload);
+  assert.equal(res.success, true);
+  assert.equal(typeof res.orders[0].distance_km, 'number');
+  assert.ok(res.orders[0].distance_km <= 3.0);
+
+  // Pin dropped ~5 km away (exceeds 3.0 km)
+  const rejectedPayload = s.validOrderPayload('out_of_custom_radius_key');
+  rejectedPayload.location = { lat: 15.8772, lng: 102.0298 };
+
+  await assert.rejects(
+    async () => s.checkout(rejectedPayload),
+    (err) => err.code === 'failed-precondition' && err.message.includes('เกินรัศมีที่ร้านกำหนด 3 กิโลเมตร')
   );
 });
 

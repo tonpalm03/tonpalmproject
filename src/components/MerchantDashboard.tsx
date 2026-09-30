@@ -377,6 +377,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
   const [editShopPhone, setEditShopPhone] = useState('');
   const [editShopAddress, setEditShopAddress] = useState('');
   const [editShopDeliveryFee, setEditShopDeliveryFee] = useState<string>('0');
+  const [editShopDeliveryRadius, setEditShopDeliveryRadius] = useState<string>('1.0');
   const [editShopBankName, setEditShopBankName] = useState('');
   const [editShopBankAccountNumber, setEditShopBankAccountNumber] = useState('');
   const [editShopBankAccountName, setEditShopBankAccountName] = useState('');
@@ -394,6 +395,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
   const shopPhoneDirtyRef = useRef(false);
   const shopAddressDirtyRef = useRef(false);
   const shopDeliveryFeeDirtyRef = useRef(false);
+  const shopDeliveryRadiusDirtyRef = useRef(false);
   const shopBankNameDirtyRef = useRef(false);
   const shopBankAccountNumberDirtyRef = useRef(false);
   const shopBankAccountNameDirtyRef = useRef(false);
@@ -473,6 +475,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
           if (!shopPhoneDirtyRef.current) setEditShopPhone(data.phone || '');
           if (!shopAddressDirtyRef.current) setEditShopAddress(data.address_detail || '');
           if (!shopDeliveryFeeDirtyRef.current) setEditShopDeliveryFee(String(data.delivery_fee ?? 0));
+          if (!shopDeliveryRadiusDirtyRef.current) setEditShopDeliveryRadius(String(data.delivery_radius_km ?? 1.0));
           if (!shopBankNameDirtyRef.current) setEditShopBankName(data.bank_name || '');
           if (!shopBankAccountNumberDirtyRef.current) setEditShopBankAccountNumber(data.bank_account_number || '');
           if (!shopBankAccountNameDirtyRef.current) setEditShopBankAccountName(data.bank_account_name || '');
@@ -862,11 +865,13 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
     }
     setIsSavingShopInfo(true);
     try {
+      const parsedRadius = parseFloat(editShopDeliveryRadius);
       const updatePayload: Record<string, any> = {
         name: editShopName.trim(),
         phone: editShopPhone.trim(),
         address_detail: editShopAddress.trim(),
         delivery_fee: Number(editShopDeliveryFee) || 0,
+        delivery_radius_km: (!isNaN(parsedRadius) && parsedRadius > 0) ? Math.round(parsedRadius * 10) / 10 : 1.0,
         bank_name: editShopBankName.trim(),
         bank_account_number: editShopBankAccountNumber.trim(),
         bank_account_name: editShopBankAccountName.trim(),
@@ -887,6 +892,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
       shopPhoneDirtyRef.current = false;
       shopAddressDirtyRef.current = false;
       shopDeliveryFeeDirtyRef.current = false;
+      shopDeliveryRadiusDirtyRef.current = false;
       shopBankNameDirtyRef.current = false;
       shopBankAccountNumberDirtyRef.current = false;
       shopBankAccountNameDirtyRef.current = false;
@@ -3087,6 +3093,64 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
             />
           </div>
 
+          {/* Delivery Radius Setting by Merchant */}
+          <div className="space-y-1.5 p-3.5 bg-orange-50/70 rounded-2xl border border-orange-200">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-orange-950 flex items-center gap-1.5">
+                <Navigation className="w-3.5 h-3.5 text-orange-600" />
+                <span>รัศมีขอบเขตจัดส่งอาหาร (กิโลเมตร)</span>
+              </label>
+              <span className="text-[11px] font-bold text-orange-700 bg-orange-100/80 px-2 py-0.5 rounded-full">
+                ค่าเริ่มต้น 1.0 กม.
+              </span>
+            </div>
+            <p className="text-[11px] text-orange-800/80">
+              กำหนดระยะทางสูงสุดที่ร้านของคุณรับจัดส่ง ลูกค้าที่ปักหมุดเกินระยะนี้จะไม่สามารถสั่งอาหารได้ (วงกลมบนแผนที่จะปรับขนาดตามทันที)
+            </p>
+
+            {/* Quick Radius Presets */}
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {[0.5, 1.0, 1.5, 2.0, 3.0, 5.0].map((preset) => (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => {
+                    shopDeliveryRadiusDirtyRef.current = true;
+                    setEditShopDeliveryRadius(String(preset));
+                  }}
+                  className={`flex-1 min-w-[52px] py-1.5 text-xs font-bold rounded-xl border transition ${
+                    parseFloat(editShopDeliveryRadius) === preset
+                      ? 'bg-orange-500 text-white border-orange-600 shadow-2xs'
+                      : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  {preset} กม.{preset === 1.0 ? ' ★' : ''}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <div className="relative flex-1">
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0.2"
+                  max="30"
+                  placeholder="1.0"
+                  value={editShopDeliveryRadius}
+                  onChange={(e) => {
+                    shopDeliveryRadiusDirtyRef.current = true;
+                    setEditShopDeliveryRadius(e.target.value);
+                  }}
+                  className="w-full px-3 py-2 text-sm bg-white border border-orange-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-orange-500 font-bold text-gray-800"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-bold pointer-events-none">
+                  กม.
+                </span>
+              </div>
+            </div>
+          </div>
+
           {/* Payment Info Settings (QR Code, Bank Account, PromptPay) */}
           <div className="space-y-3.5 p-4 bg-gradient-to-br from-emerald-50/80 to-teal-50/60 rounded-2xl border border-emerald-200">
             <div className="flex items-center justify-between border-b border-emerald-200/60 pb-2">
@@ -3245,7 +3309,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
               <MapPicker
                 location={shopLocation}
                 centerLocation={shopLocation}
-                maxRadiusKm={2.0}
+                maxRadiusKm={parseFloat(editShopDeliveryRadius) > 0 ? parseFloat(editShopDeliveryRadius) : 1.0}
                 showRadiusCircle={true}
                 onChange={(loc) => {
                   shopLocationDirtyRef.current = true;

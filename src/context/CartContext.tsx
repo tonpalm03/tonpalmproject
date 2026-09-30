@@ -5,7 +5,7 @@ import { OrderItem, MenuItem, MenuItemOption, Shop } from '@/types';
 import { soundAlert } from '@/lib/soundAlert';
 
 export interface ShopCartGroup {
-  shop: { id: string; name: string; phone?: string; delivery_fee?: number; location?: { lat: number; lng: number } };
+  shop: { id: string; name: string; phone?: string; delivery_fee?: number; delivery_radius_km?: number; location?: { lat: number; lng: number } };
   items: OrderItem[];
   subtotal: number;
   deliveryFee: number;
@@ -14,23 +14,23 @@ export interface ShopCartGroup {
 
 interface CartContextType {
   items: OrderItem[];
-  currentShop: { id: string; name: string; phone?: string; delivery_fee?: number; location?: { lat: number; lng: number } } | null;
+  currentShop: { id: string; name: string; phone?: string; delivery_fee?: number; delivery_radius_km?: number; location?: { lat: number; lng: number } } | null;
   groupedItems: ShopCartGroup[];
-  shopsInCart: { id: string; name: string; phone?: string; delivery_fee?: number; location?: { lat: number; lng: number } }[];
+  shopsInCart: { id: string; name: string; phone?: string; delivery_fee?: number; delivery_radius_km?: number; location?: { lat: number; lng: number } }[];
   deliveryFee: number;
   subtotal: number;
   total: number;
   gpAmount: number;
   addItem: (
     item: MenuItem,
-    shop: { id: string; name: string; phone?: string; delivery_fee?: number; location?: { lat: number; lng: number } },
+    shop: { id: string; name: string; phone?: string; delivery_fee?: number; delivery_radius_km?: number; location?: { lat: number; lng: number } },
     note?: string,
     selectedOptions?: MenuItemOption[],
     quantity?: number
   ) => { success: boolean; needConfirm?: boolean; message?: string };
   confirmSwitchShopAndAdd: (
     item: MenuItem,
-    shop: { id: string; name: string; phone?: string; delivery_fee?: number; location?: { lat: number; lng: number } },
+    shop: { id: string; name: string; phone?: string; delivery_fee?: number; delivery_radius_km?: number; location?: { lat: number; lng: number } },
     note?: string,
     selectedOptions?: MenuItemOption[],
     quantity?: number
@@ -117,6 +117,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             name: item.shop_name || 'ร้านค้าชุมชน',
             phone: item.shop_phone || '',
             delivery_fee: shopFee,
+            delivery_radius_km: item.shop_delivery_radius_km,
             location: item.shop_location,
           },
           items: [],
@@ -152,7 +153,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = (
     item: MenuItem,
-    shop: { id: string; name: string; phone?: string; delivery_fee?: number; location?: { lat: number; lng: number } },
+    shop: { id: string; name: string; phone?: string; delivery_fee?: number; delivery_radius_km?: number; location?: { lat: number; lng: number } },
     note?: string,
     selectedOptions?: MenuItemOption[],
     quantity?: number
@@ -192,6 +193,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           shop_name: shop.name,
           shop_phone: shop.phone,
           shop_delivery_fee: shopFee,
+          shop_delivery_radius_km: shop.delivery_radius_km,
           shop_location: shop.location,
         }
       ];

@@ -123,11 +123,38 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
     return shopsInCart[0]?.location || DEFAULT_CAMPUS_LOCATION;
   }, [shopsInCart]);
 
+  // Evaluate delivery distance & radius compliance per shop in cart
+  const shopDistanceEvaluations = useMemo(() => {
+    return groupedItems.map((group) => {
+      const shopLoc = group.shop.location || DEFAULT_CAMPUS_LOCATION;
+      const allowedRadius = typeof group.shop.delivery_radius_km === 'number' && group.shop.delivery_radius_km > 0
+        ? group.shop.delivery_radius_km
+        : (MAX_DELIVERY_RADIUS_KM || 1.0);
+      const dist = getDistanceKm(shopLoc.lat, shopLoc.lng, location.lat, location.lng);
+      const isOutOfRange = dist > (allowedRadius + 0.05);
+      return {
+        shop: group.shop,
+        distanceKm: Math.round(dist * 100) / 100,
+        allowedRadius,
+        isOutOfRange,
+      };
+    });
+  }, [groupedItems, location]);
+
+  const outOfRangeShops = useMemo(() => {
+    return shopDistanceEvaluations.filter((e) => e.isOutOfRange);
+  }, [shopDistanceEvaluations]);
+
+  const isDeliveryOutOfRange = outOfRangeShops.length > 0;
+
   const deliveryDistanceKm = useMemo(() => {
     return getDistanceKm(shopCenterLocation.lat, shopCenterLocation.lng, location.lat, location.lng);
   }, [shopCenterLocation, location]);
 
-  const isDeliveryOutOfRange = deliveryDistanceKm > (MAX_DELIVERY_RADIUS_KM + 0.05);
+  const activeAllowedRadius = useMemo(() => {
+    if (shopDistanceEvaluations.length === 0) return MAX_DELIVERY_RADIUS_KM || 1.0;
+    return Math.min(...shopDistanceEvaluations.map((e) => e.allowedRadius));
+  }, [shopDistanceEvaluations]);
 
   // 1. If not logged in, prompt to log in first!
   if (!user) {
@@ -595,7 +622,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
             <MapPicker
               location={location}
               centerLocation={shopCenterLocation}
-              maxRadiusKm={MAX_DELIVERY_RADIUS_KM}
+              maxRadiusKm={activeAllowedRadius}
               showRadiusCircle={true}
               onChange={(loc) => {
                 setLocation(loc);
@@ -646,11 +673,20 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
               <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5 animate-bounce" />
               <div className="space-y-1">
                 <p className="font-bold text-xs text-rose-900">
-                  จุดจัดส่งอยู่นอกรัศมีบริการ {MAX_DELIVERY_RADIUS_KM} กม. (ระยะทางปัจจุบัน: {formatDistance(deliveryDistanceKm)})
+                  {outOfRangeShops.length === 1
+                    ? `จุดจัดส่งอยู่นอกรัศมีบริการของร้าน "${outOfRangeShops[0].shop.name}" (ระยะทาง: ${formatDistance(outOfRangeShops[0].distanceKm)} / ร้านรับส่งไม่เกิน ${outOfRangeShops[0].allowedRadius} กม.)`
+                    : `จุดจัดส่งอยู่นอกรัศมีบริการของ ${outOfRangeShops.length} ร้านค้า`}
                 </p>
-                <p className="text-[11px] text-rose-700 leading-relaxed">
-                  ระบบเปิดรับออเดอร์เฉพาะในเขตบริการไม่เกิน {MAX_DELIVERY_RADIUS_KM} กิโลเมตรจากร้านค้า / มรภ.ชัยภูมิ เพื่อรักษาคุณภาพและความรวดเร็วในการจัดส่งอาหาร กรุณาเลื่อนหรือปักหมุดใหม่อีกครั้ง
-                </p>
+                <div className="text-[11px] text-rose-700 leading-relaxed space-y-0.5">
+                  {outOfRangeShops.map((item, idx) => (
+                    <div key={idx} className="font-medium">
+                      • {item.shop.name}: ระยะ {formatDistance(item.distanceKm)} (ร้านกำหนดไม่เกิน {item.allowedRadius} กม.)
+                    </div>
+                  ))}
+                  <p className="pt-0.5 text-gray-500">
+                    กรุณาเลื่อนหรือปักหมุดใหม่อยู่ในเขตบริการของร้านค้าเพื่อดำเนินการสั่งอาหารครับ
+                  </p>
+                </div>
               </div>
             </div>
           )}
@@ -713,7 +749,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                 {hasOwnShopItems
                   ? 'กรุณาลบเมนูร้านของตนเองออกก่อนสั่งซื้อ'
                   : isDeliveryOutOfRange
-                  ? `จุดส่งเกิน ${MAX_DELIVERY_RADIUS_KM} กม. (${formatDistance(deliveryDistanceKm)})`
+                  ? `จุดส่งเกินรัศมีร้าน (${formatDistance(outOfRangeShops[0]?.distanceKm || deliveryDistanceKm)})`
                   : isSubmitting
                   ? 'กำลังส่งออเดอร์...'
                   : `ยืนยันสั่งซื้อ & ไปชำระเงิน (${total} บาท)`}

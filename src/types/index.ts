@@ -44,6 +44,7 @@ export interface Shop {
   line_webhook_url?: string; // Google Apps Script / Webhook URL for LINE notifications
   credit_balance?: number; // Prepaid credit balance in THB
   delivery_fee?: number; // Delivery fee set by shop in THB (0 = free delivery)
+  delivery_radius_km?: number; // Custom delivery radius in km set by shop (defaults to 1.0 km)
   created_at?: any;
 }
 
@@ -107,6 +108,7 @@ export interface OrderItem {
   shop_name?: string;
   shop_phone?: string;
   shop_delivery_fee?: number;
+  shop_delivery_radius_km?: number;
   shop_location?: { lat: number; lng: number };
 }
 

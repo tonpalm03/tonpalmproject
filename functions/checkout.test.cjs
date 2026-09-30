@@ -445,3 +445,52 @@ test('checkoutOrder correctly disambiguates same option name in different groups
   assert.equal(res.orders[0].total_amount, 95);
 });
 
+test('checkoutOrder rejects merchant attempting to order from their own shop', async () => {
+  const s = setup({ uid: 'merchant_user_1' });
+  s.documents.set('access/merchant_user_1', { role: 'merchant', shop_id: 'shop_1' });
+
+  const payload = {
+    idempotency_key: 'own_shop_checkout_key',
+    customer_name: 'Merchant Owner',
+    customer_phone: '0812345678',
+    delivery_address: 'Kitchen 1',
+    payment_method: 'cash',
+    orders: [
+      {
+        shop_id: 'shop_1',
+        items: [{ menu_id: 'menu_1', quantity: 1, selected_options: [] }]
+      }
+    ]
+  };
+
+  await assert.rejects(
+    async () => s.checkout(payload),
+    (err) => err.code === 'failed-precondition' && err.message.includes('ไม่สามารถสั่งอาหารจากร้านของตนเองได้')
+  );
+});
+
+test('checkoutOrder allows merchant to order from another shop', async () => {
+  const s = setup({ uid: 'merchant_user_2' });
+  // merchant owns shop_2, but ordering from shop_1
+  s.documents.set('access/merchant_user_2', { role: 'merchant', shop_id: 'shop_2' });
+
+  const payload = {
+    idempotency_key: 'cross_shop_checkout_key',
+    customer_name: 'Merchant Neighbor',
+    customer_phone: '0898765432',
+    delivery_address: 'Neighbor Shop 2',
+    payment_method: 'cash',
+    orders: [
+      {
+        shop_id: 'shop_1',
+        items: [{ menu_id: 'menu_1', quantity: 1, selected_options: [] }]
+      }
+    ]
+  };
+
+  const res = await s.checkout(payload);
+  assert.equal(res.success, true);
+  assert.equal(res.orders.length, 1);
+  assert.equal(res.orders[0].shop_id, 'shop_1');
+});
+

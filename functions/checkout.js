@@ -97,6 +97,24 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
         throw new functions.https.HttpsError('invalid-argument', 'Duplicate shops in order requests');
       }
 
+      // Verify caller is not ordering from their own shop
+      const callerAccessRef = db.collection('access').doc(customerUid);
+      const callerUserRef = db.collection('users').doc(customerUid);
+      const [callerAccessSnap, callerUserSnap] = await Promise.all([
+        tx.get(callerAccessRef),
+        tx.get(callerUserRef)
+      ]);
+      const callerShopId = (callerAccessSnap.exists && callerAccessSnap.data().role === 'merchant' && callerAccessSnap.data().shop_id)
+        || (callerUserSnap.exists && callerUserSnap.data().role === 'merchant' && callerUserSnap.data().shop_id)
+        || null;
+
+      if (callerShopId && uniqueShopIds.includes(callerShopId)) {
+        throw new functions.https.HttpsError(
+          'failed-precondition',
+          'คุณไม่สามารถสั่งอาหารจากร้านของตนเองได้ (คุณยังสามารถสั่งอาหารจากร้านอื่นได้ตามปกติครับ)'
+        );
+      }
+
       // Read all shops
       const shopSnaps = new Map();
       for (const shopId of uniqueShopIds) {

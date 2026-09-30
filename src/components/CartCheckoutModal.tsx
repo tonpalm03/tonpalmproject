@@ -54,6 +54,11 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
   const [showTerms, setShowTerms] = useState(false);
   const idempotencyKeyRef = useRef<string>(`idemp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`);
 
+  const hasOwnShopItems = Boolean(
+    user && user.role === 'merchant' && user.shop_id &&
+    groupedItems.some(group => group.shop.id === user.shop_id)
+  );
+
   // 1. If not logged in, prompt to log in first!
   if (!user) {
     return (
@@ -148,6 +153,11 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
     }
     if (!deliveryAddress.trim()) {
       setErrorMsg('กรุณากรอกรายละเอียดสถานที่จัดส่ง เช่น หอพัก / เลขห้อง');
+      return;
+    }
+
+    if (hasOwnShopItems) {
+      setErrorMsg('คุณไม่สามารถสั่งอาหารจากร้านของตนเองได้ กรุณาลบเมนูของร้านตนเองออกจากตะกร้าก่อนสั่งซื้อ (คุณสามารถสั่งอาหารจากร้านอื่นได้ตามปกติครับ)');
       return;
     }
 
@@ -311,34 +321,45 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
               </button>
             </div>
 
-            {groupedItems.map((group) => (
-              <div
-                key={group.shop.id}
-                className="bg-white rounded-2xl border border-gray-200 p-3.5 shadow-2xs space-y-2.5"
-              >
-                {/* Shop Group Header */}
-                <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-bold">
-                      <Store className="w-3.5 h-3.5" />
+            {groupedItems.map((group) => {
+              const isGroupOwnShop = Boolean(user?.role === 'merchant' && user?.shop_id === group.shop.id);
+              return (
+                <div
+                  key={group.shop.id}
+                  className={`bg-white rounded-2xl border p-3.5 shadow-2xs space-y-2.5 ${
+                    isGroupOwnShop ? 'border-rose-300 ring-2 ring-rose-100' : 'border-gray-200'
+                  }`}
+                >
+                  {isGroupOwnShop && (
+                    <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2 text-rose-800 text-xs font-bold">
+                      <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                      <span>(ร้านของคุณ) ระบบไม่อนุญาตให้สั่งอาหารจากร้านของตนเอง กรุณากดลบรายการออก</span>
                     </div>
-                    <div>
-                      <h4 className="font-bold text-xs text-gray-800 leading-tight">
-                        {group.shop.name}
-                      </h4>
-                      <p className="text-[10px] text-gray-400">
-                        {group.items.length} เมนู • {group.deliveryFee === 0 ? 'ส่งฟรี (ร้านส่งเอง)' : `ค่าส่ง ${group.deliveryFee} บ. (ร้านส่งเอง)`}
-                      </p>
+                  )}
+
+                  {/* Shop Group Header */}
+                  <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-bold">
+                        <Store className="w-3.5 h-3.5" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-xs text-gray-800 leading-tight">
+                          {group.shop.name}
+                        </h4>
+                        <p className="text-[10px] text-gray-400">
+                          {group.items.length} เมนู • {group.deliveryFee === 0 ? 'ส่งฟรี (ร้านส่งเอง)' : `ค่าส่ง ${group.deliveryFee} บ. (ร้านส่งเอง)`}
+                        </p>
+                      </div>
                     </div>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                      group.deliveryFee === 0
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        : 'bg-amber-50 text-amber-800 border-amber-200'
+                    }`}>
+                      {group.deliveryFee === 0 ? 'ส่งฟรี' : `+ ค่าส่ง ${group.deliveryFee} บ.`}
+                    </span>
                   </div>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                    group.deliveryFee === 0
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                      : 'bg-amber-50 text-amber-800 border-amber-200'
-                  }`}>
-                    {group.deliveryFee === 0 ? 'ส่งฟรี' : `+ ค่าส่ง ${group.deliveryFee} บ.`}
-                  </span>
-                </div>
 
                 {/* Items in this shop */}
                 <div className="divide-y divide-gray-50">
@@ -390,7 +411,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                   <span className="font-bold text-gray-800">รวมร้านนี้: {group.total} ฿</span>
                 </div>
               </div>
-            ))}
+            ); })}
 
             {/* Bill Overall Breakdown */}
             <div className="bg-gray-50 rounded-2xl p-3.5 border border-gray-200 space-y-1.5 text-xs">
@@ -580,11 +601,21 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
             </p>
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 disabled:opacity-50 text-white rounded-2xl font-bold text-sm sm:text-base shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2 active:scale-98 transition"
+              disabled={isSubmitting || hasOwnShopItems}
+              className={`w-full py-3.5 rounded-2xl font-bold text-sm sm:text-base shadow-lg flex items-center justify-center gap-2 active:scale-98 transition ${
+                hasOwnShopItems
+                  ? 'bg-gray-300 shadow-none cursor-not-allowed text-gray-600'
+                  : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-orange-500/25'
+              }`}
             >
-              <span>{isSubmitting ? 'กำลังส่งออเดอร์...' : `ยืนยันสั่งซื้อ & ไปชำระเงิน (${total} บาท)`}</span>
-              <ArrowRight className="w-5 h-5" />
+              <span>
+                {hasOwnShopItems
+                  ? 'กรุณาลบเมนูร้านของตนเองออกก่อนสั่งซื้อ'
+                  : isSubmitting
+                  ? 'กำลังส่งออเดอร์...'
+                  : `ยืนยันสั่งซื้อ & ไปชำระเงิน (${total} บาท)`}
+              </span>
+              {!hasOwnShopItems && <ArrowRight className="w-5 h-5" />}
             </button>
             <p className="text-center text-[11px] text-gray-400 mt-2">
               โอนชำระเงินกับร้านค้าผ่านแชทสดก่อนเริ่มปรุงอาหาร • ร้านค้าเป็นผู้จัดส่งเอง

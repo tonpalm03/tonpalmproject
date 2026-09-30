@@ -710,7 +710,7 @@ exports.sendOrderPush = functions.region('us-central1').https.onRequest((req, re
  * Realtime Chat Message Push Notification Trigger
  * Listens for new messages on orders/{orderId}/messages/{messageId} and sends push alerts
  */
-exports.onChatMessageCreated = region.firestore
+exports.onChatMessageCreated = functions.region('asia-southeast3').firestore
   .document('orders/{orderId}/messages/{messageId}')
   .onCreate(async (snap, context) => {
     const message = snap.data();

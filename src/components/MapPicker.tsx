@@ -312,12 +312,12 @@ export default function MapPicker({
               {isWithinRadius ? (
                 <>
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-200" />
-                  <span>ระยะ {formatDistance(distanceKm)} (ในพื้นที่ 3 กม.)</span>
+                  <span>ระยะ {formatDistance(distanceKm)} (ในพื้นที่ {maxRadiusKm} กม.)</span>
                 </>
               ) : (
                 <>
                   <AlertTriangle className="w-3.5 h-3.5 text-yellow-300" />
-                  <span>เกินรัศมี ({formatDistance(distanceKm)} &gt; 3 กม.)</span>
+                  <span>เกินรัศมี ({formatDistance(distanceKm)} &gt; {maxRadiusKm} กม.)</span>
                 </>
               )}
             </div>
@@ -366,11 +366,11 @@ export default function MapPicker({
                         ? 'bg-emerald-950 text-emerald-300 border-emerald-700'
                         : 'bg-rose-950 text-rose-300 border-rose-700 animate-pulse'
                     }`}>
-                      {isWithinRadius ? `ในพื้นที่ (${formatDistance(distanceKm)})` : `เกิน 3 กม. (${formatDistance(distanceKm)})`}
+                      {isWithinRadius ? `ในพื้นที่ (${formatDistance(distanceKm)})` : `เกิน ${maxRadiusKm} กม. (${formatDistance(distanceKm)})`}
                     </span>
                   )}
                 </div>
-                <p className="text-[10px] text-gray-400">แตะจุดที่ต้องการ หรือลากหมุดไปยังหน้าตึก/หอพักของคุณ (วงกลมสีส้มคือรัศมี 3 กม.)</p>
+                <p className="text-[10px] text-gray-400">แตะจุดที่ต้องการ หรือลากหมุดไปยังหน้าตึก/หอพักของคุณ (วงกลมสีส้มคือรัศมี {maxRadiusKm} กม.)</p>
               </div>
             </div>
 

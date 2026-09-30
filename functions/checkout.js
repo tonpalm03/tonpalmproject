@@ -446,7 +446,7 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
           };
         }
 
-        // Authoritative 3 km Delivery Radius Validation
+        // Authoritative 2 km Delivery Radius Validation
         const orderLoc = orderReq.location || location || null;
         let calculatedDistanceKm = null;
         if (orderLoc && typeof orderLoc.lat === 'number' && typeof orderLoc.lng === 'number') {
@@ -455,10 +455,10 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
             : { lat: 15.8272, lng: 102.0298 };
           const distKm = getDistanceKm(shopLoc.lat, shopLoc.lng, orderLoc.lat, orderLoc.lng);
           calculatedDistanceKm = Math.round(distKm * 100) / 100;
-          if (distKm > 3.2) {
+          if (distKm > 2.2) {
             throw new functions.https.HttpsError(
               'failed-precondition',
-              `จุดจัดส่งอยู่นอกพื้นที่บริการ (ระยะทาง ${distKm.toFixed(1)} กม. เกินรัศมี 3 กิโลเมตร)`
+              `จุดจัดส่งอยู่นอกพื้นที่บริการ (ระยะทาง ${distKm.toFixed(1)} กม. เกินรัศมี 2 กิโลเมตร)`
             );
           }
         }

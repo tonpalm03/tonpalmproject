@@ -3245,7 +3245,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
               <MapPicker
                 location={shopLocation}
                 centerLocation={shopLocation}
-                maxRadiusKm={3.0}
+                maxRadiusKm={2.0}
                 showRadiusCircle={true}
                 onChange={(loc) => {
                   shopLocationDirtyRef.current = true;

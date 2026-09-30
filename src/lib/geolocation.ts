@@ -42,8 +42,8 @@ export async function getCurrentLocation(): Promise<{ lat: number; lng: number }
 // Platform / Campus centroid: มหาวิทยาลัยราชภัฏชัยภูมิ (มรภ.ชัยภูมิ)
 export const DEFAULT_CAMPUS_LOCATION = { lat: 15.8272, lng: 102.0298 };
 
-// Maximum delivery radius strictly enforced at 3.0 kilometers
-export const MAX_DELIVERY_RADIUS_KM = 3.0;
+// Maximum delivery radius strictly enforced at 2.0 kilometers
+export const MAX_DELIVERY_RADIUS_KM = 2.0;
 
 /**
  * Calculates the great-circle distance between two points on the Earth (Haversine formula in km)

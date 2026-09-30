@@ -649,7 +649,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                   จุดจัดส่งอยู่นอกรัศมีบริการ {MAX_DELIVERY_RADIUS_KM} กม. (ระยะทางปัจจุบัน: {formatDistance(deliveryDistanceKm)})
                 </p>
                 <p className="text-[11px] text-rose-700 leading-relaxed">
-                  ระบบเปิดรับออเดอร์เฉพาะในเขตบริการไม่เกิน 3 กิโลเมตรจากร้านค้า / มรภ.ชัยภูมิ เพื่อรักษาคุณภาพและความรวดเร็วในการจัดส่งอาหาร กรุณาเลื่อนหรือปักหมุดใหม่อีกครั้ง
+                  ระบบเปิดรับออเดอร์เฉพาะในเขตบริการไม่เกิน {MAX_DELIVERY_RADIUS_KM} กิโลเมตรจากร้านค้า / มรภ.ชัยภูมิ เพื่อรักษาคุณภาพและความรวดเร็วในการจัดส่งอาหาร กรุณาเลื่อนหรือปักหมุดใหม่อีกครั้ง
                 </p>
               </div>
             </div>
@@ -713,7 +713,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                 {hasOwnShopItems
                   ? 'กรุณาลบเมนูร้านของตนเองออกก่อนสั่งซื้อ'
                   : isDeliveryOutOfRange
-                  ? `จุดส่งเกิน 3 กม. (${formatDistance(deliveryDistanceKm)})`
+                  ? `จุดส่งเกิน ${MAX_DELIVERY_RADIUS_KM} กม. (${formatDistance(deliveryDistanceKm)})`
                   : isSubmitting
                   ? 'กำลังส่งออเดอร์...'
                   : `ยืนยันสั่งซื้อ & ไปชำระเงิน (${total} บาท)`}

@@ -16,7 +16,13 @@ export interface LiffInitResult {
   error?: string;
 }
 
-let liffInitPromise: Promise<LiffInitResult> | null = null;
+export interface LineLoginResult {
+  status: 'redirecting' | 'authenticated' | 'in_client' | 'failed';
+  error?: string;
+}
+
+// Store the initialization promise alone so subsequent calls check live SDK status
+let sdkInitPromise: Promise<boolean> | null = null;
 
 export function isLineTokenValid(): boolean {
   try {
@@ -64,59 +70,32 @@ export async function getValidLineIdToken(maxAttempts: number = 8, intervalMs: n
   return null;
 }
 
-export async function initLiff(forceRefresh: boolean = false): Promise<LiffInitResult> {
-  if (typeof window === 'undefined') {
-    return { isInitialized: false, isLoggedIn: false };
+async function ensureLiffSdkInitialized(): Promise<boolean> {
+  if (typeof window === 'undefined') return false;
+
+  if (liff.id) {
+    if (liff.ready) await liff.ready;
+    return true;
   }
 
-  if (forceRefresh) {
-    liffInitPromise = null;
-  }
+  if (sdkInitPromise) return sdkInitPromise;
 
-  // Reuse pending or completed initialization promise to avoid concurrent init errors
-  if (liffInitPromise) {
-    return liffInitPromise;
-  }
-
-  liffInitPromise = (async (): Promise<LiffInitResult> => {
+  sdkInitPromise = (async (): Promise<boolean> => {
     const liffId = process.env.NEXT_PUBLIC_LINE_LIFF_ID;
-
     if (!liffId) {
       console.warn('NEXT_PUBLIC_LINE_LIFF_ID is not configured');
-      return { isInitialized: false, isLoggedIn: false, error: 'NO_LIFF_ID' };
+      return false;
     }
 
     try {
       if (!liff.id) {
         await liff.init({ liffId });
       }
-
-      // On iOS Safari / WebKit and desktop browsers, ensure storage sync
       if (liff.ready) {
         await liff.ready;
       }
 
-      const loggedIn = liff.isLoggedIn();
-
-      let profile: LineUserProfile | undefined = undefined;
-      if (loggedIn) {
-        // Safe profile extraction: profile failure on iOS/PC must NEVER block authentication
-        try {
-          const p = await liff.getProfile().catch(() => null);
-          if (p) {
-            profile = {
-              userId: p.userId,
-              displayName: p.displayName,
-              pictureUrl: p.pictureUrl,
-              statusMessage: p.statusMessage,
-            };
-          }
-        } catch (profileErr) {
-          console.warn('LIFF getProfile non-critical warning:', profileErr);
-        }
-      }
-
-      // Clean up URL parameters left after OAuth redirect callback
+      // Clean up OAuth query parameters from URL without reloading
       try {
         if (typeof window !== 'undefined' && (window.location.search.includes('code=') || window.location.search.includes('liffClientId='))) {
           const cleanUrl = `${window.location.origin}${window.location.pathname}`;
@@ -124,38 +103,88 @@ export async function initLiff(forceRefresh: boolean = false): Promise<LiffInitR
         }
       } catch (_) {}
 
-      return {
-        isInitialized: true,
-        isLoggedIn: loggedIn,
-        profile,
-      };
-    } catch (err: unknown) {
-      console.warn('LINE LIFF Init Error:', err);
-      liffInitPromise = null;
-      return {
-        isInitialized: false,
-        isLoggedIn: false,
-        error: err instanceof Error ? err.message : 'UNKNOWN_ERROR',
-      };
+      return true;
+    } catch (err) {
+      console.warn('LINE LIFF SDK Init Error:', err);
+      sdkInitPromise = null;
+      return false;
     }
   })();
 
-  return liffInitPromise;
+  return sdkInitPromise;
 }
 
-export function lineLogin(force: boolean = false) {
-  if (typeof window === 'undefined') return;
-  liffInitPromise = null;
+/**
+ * Initialize LIFF and return real-time authentication status without blocking on getProfile()
+ */
+export async function initLiff(forceRefresh: boolean = false): Promise<LiffInitResult> {
+  if (typeof window === 'undefined') {
+    return { isInitialized: false, isLoggedIn: false };
+  }
+
+  if (forceRefresh) {
+    sdkInitPromise = null;
+  }
+
+  const isInitialized = await ensureLiffSdkInitialized();
+  if (!isInitialized) {
+    return { isInitialized: false, isLoggedIn: false, error: 'INIT_FAILED' };
+  }
+
+  const isLoggedIn = liff.isLoggedIn();
+  return {
+    isInitialized: true,
+    isLoggedIn,
+  };
+}
+
+/**
+ * Independent lazy profile loader that never blocks core authentication pipeline
+ */
+export async function getLineProfile(): Promise<LineUserProfile | null> {
+  try {
+    if (typeof window === 'undefined' || !liff.isLoggedIn()) return null;
+    const p = await liff.getProfile();
+    if (!p) return null;
+    return {
+      userId: p.userId,
+      displayName: p.displayName,
+      pictureUrl: p.pictureUrl,
+      statusMessage: p.statusMessage,
+    };
+  } catch (err) {
+    console.warn('Lazy getLineProfile failed:', err);
+    return null;
+  }
+}
+
+/**
+ * Initiate LINE OAuth login with environment checking and proper error propagation
+ */
+export function lineLogin(force: boolean = false): LineLoginResult {
+  if (typeof window === 'undefined') {
+    return { status: 'failed', error: 'WINDOW_UNDEFINED' };
+  }
 
   try {
-    if (force && liff.isLoggedIn()) {
-      try { liff.logout(); } catch (_) {}
+    // If running inside LINE App (in-client browser), auth is handled natively by LIFF
+    if (liff.isInClient?.() && liff.isLoggedIn()) {
+      return { status: 'in_client' };
     }
-    // Explicitly provide redirectUri so LINE OAuth never has mismatch with current origin
+
+    if (force && liff.isLoggedIn()) {
+      try {
+        liff.logout();
+      } catch (_) {}
+    }
+
     const redirectUri = `${window.location.origin}${window.location.pathname}`;
     liff.login({ redirectUri });
-  } catch (err) {
+    return { status: 'redirecting' };
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : 'LIFF_LOGIN_ERROR';
     console.error('LIFF login execution error:', err);
+    return { status: 'failed', error: errorMsg };
   }
 }
 
@@ -169,7 +198,7 @@ export function getLineIdToken(): string | null {
 }
 
 export function lineLogout() {
-  liffInitPromise = null;
+  sdkInitPromise = null;
   try {
     if (typeof window !== 'undefined' && liff.isLoggedIn()) {
       liff.logout();
@@ -178,4 +207,3 @@ export function lineLogout() {
     console.warn('LIFF logout error:', e);
   }
 }
-

@@ -178,28 +178,127 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
           if (rawItem.selected_options != null && !Array.isArray(rawItem.selected_options)) {
             throw new functions.https.HttpsError('invalid-argument', 'Invalid selected options');
           }
-          if (Array.isArray(rawItem.selected_options)) {
-            const availableOptions = Array.isArray(menuData.options) ? [...menuData.options] : [];
-            if (Array.isArray(menuData.option_groups)) {
-              for (const group of menuData.option_groups) {
-                if (group && Array.isArray(group.options)) {
-                  availableOptions.push(...group.options);
+
+          const rawOptions = Array.isArray(rawItem.selected_options) ? rawItem.selected_options : [];
+          const hasOptionGroups = Array.isArray(menuData.option_groups) && menuData.option_groups.length > 0;
+
+          if (hasOptionGroups) {
+            // Track which options matched which group
+            const groupSelections = new Map();
+            for (const grp of menuData.option_groups) {
+              if (grp && grp.id) groupSelections.set(grp.id, []);
+            }
+
+            for (const opt of rawOptions) {
+              if (!opt || typeof opt.name !== 'string') {
+                throw new functions.https.HttpsError('invalid-argument', 'Invalid selected option');
+              }
+
+              let matchedGroup = null;
+              let matchedOption = null;
+
+              // 1. Match by explicit group_id or group_title
+              if (opt.group_id) {
+                matchedGroup = menuData.option_groups.find(g => g && g.id === opt.group_id);
+              }
+              if (!matchedGroup && opt.group_title) {
+                matchedGroup = menuData.option_groups.find(g => g && (g.title === opt.group_title || g.name === opt.group_title));
+              }
+
+              // 2. If matched to a specific group, look inside that group
+              if (matchedGroup && Array.isArray(matchedGroup.options)) {
+                if (opt.option_id) {
+                  matchedOption = matchedGroup.options.find(o => o && o.id === opt.option_id);
+                }
+                if (!matchedOption) {
+                  matchedOption = matchedGroup.options.find(o => o && o.name === opt.name);
                 }
               }
+
+              // 3. Fallback matching across all groups if no group was specified
+              if (!matchedOption) {
+                for (const grp of menuData.option_groups) {
+                  if (grp && Array.isArray(grp.options)) {
+                    const found = grp.options.find(o => o && o.name === opt.name);
+                    if (found) {
+                      matchedGroup = grp;
+                      matchedOption = found;
+                      break;
+                    }
+                  }
+                }
+              }
+
+              // 4. Fallback to legacy menu options if any
+              if (!matchedOption && Array.isArray(menuData.options)) {
+                matchedOption = menuData.options.find(o => o && o.name === opt.name);
+              }
+
+              if (!matchedOption) {
+                throw new functions.https.HttpsError('invalid-argument', `ตัวเลือกอาหาร "${opt.name}" ไม่มีในเมนูแล้ว กรุณาเลือกอาหารใหม่`);
+              }
+
+              if (!Number.isFinite(matchedOption.price) || matchedOption.price < 0) {
+                throw new functions.https.HttpsError('failed-precondition', 'Invalid menu option price');
+              }
+
+              if (matchedGroup && matchedGroup.id) {
+                const list = groupSelections.get(matchedGroup.id) || [];
+                list.push(matchedOption);
+                groupSelections.set(matchedGroup.id, list);
+              }
+
+              verifiedOptions.push({
+                name: matchedOption.name,
+                price: matchedOption.price,
+                group_id: matchedGroup ? matchedGroup.id : undefined,
+                group_title: matchedGroup ? (matchedGroup.title || matchedGroup.name) : undefined,
+              });
+              itemUnitPrice += matchedOption.price;
             }
-            for (const opt of rawItem.selected_options) {
+
+            // Validate group constraints (required, single vs multiple, max)
+            for (const grp of menuData.option_groups) {
+              if (!grp) continue;
+              const selections = groupSelections.get(grp.id) || [];
+              const groupLabel = grp.title || grp.name || 'ตัวเลือก';
+
+              if (grp.required === true) {
+                const minReq = typeof grp.min_select === 'number' ? grp.min_select : 1;
+                if (selections.length < minReq) {
+                  throw new functions.https.HttpsError('invalid-argument', `กรุณาเลือก "${groupLabel}" ให้ครบถ้วน`);
+                }
+              }
+
+              if (grp.type === 'single' && selections.length > 1) {
+                throw new functions.https.HttpsError('invalid-argument', `ตัวเลือก "${groupLabel}" สามารถเลือกได้เพียง 1 รายการ`);
+              }
+
+              if (typeof grp.max_select === 'number' && grp.max_select > 0 && selections.length > grp.max_select) {
+                throw new functions.https.HttpsError('invalid-argument', `ตัวเลือก "${groupLabel}" สามารถเลือกได้ไม่เกิน ${grp.max_select} รายการ`);
+              }
+            }
+          } else if (Array.isArray(menuData.options) && menuData.options.length > 0) {
+            // Legacy menu options without groups
+            const availableOptions = menuData.options;
+            for (const opt of rawOptions) {
               if (!opt || typeof opt.name !== 'string') {
                 throw new functions.https.HttpsError('invalid-argument', 'Invalid selected option');
               }
               const matched = availableOptions.find(o => o && o.name === opt.name);
               if (!matched) {
-                throw new functions.https.HttpsError('invalid-argument', 'ตัวเลือกอาหารไม่มีในเมนูแล้ว กรุณาเลือกอาหารใหม่');
+                throw new functions.https.HttpsError('invalid-argument', `ตัวเลือกอาหาร "${opt.name}" ไม่มีในเมนูแล้ว กรุณาเลือกอาหารใหม่`);
               }
               if (!Number.isFinite(matched.price) || matched.price < 0) {
                 throw new functions.https.HttpsError('failed-precondition', 'Invalid menu option price');
               }
               verifiedOptions.push({ name: matched.name, price: matched.price });
               itemUnitPrice += matched.price;
+            }
+          } else {
+            // Menu has no options; ensure client didn't inject extra options
+            if (rawOptions.length > 0) {
+              throw new functions.https.HttpsError('invalid-argument', 'เมนูนี้ไม่มีตัวเลือกเพิ่มเติม');
             }
           }
 
@@ -343,9 +442,13 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
     // Another request with this key may have committed while this one was running.
     if (result.request) return replayCheckout(result.request);
 
-    // Post-transaction badge notifications
+    // Post-transaction badge and push notifications
     for (const shopId of [...new Set(result.shopIds)]) {
       sendShopBadge(shopId).catch(err => console.warn('sendShopBadge error:', err));
+    }
+
+    if (typeof helpers.notifyShopNewOrders === 'function') {
+      helpers.notifyShopNewOrders(result.orders).catch(err => console.warn('notifyShopNewOrders error:', err));
     }
 
     return {

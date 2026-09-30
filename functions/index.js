@@ -48,6 +48,50 @@ const handleOrderBadgeChange = async (change) => {
 };
 exports.onOrderBadgeChanged = handleOrderBadgeChange;
 
+async function notifyShopNewOrders(orders) {
+  if (!Array.isArray(orders) || orders.length === 0) return;
+  for (const order of orders) {
+    const shopId = order.shop_id;
+    if (!shopId) continue;
+    try {
+      const tokens = await merchantTokens(shopId);
+      if (tokens.length > 0) {
+        const orderNumber = order.order_number ? `#${order.order_number}` : '';
+        const total = order.total_amount ? `฿${order.total_amount}` : '';
+        const itemsCount = Array.isArray(order.items) ? order.items.length : 0;
+        const itemsPreview = Array.isArray(order.items)
+          ? order.items.slice(0, 2).map(i => `${i.name} x${i.quantity}`).join(', ') + (itemsCount > 2 ? ` และอีก ${itemsCount - 2} รายการ` : '')
+          : '';
+        const title = `🔔 มีออเดอร์ใหม่! ${orderNumber}`.trim();
+        const body = `${order.shop_name || 'ร้านค้า'} • ${itemsPreview ? itemsPreview + ' • ' : ''}${total} (แตะเพื่อเปิดดู)`;
+
+        await admin.messaging().sendEachForMulticast({
+          tokens,
+          notification: { title, body },
+          data: {
+            orderId: String(order.id),
+            shopId: String(shopId),
+            type: 'NEW_ORDER',
+          },
+          android: {
+            priority: 'high',
+            notification: {
+              channelId: 'orders_channel',
+              sound: 'default',
+              defaultSound: true,
+              defaultVibrateTimings: true,
+              notificationPriority: 'PRIORITY_MAX',
+              visibility: 'PUBLIC',
+            },
+          },
+        }).catch(err => console.warn('Order push multicast error:', err));
+      }
+    } catch (err) {
+      console.warn('notifyShopNewOrders error for shop', shopId, err);
+    }
+  }
+}
+
 const createCheckoutHandler = require('./checkout');
 
 const region = functions.region('us-central1');
@@ -323,7 +367,7 @@ exports.topUpMerchantCredit = region.runWith({ invoker: 'public' }).https.onCall
  * Server-side order checkout callable: authoritative pricing, atomic reservation, idempotency
  */
 exports.checkoutOrder = region.runWith({ invoker: 'public' }).https.onCall(
-  createCheckoutHandler(admin, functions, { sendShopBadge, merchantTokens })
+  createCheckoutHandler(admin, functions, { sendShopBadge, merchantTokens, notifyShopNewOrders })
 );
 
 /**

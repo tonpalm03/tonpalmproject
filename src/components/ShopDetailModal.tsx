@@ -148,12 +148,24 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
   };
 
   const allSelectedOptionsList: MenuItemOption[] = useMemo(() => {
-    const groupOpts = Object.values(selectedGroupOptions).flat().map((o) => ({
-      name: o.name,
-      price: o.price || 0,
-    }));
+    const groupOpts: MenuItemOption[] = [];
+    if (customizingItem?.option_groups) {
+      for (const grp of customizingItem.option_groups) {
+        const selected = selectedGroupOptions[grp.id] || [];
+        for (const opt of selected) {
+          groupOpts.push({
+            id: opt.id,
+            name: opt.name,
+            price: opt.price || 0,
+            group_id: grp.id,
+            group_title: grp.title || grp.name,
+            option_id: opt.id,
+          });
+        }
+      }
+    }
     return [...selectedOptions, ...groupOpts];
-  }, [selectedOptions, selectedGroupOptions]);
+  }, [customizingItem, selectedOptions, selectedGroupOptions]);
 
   const handleConfirmAddToCart = () => {
     if (!user) {

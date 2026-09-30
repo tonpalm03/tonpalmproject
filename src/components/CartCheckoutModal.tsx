@@ -217,10 +217,17 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
 
       const createdOrders = response.data?.orders || [];
 
-      // Offline fallback storage sync
-      const existingOrders = JSON.parse(localStorage.getItem('hchk_orders') || '[]');
-      existingOrders.unshift(...createdOrders);
-      localStorage.setItem('hchk_orders', JSON.stringify(existingOrders));
+      // Safe offline fallback storage sync (isolated so storage errors never reject order)
+      try {
+        const cachedRaw = localStorage.getItem('hchk_orders');
+        const existingOrders = cachedRaw ? JSON.parse(cachedRaw) : [];
+        if (Array.isArray(existingOrders)) {
+          existingOrders.unshift(...createdOrders);
+          localStorage.setItem('hchk_orders', JSON.stringify(existingOrders.slice(0, 50)));
+        }
+      } catch (storageErr) {
+        console.warn('LocalStorage order cache sync non-critical warning:', storageErr);
+      }
 
       clearCart();
       setIsSubmitting(false);

@@ -79,6 +79,10 @@ export default function AuthModal({ onClose }: AuthModalProps) {
               setLoading(true);
               setError('');
               const res = await loginWithLine();
+              if (res.redirecting) {
+                // Keep loading indicator while browser initiates OAuth redirect
+                return;
+              }
               setLoading(false);
               if (res.success) {
                 onClose();

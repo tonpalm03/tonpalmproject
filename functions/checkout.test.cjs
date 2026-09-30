@@ -55,7 +55,11 @@ function setup({ gpEnabled = true, gpPercent = 5, deliveryFee = 10, isShopOpen =
   const admin = { firestore };
   const functions = { https: { HttpsError: class extends Error { constructor(code, msg) { super(msg); this.code = code; } } } };
   const notifications = [];
-  const handler = createCheckoutHandler(admin, functions, { sendShopBadge: async shopId => { notifications.push(shopId); } });
+  const pushedOrders = [];
+  const handler = createCheckoutHandler(admin, functions, {
+    sendShopBadge: async shopId => { notifications.push(shopId); },
+    notifyShopNewOrders: async orders => { pushedOrders.push(...orders); },
+  });
 
   const validOrderPayload = (idempKey = 'key_1') => ({
     idempotency_key: idempKey,
@@ -77,6 +81,7 @@ function setup({ gpEnabled = true, gpPercent = 5, deliveryFee = 10, isShopOpen =
   return {
     documents,
     notifications,
+    pushedOrders,
     checkout: (payload, userUid = uid) => handler(payload, { auth: userUid ? { uid: userUid } : null }),
     validOrderPayload,
   };
@@ -343,5 +348,100 @@ test('checkoutOrder correctly processes items with option_groups', async () => {
   assert.equal(res.orders[0].items[0].price, 75);
   assert.equal(res.orders[0].food_subtotal, 150);
   assert.equal(res.orders[0].total_amount, 160);
+  assert.equal(s.pushedOrders.length, 1);
+  assert.equal(s.pushedOrders[0].id, res.orders[0].id);
+});
+
+test('checkoutOrder rejects when required option group is skipped', async () => {
+  const s = setup();
+  const menu = s.documents.get('menu_items/menu_1');
+  menu.option_groups = [
+    {
+      id: 'grp_noodles',
+      name: 'เลือกเส้น',
+      type: 'single',
+      required: true,
+      options: [
+        { name: 'เส้นเล็ก', price: 0 },
+        { name: 'บะหมี่', price: 0 }
+      ]
+    }
+  ];
+
+  const payload = {
+    idempotency_key: 'skip_required_key',
+    customer_name: 'Somchai',
+    customer_phone: '0899999999',
+    delivery_address: '123 Huaychan',
+    payment_method: 'cash',
+    orders: [
+      {
+        shop_id: 'shop_1',
+        items: [
+          {
+            menu_id: 'menu_1',
+            quantity: 1,
+            selected_options: [] // Skipped required group
+          }
+        ]
+      }
+    ]
+  };
+
+  await assert.rejects(s.checkout(payload), { code: 'invalid-argument' });
+});
+
+test('checkoutOrder correctly disambiguates same option name in different groups using group_id', async () => {
+  const s = setup();
+  const menu = s.documents.get('menu_items/menu_1');
+  menu.option_groups = [
+    {
+      id: 'grp_size',
+      name: 'ขนาด',
+      type: 'single',
+      required: true,
+      options: [
+        { id: 'opt_size_special', name: 'พิเศษ', price: 5 }
+      ]
+    },
+    {
+      id: 'grp_topping',
+      name: 'ท็อปปิ้ง',
+      type: 'multiple',
+      required: false,
+      options: [
+        { id: 'opt_topping_special', name: 'พิเศษ', price: 30 }
+      ]
+    }
+  ];
+
+  const payload = {
+    idempotency_key: 'disambiguate_key',
+    customer_name: 'Somchai',
+    customer_phone: '0899999999',
+    delivery_address: '123 Huaychan',
+    payment_method: 'cash',
+    orders: [
+      {
+        shop_id: 'shop_1',
+        items: [
+          {
+            menu_id: 'menu_1',
+            quantity: 1,
+            selected_options: [
+              { name: 'พิเศษ', price: 0, group_id: 'grp_size' },
+              { name: 'พิเศษ', price: 0, group_id: 'grp_topping' }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  const res = await s.checkout(payload);
+  assert.equal(res.success, true);
+  // Base 50 + 5 (size special) + 30 (topping special) = 85 + 10 (delivery) = 95
+  assert.equal(res.orders[0].items[0].price, 85);
+  assert.equal(res.orders[0].total_amount, 95);
 });
 

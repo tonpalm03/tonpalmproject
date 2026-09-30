@@ -23,7 +23,7 @@ interface AuthContextType {
   role: UserRole;
   isLoading: boolean;
   isLiffAvailable: boolean;
-  loginWithLine: () => Promise<{ success: boolean; error?: string }>;
+  loginWithLine: () => Promise<{ success: boolean; redirecting?: boolean; error?: string }>;
   loginWithEmail: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
   registerWithEmail: (email: string, pass: string, name: string, phone: string) => Promise<{ success: boolean; error?: string }>;
   updateUserPhone: (phone: string) => Promise<void>;
@@ -180,14 +180,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const loginWithLine = async (): Promise<{ success: boolean; error?: string }> => {
+  const loginWithLine = async (): Promise<{ success: boolean; redirecting?: boolean; error?: string }> => {
     try {
       allowLineLogin.current = true;
       setIsLoading(true);
       setAuthError('');
       const initResult = await initLiff();
       if (!initResult.isInitialized) {
-        throw new Error('ไม่สามารถเชื่อมต่อระบบ LINE ได้ กรุณาลองใหม่อีกครั้ง');
+        setIsLoading(false);
+        const err = 'ไม่สามารถเชื่อมต่อระบบ LINE ได้ กรุณาลองใหม่อีกครั้ง';
+        setAuthError(err);
+        return { success: false, error: err };
       }
 
       if (initResult.isLoggedIn) {
@@ -199,20 +202,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             await signInWithCustomToken(auth, response.data.token);
             setIsLoading(false);
             return { success: true };
-          } catch (exchangeErr) {
-            console.warn('Cached LINE token exchange failed, forcing fresh login:', exchangeErr);
-            triggerLineLogin(true);
-            return { success: true };
+          } catch (exchangeErr: any) {
+            console.warn('Cached LINE token exchange failed:', exchangeErr);
+            const errCode = exchangeErr?.code || '';
+            const isTokenInvalid = errCode === 'unauthenticated' || errCode === 'invalid-argument' || exchangeErr?.message?.includes('token');
+            if (isTokenInvalid) {
+              // Stale token, clear session and re-trigger fresh login
+              triggerLineLogout();
+              const redirectRes = triggerLineLogin(true);
+              if (redirectRes.status === 'redirecting') {
+                return { success: true, redirecting: true };
+              }
+            }
+            setIsLoading(false);
+            const msg = 'ไม่สามารถยืนยันตัวตนกับ LINE ได้ กรุณาตรวจสอบการเชื่อมต่อแล้วลองใหม่อีกครั้ง';
+            setAuthError(msg);
+            return { success: false, error: msg };
           }
         } else {
-          // Stale session, force fresh login
-          triggerLineLogin(true);
-          return { success: true };
+          // No valid ID token in logged in state, clear stale session and redirect
+          triggerLineLogout();
+          const redirectRes = triggerLineLogin(true);
+          if (redirectRes.status === 'redirecting') {
+            return { success: true, redirecting: true };
+          }
+          setIsLoading(false);
+          return { success: false, error: 'ไม่พบข้อมูลการเข้าสู่ระบบ LINE กรุณาลองใหม่อีกครั้ง' };
         }
       }
 
-      triggerLineLogin();
-      return { success: true };
+      const redirectRes = triggerLineLogin();
+      if (redirectRes.status === 'redirecting') {
+        return { success: true, redirecting: true };
+      }
+      setIsLoading(false);
+      return { success: false, error: redirectRes.error || 'ไม่สามารถเปิดหน้าเข้าสู่ระบบ LINE ได้' };
     } catch (err: unknown) {
       setIsLoading(false);
       const msg = err instanceof Error ? err.message : 'เข้าสู่ระบบ LINE ไม่สำเร็จ';

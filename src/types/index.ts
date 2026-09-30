@@ -51,8 +51,12 @@ export interface Shop {
 export type MenuCategory = 'food' | 'drink_dessert';
 
 export interface MenuItemOption {
+  id?: string;
   name: string;
   price: number;
+  group_id?: string;
+  group_title?: string;
+  option_id?: string;
 }
 
 export interface OptionItem {
@@ -64,6 +68,7 @@ export interface OptionItem {
 export interface OptionGroup {
   id: string;
   title: string;
+  name?: string;
   required: boolean;
   type: 'single' | 'multiple';
   min_select?: number;

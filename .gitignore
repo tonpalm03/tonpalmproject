@@ -61,3 +61,7 @@ android/local.properties
 android/.idea/
 android/*.iml
 android/app/*.iml
+
+# temp & outputs
+output/
+tmp/

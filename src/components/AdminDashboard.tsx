@@ -2406,7 +2406,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                   <span>ยอดเครดิตคงเหลือของร้านค้า ({shops.length} ร้าน)</span>
                 </h3>
                 <p className="text-xs text-gray-400 mt-0.5">
-                  ร้านค้าติดต่อแอดมินเพื่อเติมเครดิตผ่าน LINE ส่วนตัว
+                  ร้านค้าติดต่อแอดมินเพื่อเติมเครดิตผ่าน LINE Official (@887nrlyw)
                 </p>
               </div>
             </div>

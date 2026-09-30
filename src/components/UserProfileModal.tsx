@@ -519,9 +519,9 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
             >
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 text-emerald-700" />
-                <span>ติดต่อเรา / ฝ่ายบริการ (LINE แอดมิน)</span>
+                <span>ติดต่อเรา / ฝ่ายบริการ (LINE Official)</span>
               </div>
-              <span className="text-[11px] text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded-full">แอดไลน์</span>
+              <span className="text-[11px] text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded-full">@887nrlyw</span>
             </button>
 
             {/* Terms of Service Button */}

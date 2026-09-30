@@ -3197,7 +3197,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
               <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 space-y-1.5">
                 <p className="font-bold">ขั้นตอนการเติมเครดิตร้านค้า:</p>
                 <ol className="list-decimal list-inside space-y-1 text-[11px] text-amber-800">
-                  <li>ทัก LINE ส่วนตัวหาแอดมิน (ID: tonpalm033)</li>
+                  <li>ทัก LINE Official Account: <strong className="text-amber-950 font-mono">@887nrlyw</strong></li>
                   <li>แจ้งชื่อร้านค้า: <strong className="text-amber-950">{shopData?.name || 'ครัวต้นปาล์ม'}</strong></li>
                   <li>โอนเงินเติมเครดิตตามต้องการ (เช่น 100, 200, 500 บาท)</li>
                   <li>ส่งสลิปให้แอดมิน แอดมินจะกดเพิ่มเครดิตเข้าระบบทันทีครับ</li>
@@ -3206,11 +3206,11 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
 
               <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-emerald-900 flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] text-emerald-700 font-bold">ติดต่อแอดมินโดยตรง</p>
-                  <p className="text-sm font-black text-emerald-950">LINE: tonpalm033</p>
+                  <p className="text-[10px] text-emerald-700 font-bold">LINE Official (HuayChan)</p>
+                  <p className="text-sm font-black text-emerald-950 font-mono">@887nrlyw</p>
                 </div>
                 <a
-                  href="https://line.me/ti/p/~tonpalm033"
+                  href="https://line.me/R/ti/p/@887nrlyw"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3.5 py-2 bg-[#06C755] hover:bg-[#05b34c] text-white font-black text-xs rounded-xl shadow-xs flex items-center gap-1 transition active:scale-95"

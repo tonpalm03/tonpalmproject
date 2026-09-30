@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Mail, Lock, LogIn, AlertCircle, Store, Smartphone, ChevronDown, ZoomIn } from 'lucide-react';
+import { X, Mail, Lock, LogIn, AlertCircle, Store, Smartphone, ChevronDown, ZoomIn, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import TermsModal from './TermsModal';
 
@@ -191,12 +191,21 @@ export default function AuthModal({ onClose }: AuthModalProps) {
                 <span>{loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบร้านค้า / แอดมิน'}</span>
               </button>
 
-              <div className="text-center pt-1">
+              <div className="text-center pt-1 space-y-0.5">
                 <p className="text-[11px] text-gray-400">
                   บัญชีร้านค้าจะได้รับการเปิดโดยผู้ดูแลระบบเท่านั้น
                 </p>
                 <p className="text-[11px] text-gray-400">
-                  หากต้องการเปิดร้านค้าใหม่ กรุณาติดต่อแอดมิน
+                  หากต้องการเปิดร้านค้าใหม่{' '}
+                  <a
+                    href="https://line.me/R/ti/p/@887nrlyw"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-emerald-600 hover:text-emerald-700 font-bold underline inline-flex items-center gap-0.5"
+                  >
+                    <span>ติดต่อ LINE Official (@887nrlyw)</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
                 </p>
               </div>
             </form>

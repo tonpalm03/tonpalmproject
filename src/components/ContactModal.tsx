@@ -49,32 +49,32 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-ping" />
                 <span className="text-xs font-black uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">
-                  Admin Support พร้อมให้บริการ
+                  HuayChan Official Account
                 </span>
               </div>
             </div>
 
             <div>
               <h3 className="text-lg sm:text-xl font-black">
-                LINE ผู้ดูแลระบบ (Admin)
+                LINE Official Account (HuayChan)
               </h3>
               <p className="text-xs text-emerald-100 mt-1 leading-relaxed">
-                สามารถทักแชทสอบถามปัญหา แจ้งเรื่องออเดอร์ หรือติดต่อเปิดร้านค้าได้โดยตรง
+                ทักแชทสอบถามปัญหา แจ้งเรื่องออเดอร์ สมัครเปิดร้านค้า หรือติดต่อแอดมินได้โดยตรง
               </p>
             </div>
 
             <div className="bg-white/15 backdrop-blur-md p-3 rounded-2xl border border-white/25 flex items-center justify-between gap-2">
               <div className="min-w-0">
-                <p className="text-[11px] text-emerald-100 font-medium">LINE ID แอดมิน:</p>
-                <p className="text-base font-black text-white tracking-wide font-mono">tonpalm033</p>
+                <p className="text-[11px] text-emerald-100 font-medium">LINE OA ID:</p>
+                <p className="text-base font-black text-white tracking-wide font-mono">@887nrlyw</p>
               </div>
               <a
-                href="https://line.me/ti/p/~tonpalm033"
+                href="https://line.me/R/ti/p/@887nrlyw"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-4 py-2.5 bg-white hover:bg-emerald-50 text-emerald-800 font-black text-xs rounded-xl shadow-md transition active:scale-95 flex items-center gap-1.5 shrink-0"
               >
-                <span>เปิด LINE</span>
+                <span>เพิ่มเพื่อน / แชท</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>

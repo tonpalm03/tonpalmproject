@@ -1,0 +1,37 @@
+{
+  "id": "/",
+  "name": "huaychan - เดลิเวอรีส่งถึงที่",
+  "short_name": "huaychan",
+  "description": "เว็บแอพสั่งอาหาร huaychan สำหรับชุมชนห้วยชันและนักศึกษา มรภ. ชัยภูมิ ร้านค้าส่งเอง ค่าส่ง 10 บาท",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#f59e0b",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

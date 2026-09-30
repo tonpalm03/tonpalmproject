@@ -1,0 +1,126 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function signedIn() {
+   return request.auth != null
+    && (!exists(/databases/$(database)/documents/_account_deletions/$(request.auth.uid))
+      || (get(/databases/$(database)/documents/_account_deletions/$(request.auth.uid)).data.state == 'deleted'
+        && request.auth.token.auth_time > get(/databases/$(database)/documents/_account_deletions/$(request.auth.uid)).data.revoked_before));
+  }
+  function access() { return get(/databases/$(database)/documents/access/$(request.auth.uid)).data; }
+  function hasAccess() { return signedIn() && exists(/databases/$(database)/documents/access/$(request.auth.uid)); }
+  function admin() { return hasAccess() && access().role == 'admin'; }
+  function merchant(shop) { return hasAccess() && access().role == 'merchant' && access().shop_id == shop; }
+  function participant(order) { return signedIn() && (order.customer_uid == request.auth.uid || merchant(order.shop_id) || admin()); }
+  function changedOnly(fields) { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields); }
+  function role() { return hasAccess() ? access().role : 'customer'; }
+  function orderData(id) { return get(/databases/$(database)/documents/orders/$(id)).data; }
+  // Only access documents grant roles; legacy users.role does not grant authority.
+  match /access/{uid} {
+   allow read: if signedIn() && (request.auth.uid == uid || admin());
+   allow create, update: if admin() && request.auth.uid != uid
+    && request.resource.data.keys().hasOnly(['role', 'shop_id'])
+    && request.resource.data.role in ['customer', 'merchant', 'admin']
+    && (request.resource.data.role != 'merchant' || request.resource.data.shop_id is string);
+   allow delete: if admin() && request.auth.uid != uid;
+  }
+  match /users/{uid} {
+   allow read: if signedIn() && (request.auth.uid == uid || admin());
+   allow create: if signedIn() && request.auth.uid == uid
+    && request.resource.data.keys().hasOnly(['uid','line_user_id','display_name','picture_url','phone','role','created_at','default_address','default_location'])
+    && request.resource.data.uid == uid && request.resource.data.role == 'customer' && request.resource.data.display_name is string;
+   allow update: if admin() || (signedIn() && request.auth.uid == uid
+    && changedOnly(['display_name','picture_url','phone','default_address','default_location']) && request.resource.data.display_name is string);
+   allow delete: if admin() && request.auth.uid != uid;
+  }
+  match /admins/{id} { allow read, write: if admin(); }
+  match /admin_merchant_credentials/{id} { allow read, write: if admin(); }
+  match /shops/{shop} {
+   allow read: if true;
+   allow create, delete: if admin();
+   allow update: if admin() || (merchant(shop)
+    && changedOnly(['name','phone','promptpay_number','image_url','address_detail','location','category','is_open','delivery_fee','bank_name','bank_account_number','bank_account_name','promptpay_qr_url','allow_cod'])
+    && request.resource.data.name is string && request.resource.data.is_open is bool
+    && (!('delivery_fee' in request.resource.data) || (request.resource.data.delivery_fee is number && request.resource.data.delivery_fee >= 0))
+    && (request.resource.data.is_open == false
+        || !exists(/databases/$(database)/documents/system_settings/general)
+        || get(/databases/$(database)/documents/system_settings/general).data.get('gp_enabled', false) != true
+        || (resource.data.credit_balance is number && resource.data.credit_balance > 0)));
+  }
+  match /shop_private/{shop}/devices/{uid} {
+   allow read, delete: if admin() || (signedIn() && uid == request.auth.uid && merchant(shop));
+   allow create, update: if signedIn() && uid == request.auth.uid && merchant(shop)
+    && request.resource.data.keys().hasOnly(['tokens','updated_at'])
+    && request.resource.data.tokens is list && request.resource.data.tokens.size() <= 20 && request.resource.data.updated_at == request.time;
+  }
+  match /menu_items/{id} {
+   allow read: if true;
+   allow create: if admin() || (merchant(request.resource.data.shop_id)
+    && request.resource.data.keys().hasOnly(['shop_id','name','price','category','image_url','is_available','options','option_groups','created_at'])
+    && request.resource.data.name is string && request.resource.data.price is number && request.resource.data.price >= 0 && request.resource.data.is_available is bool);
+   allow update: if admin() || (merchant(resource.data.shop_id)
+    && changedOnly(['name','price','category','image_url','is_available','options','option_groups'])
+    && request.resource.data.price is number && request.resource.data.price >= 0 && request.resource.data.is_available is bool);
+   allow delete: if admin() || merchant(resource.data.shop_id);
+  }
+  match /system_settings/{id} {
+   allow read: if id == 'general' || (id == 'order_counter' && signedIn()) || admin();
+   allow write: if admin();
+  }
+  match /orders/{id} {
+   allow read: if participant(resource.data);
+   // Order creation is handled exclusively through checkoutOrder Cloud Function. Direct client creation is denied.
+   allow create: if admin();
+   allow update: if admin() || (participant(resource.data) && (
+    (changedOnly(['last_message','last_message_sender','last_message_at','has_unread_message','has_customer_unread_message'])
+      && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['last_message_sender']) || request.resource.data.last_message_sender == role()))
+    || (changedOnly(['status']) && merchant(resource.data.shop_id)
+      && ((resource.data.status == 'pending' && request.resource.data.status in ['cooking','cancelled'])
+       || (resource.data.status == 'cooking' && request.resource.data.status in ['delivering','cancelled'])))
+    || (changedOnly(['status','cancelled_by','cancelled_at']) && resource.data.customer_uid == request.auth.uid && resource.data.status == 'pending' && request.resource.data.status == 'cancelled'
+      && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['cancelled_by']) || request.resource.data.cancelled_by == 'customer')
+      && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['cancelled_at']) || request.resource.data.cancelled_at == request.time))
+   ));
+   allow delete: if admin();
+   match /messages/{message} {
+    allow read: if participant(orderData(id));
+    allow create: if participant(orderData(id))
+     && request.resource.data.keys().hasOnly(['order_id','sender_uid','sender_name','sender_role','sender_avatar','text','image_url','created_at','is_read'])
+     && request.resource.data.order_id == id && request.resource.data.sender_uid == request.auth.uid
+     && request.resource.data.sender_role == role() && request.resource.data.created_at == request.time && request.resource.data.is_read == false;
+    allow update: if participant(orderData(id)) && changedOnly(['is_read']) && request.resource.data.is_read == true;
+    allow delete: if admin();
+   }
+  }
+  match /weekly_settlements/{id} {
+   allow read: if admin() || merchant(resource.data.shop_id);
+   // Submitted totals remain unapproved merchant claims until checked by admin.
+   allow create: if merchant(request.resource.data.shop_id)
+    && request.resource.data.keys().hasOnly(['id','shop_id','shop_name','cycle_id','cycle_label','week_start','week_end','total_food_sales','delivery_earnings','order_count','gp_due','status','slip_url','updated_at'])
+    && request.resource.data.status == 'pending_approval' && request.resource.data.slip_url is string && request.resource.data.updated_at == request.time;
+   allow update: if admin() || (merchant(resource.data.shop_id) && resource.data.status != 'paid'
+    && changedOnly(['slip_url','status','updated_at']) && request.resource.data.status == 'pending_approval'
+    && request.resource.data.slip_url is string && request.resource.data.updated_at == request.time);
+   allow delete: if admin();
+  }
+  match /shop_reviews/{id} {
+   allow read: if true;
+   allow create: if signedIn() && request.resource.data.keys().hasOnly(['shop_id','order_id','customer_uid','customer_name','customer_avatar','rating','comment','created_at'])
+    && request.resource.data.order_id == id && request.resource.data.customer_uid == request.auth.uid
+    && orderData(id).customer_uid == request.auth.uid && orderData(id).status == 'completed' && orderData(id).shop_id == request.resource.data.shop_id
+    && request.resource.data.rating is int && request.resource.data.rating >= 1 && request.resource.data.rating <= 5
+    && request.resource.data.comment is string && request.resource.data.comment.size() <= 2000 && request.resource.data.created_at == request.time;
+   allow delete: if admin();
+  }
+  match /credit_transactions/{id} {
+   allow read: if admin() || (signedIn() && merchant(resource.data.shop_id));
+   allow create: if admin() && request.resource.data.keys().hasOnly(['id','shop_id','shop_name','order_id','order_number','amount','type','note','created_by','created_at'])
+    && request.resource.data.amount is number && request.resource.data.shop_id is string && request.resource.data.created_at == request.time;
+   allow update, delete: if admin();
+  }
+  match /_checkout_requests/{id} {
+   allow read, write: if admin();
+  }
+  match /{document=**} { allow read, write: if false; }
+ }
+}

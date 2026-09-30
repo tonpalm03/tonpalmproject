@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8fafc;
+  --foreground: #1e293b;
 }
 
 @theme inline {
@@ -12,15 +12,33 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background: #f8fafc;
+  color: #1e293b;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Fallback solid colors for buttons and gradient cards on older WebViews/Android.
+   Keep bg-gradient-to-t photo overlays transparent so storefront images remain visible. */
+.bg-gradient-to-r,
+.bg-gradient-to-br,
+.bg-gradient-to-tr,
+.bg-gradient-to-l,
+.bg-gradient-to-b {
+  background-color: #f97316;
+}
+
+button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }

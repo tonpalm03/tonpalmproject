@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>รายงานความก้าวหน้าโครงงาน Mobile App ในฝัน ครั้งที่ 1 - ห้วยชันหิวข้าว (huaychan.web.app)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    @page {
+      size: A4;
+      margin: 12mm 15mm 12mm 15mm;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    body {
+      font-family: 'Sarabun', sans-serif;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #1e293b;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+    h1, h2, h3, h4, h5, .heading-font {
+      font-family: 'Prompt', sans-serif;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #f97316 100%);
+      color: white;
+      padding: 18px 22px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 6px -1px rgba(194, 65, 12, 0.2);
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.25);
+      color: #fff;
+      margin-bottom: 6px;
+      letter-spacing: 0.3px;
+    }
+    .header-banner h1 {
+      margin: 0 0 4px 0;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+    .header-banner p {
+      margin: 0;
+      font-size: 12.5px;
+      opacity: 0.95;
+    }
+    .meta-box {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 12px;
+      background-color: #fff7ed;
+      border: 1px solid #ffedd5;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 12px;
+    }
+    .meta-item strong {
+      color: #9a3412;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #0f172a;
+      border-left: 4px solid #ea580c;
+      padding-left: 10px;
+      margin-top: 18px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .subsection-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #c2410c;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      font-family: 'Prompt', sans-serif;
+    }
+    .quote-box {
+      background: #fdfaf6;
+      border-left: 4px solid #ea580c;
+      border-right: 1px solid #fed7aa;
+      border-top: 1px solid #fed7aa;
+      border-bottom: 1px solid #fed7aa;
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      font-size: 12.5px;
+      color: #334155;
+      line-height: 1.6;
+    }
+    .quote-box strong {
+      color: #9a3412;
+    }
+    .concept-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .concept-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .concept-card.highlight {
+      background: #fffbeb;
+      border-color: #fde68a;
+    }
+    .concept-card h4 {
+      margin: 0 0 4px 0;
+      font-size: 12.5px;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .concept-card p {
+      margin: 0;
+      font-size: 11.5px;
+      color: #475569;
+      line-height: 1.45;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+      font-size: 11.5px;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background-color: #f1f5f9;
+      color: #1e293b;
+      font-weight: 600;
+      font-family: 'Prompt', sans-serif;
+    }
+    tr:nth-child(even) td {
+      background-color: #f8fafc;
+    }
+    .tag-tech {
+      background-color: #ea580c;
+      color: white;
+      font-weight: 600;
+      padding: 1.5px 5px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      display: inline-block;
+      margin-bottom: 2px;
+    }
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 14px 0;
+    }
+    .feature-item {
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: #f8fafc;
+      border-left: 3px solid #f97316;
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+    .feature-item strong {
+      color: #0f172a;
+      display: block;
+      margin-bottom: 2px;
+      font-family: 'Prompt', sans-serif;
+      font-size: 12.5px;
+    }
+    .callout {
+      background-color: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: #1e40af;
+    }
+    .callout a {
+      color: #1d4ed8;
+      font-weight: 700;
+      text-decoration: underline;
+    }
+    .page-break {
+      page-break-before: always;
+    }
+    .footer-note {
+      text-align: center;
+      font-size: 10.5px;
+      color: #94a3b8;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 6px;
+      margin-top: 14px;
+    }
+    .code-pill {
+      font-family: monospace;
+      background: #e2e8f0;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 11px;
+      color: #0f172a;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= PAGE 1 ================= -->
+
+  <!-- HEADER -->
+  <div class="header-banner">
+    <span class="badge">เอกสารส่งความก้าวหน้าครั้งที่ 1 (Milestone Progress Report #1)</span>
+    <h1>โครงงาน: ห้วยชันหิวข้าว (Huai Chan Hiu Khao)</h1>
+    <p>แพลตฟอร์มสั่งอาหารเดลิเวอรีระดับชุมชน เพื่อชาวบ้านห้วยชันและนักศึกษา มหาวิทยาลัยราชภัฏชัยภูมิ</p>
+  </div>
+
+  <!-- META BOX -->
+  <div class="meta-box">
+    <div class="meta-item">
+      <strong>🌐 ลิงก์ระบบจริง (Live Web App):</strong> <a href="https://huaychan.web.app" target="_blank" style="color:#c2410c; font-weight:700; text-decoration:none;">https://huaychan.web.app</a><br>
+      <strong>📱 รูปแบบแพลตฟอร์ม:</strong> Progressive Web App (PWA) & Hybrid Android App (Capacitor)
+    </div>
+    <div class="meta-item">
+      <strong>👤 ผู้จัดทำ:</strong> รัชชานนท์ ผมไผ &nbsp;|&nbsp; <strong>รหัสนักศึกษา:</strong> 681102118<br>
+      <strong>🎯 ความพร้อมระบบ:</strong> ใช้งานได้จริงบน Production Hosting (Google Cloud)
+    </div>
+  </div>
+
+  <!-- CONCEPT SECTION -->
+  <div class="section-title">💡 คอนเซ็ปต์และที่มาของแอปพลิเคชัน (App Concept & Origin)</div>
+  
+  <div class="quote-box">
+    <p style="margin: 0 0 6px 0;">
+      <em>"เราเห็นพ่อค้าแม่ค้าใกล้บ้านโพสต์ขายอาหารบน Facebook อยู่ทุกวัน จึงอยากทำพื้นที่เล็ก ๆ ที่ช่วยรวมร้านและเมนูให้หาเจอง่าย สั่งสะดวก และคุยกับคนขายได้โดยตรง ให้ร้านในชุมชนมีโอกาสเข้าถึงลูกค้ามากขึ้น และให้คนแถวนี้ได้อุดหนุนกัน"</em>
+    </p>
+    <p style="margin: 0 0 6px 0;">
+      <em>"ที่นี่ ร้านค้าเป็นคนขาย ปรุงอาหาร รับเงิน และจัดส่งเอง โดยรับผิดชอบอาหารและบริการของร้าน ส่วน huaychan ดูแลระบบที่ช่วยให้ร้านกับลูกค้ามาเจอกัน หากมีปัญหา ติดต่อร้านผ่านออเดอร์ได้เลย หรือแจ้งแอดมินให้ช่วยประสานงาน"</em>
+    </p>
+    <p style="margin: 0; font-weight: 600; color: #9a3412;">
+      👉 "ร้านเล็ก ๆ ก็มีหน้าร้านออนไลน์ของตัวเองได้ และทุกออเดอร์คือการอุดหนุนคนในชุมชน"
+    </p>
+  </div>
+
+  <div class="subsection-title">📌 4 เสาหลักของแนวคิดระบบ (Core Concept Pillars)</div>
+  <div class="concept-grid">
+    <div class="concept-card highlight">
+      <h4>🏪 1. รวมร้านชุมชนให้หาเจอง่าย สั่งสะดวก</h4>
+      <p>แก้ปัญหาโพสต์ในกลุ่ม Facebook ที่เลื่อนหายไว ไม่มีเมนูรวม ด้วยการสร้างศูนย์รวมร้านอาหารตามสั่ง ร้านน้ำ ขนม ในหมู่บ้านห้วยชัน ให้ลูกค้าและนักศึกษาค้นหาและกดสั่งได้ในไม่กี่คลิก</p>
+    </div>
+    <div class="concept-card highlight">
+      <h4>🛵 2. ร้านค้าปรุงเอง ส่งเอง รับเงินเอง (Merchant Direct Care)</h4>
+      <p>ร้านค้ารับผิดชอบอาหาร บริการ และขี่รถไปส่งให้ลูกค้าด้วยตนเองในชุมชนและหอพัก ค่าส่งเหมา <strong>10 บาท/ออเดอร์</strong> เข้ากระเป๋าพ่อค้าแม่ค้าผู้ส่ง 100% สบายกระเป๋าผู้สั่ง</p>
+    </div>
+    <div class="concept-card">
+      <h4>🛒 3. ตะกร้ารวม สั่งหลายร้านพร้อมกัน (Multi-Shop Cart)</h4>
+      <p>ตอบโจทย์การสั่งอาหารจริง เช่น สั่งข้าวร้านป้าพร พร้อมสั่งชานมร้านลุงสม รวมในตะกร้าเดียว ระบบจะคำนวณค่าส่ง 10 บ./ร้าน และแยกบิลส่งถึงร้านค้าแต่ละร้านอย่างเป็นธรรมอัตโนมัติ</p>
+    </div>
+    <div class="concept-card">
+      <h4>💬 4. แชทคุยตรง & มีแอดมินประสานงาน (Community Support)</h4>
+      <p>ลูกค้าสามารถแชทสดหรือโทรคุยกับคนส่งได้โดยตรงผ่านหน้ารายละเอียดออเดอร์ และมีแอดมินกลางช่วยมอนิเตอร์และดูแลประสานงานหากเกิดปัญหา</p>
+    </div>
+  </div>
+
+  <!-- TECH STACK -->
+  <div class="section-title">🛠️ ส่วนที่ 1: สรุป Tech Stack (เทคโนโลยีและเครื่องมือที่ใช้)</div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 24%;">ส่วนของระบบ</th>
+        <th style="width: 28%;">เทคโนโลยี / Framework</th>
+        <th style="width: 48%;">หน้าที่และการทำงานในสถาปัตยกรรมระบบ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Frontend Web App</strong></td>
+        <td><span class="tag-tech">Next.js 16</span> <span class="tag-tech">React 19</span></td>
+        <td>App Router สถาปัตยกรรมแบบ Single Page + SSR โหลดรวดเร็ว ราบรื่น</td>
+      </tr>
+      <tr>
+        <td><strong>Language & Types</strong></td>
+        <td><span class="tag-tech">TypeScript</span></td>
+        <td>ควบคุม Data Contract และ Type-Safe ทั่วทั้งระบบ ลดข้อผิดพลาด Runtime</td>
+      </tr>
+      <tr>
+        <td><strong>Styling & UI</strong></td>
+        <td><span class="tag-tech">Tailwind CSS v4</span> <span class="tag-tech">Lucide Icons</span></td>
+        <td>ออกแบบ UI สไตล์โมเดิร์น Mobile-First แสดงผลคมชัดทุกอุปกรณ์</td>
+      </tr>
+      <tr>
+        <td><strong>Mobile Runtime</strong></td>
+        <td><span class="tag-tech">Capacitor 8</span> <span class="tag-tech">PWA Manifest</span></td>
+        <td>สร้างเป็น Android APK พร้อมรองรับ Service Worker ติดตั้งลงหน้าจอมือถือได้ทันที</td>
+      </tr>
+      <tr>
+        <td><strong>Real-time Database</strong></td>
+        <td><span class="tag-tech">Google Cloud Firestore</span></td>
+        <td>ฐานข้อมูล NoSQL สื่อสารสองทางแบบ Real-time (onSnapshot) ออเดอร์และแชทสด</td>
+      </tr>
+      <tr>
+        <td><strong>Authentication</strong></td>
+        <td><span class="tag-tech">LINE LIFF SDK 2.x</span> <span class="tag-tech">Firebase Auth</span></td>
+        <td>ล็อกอินอัตโนมัติด้วยบัญชี LINE ระบุตัวตนลูกค้าและร้านค้าโดยไม่ต้องจำรหัสผ่าน</td>
+      </tr>
+      <tr>
+        <td><strong>Cloud & Hosting</strong></td>
+        <td><span class="tag-tech">Firebase Hosting</span> <span class="tag-tech">Cloud Functions</span></td>
+        <td>โฮสต์เว็บแอปบน Google Global CDN โหลดไว และรัน Serverless Background Logic</td>
+      </tr>
+      <tr>
+        <td><strong>Maps & Geolocation</strong></td>
+        <td><span class="tag-tech">Leaflet (OpenStreetMap)</span></td>
+        <td>ระบบแผนที่ปักหมุดพิกัดจัดส่ง พร้อมปุ่มส่งต่อไปยัง Google Maps Navigation</td>
+      </tr>
+      <tr>
+        <td><strong>Audio & Media Tools</strong></td>
+        <td><span class="tag-tech">Web Audio API</span> <span class="tag-tech">HTML5 Canvas</span></td>
+        <td>เสียงกริ่งเตือนออเดอร์ใหม่ในตัว และระบบตัดขอบ/ย่อขนาดรูปภาพอาหารอัตโนมัติ</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <!-- ================= PAGE 2 ================= -->
+
+  <!-- PRD SECTION -->
+  <div class="section-title">📋 ส่วนที่ 2: เอกสารรายละเอียดของระบบ (PRD - Product Requirements Document)</div>
+
+  <div class="subsection-title">1. กลุ่มผู้ใช้งานหลักและสิทธิ์ในระบบ (User Roles & Permissions)</div>
+  <table style="margin-bottom: 12px;">
+    <thead>
+      <tr>
+        <th style="width: 22%;">บทบาท (Role)</th>
+        <th style="width: 38%;">ฟังก์ชันหลักที่เข้าถึงได้</th>
+        <th style="width: 40%;">สิทธิ์การจัดการในระบบ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1. ลูกค้า (Customer)</strong><br><span class="code-pill">role: 'customer'</span></td>
+        <td>ดูรายชื่อร้านค้า, ดูเมนู, สั่งซื้อหลายร้านพร้อมกัน, ปักหมุดที่อยู่บนแผนที่, ติดตามสถานะออเดอร์แบบสด, แชทกับคนส่ง, เขียนรีวิวให้ดาว</td>
+        <td>แก้ไขโปรไฟล์และเบอร์โทรตนเอง, สร้างคำสั่งซื้อ, ส่งข้อความแชทในออเดอร์ของตนเอง</td>
+      </tr>
+      <tr>
+        <td><strong>2. ร้านค้า (Merchant)</strong><br><span class="code-pill">role: 'merchant'</span></td>
+        <td>รับออเดอร์พร้อมเสียงกริ่งเตือน, เปลี่ยนสถานะอาหาร (เริ่มทำ ➔ ออกส่ง ➔ สำเร็จ), กดนำทางด้วย Google Maps, จัดการเมนูและสต็อก, สรุปยอดขาย</td>
+        <td>เปิด-ปิดร้านค้า, เพิ่ม/แก้ไข/ลบเมนูของร้านตนเอง, ปรับแต่งรูปภาพหน้าร้านและเมนูอาหาร</td>
+      </tr>
+      <tr>
+        <td><strong>3. แอดมิน (Admin)</strong><br><span class="code-pill">role: 'admin'</span></td>
+        <td>มอนิเตอร์ออเดอร์ทั้งหมดในระบบ, กรองและค้นหาย้อนหลัง, ดาวน์โหลดรายงาน CSV (Excel ภาษาไทย UTF-8), แต่งตั้งร้านค้า, ล้างประวัติแชทเก่า</td>
+        <td>สิทธิ์เต็มรูปแบบในการดูแลระบบ, แต่งตั้งสิทธิ์ผู้ใช้, จัดการข้อมูลร้านค้าและแก้ปัญหาคำสั่งซื้อ</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="subsection-title">2. โมเดลธุรกิจและระบบการเงินชุมชน (Business & Financial Model)</div>
+  <ul style="margin: 0 0 12px 0; padding-left: 18px; font-size: 12px; color: #334155; line-height: 1.6;">
+    <li><strong>อัตราค่าจัดส่ง (Delivery Fee):</strong> อัตราเหมา <strong>10 บาท / ออเดอร์ / ร้านค้า</strong> (ยอดเงินค่าส่งเข้ากระเป๋าพ่อค้าแม่ค้าผู้จัดส่ง 100%)</li>
+    <li><strong>ค่าบำรุงรักษาระบบ (GP Commission):</strong> คิดค่าธรรมเนียมเพียง <strong>5%</strong> จากยอดค่าอาหาร (ไม่รวมค่าส่ง 10 บาท) เพื่อนำไปเป็นค่าใช้จ่ายในการดูแลระบบคลาวด์และเซิร์ฟเวอร์</li>
+    <li><strong>วิธีการชำระเงิน (Payment Methods):</strong>
+      <br>- <strong>เงินสดปลายทาง (Cash on Delivery):</strong> ชำระตรงกับคนส่ง พร้อมระบบแจ้งความประสงค์เงินทอนล่วงหน้า (เช่น เตรียมเงินทอนแบงก์ 500)
+      <br>- <strong>สแกนจ่ายพร้อมเพย์ (PromptPay QR):</strong> สแกนจ่ายตรงเข้าบัญชีร้านค้าปลายทางเมื่ออาหารส่งถึงมือ
+    </li>
+  </ul>
+
+  <div class="subsection-title">3. สถาปัตยกรรมโครงสร้างฐานข้อมูล (Cloud Firestore Data Model)</div>
+  <table style="margin-bottom: 12px;">
+    <thead>
+      <tr>
+        <th style="width: 25%;">Collection Name</th>
+        <th style="width: 35%;">ฟิลด์ข้อมูลสำคัญ (Key Fields)</th>
+        <th style="width: 40%;">คำอธิบายการใช้งาน</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="code-pill">users</span></td>
+        <td>uid, display_name, phone, role, line_user_id, picture_url</td>
+        <td>โปรไฟล์ผู้ใช้งาน สิทธิ์การเข้าถึง และข้อมูลการติดต่อ</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">shops</span></td>
+        <td>id, name, phone, is_open, image_url, rating, sales_count, location</td>
+        <td>ข้อมูลร้านค้าในชุมชน สถานะเปิด-ปิด พิกัดร้าน และสถิติยอดขาย</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">menu_items</span></td>
+        <td>id, shop_id, name, price, category, image_url, is_available</td>
+        <td>รายการอาหาร/เครื่องดื่ม ราคา รูปภาพ และสถานะพร้อมขาย</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">orders</span></td>
+        <td>id, customer_uid, shop_id, items, total_amount, status, location</td>
+        <td>บิลคำสั่งซื้อ รายการอาหาร พิกัดจัดส่ง และสถานะ Real-time</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">chats</span></td>
+        <td>id, order_id, sender_uid, sender_role, text, image_url, created_at</td>
+        <td>ข้อความสนทนาสองทางระหว่างลูกค้าและร้านค้าตามรายออเดอร์</td>
+      </tr>
+      <tr>
+        <td><span class="code-pill">shop_reviews</span></td>
+        <td>id, shop_id, order_id, customer_name, rating (1-5), comment</td>
+        <td>คะแนนดาวและความคิดเห็นจากลูกค้าหลังได้รับอาหาร</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <!-- ================= PAGE 3 ================= -->
+
+  <!-- CORE FEATURES SECTION -->
+  <div class="section-title">🚀 ส่วนที่ 3: สรุปความก้าวหน้า Core Feature ที่พัฒนาและเปิดใช้งานแล้ว</div>
+  <div class="callout">
+    ✨ <strong>เข้าชมและทดสอบการทำงานของระบบจริงได้ที่:</strong> <a href="https://huaychan.web.app" target="_blank">https://huaychan.web.app</a>
+  </div>
+
+  <ul class="feature-list">
+    <li class="feature-item">
+      <strong>1. ระบบสั่งอาหารและตะกร้ารวมหลายร้าน (Multi-Shop Cart & Auto-Split System)</strong>
+      ผู้ใช้สามารถเลือกอาหารและเครื่องดื่มจากร้านค้าที่แตกต่างกันลงในตะกร้าเดียวกันได้ ระบบจะจัดกลุ่มสินค้าตามร้านค้า คำนวณค่าส่งเหมา 10 บาท/ร้านค้าอย่างถูกต้อง และเมื่อกดยืนยัน ระบบจะแยกเป็น Order Document รายร้านส่งตรงถึงพ่อค้าแม่ค้าแต่ละคนทันที
+    </li>
+    <li class="feature-item">
+      <strong>2. ระบบติดตามสถานะคำสั่งซื้อแบบสด (Live Real-time Order Tracking & Timeline)</strong>
+      แสดงสเต็ปสถานะการจัดส่ง 4 ขั้นตอนอย่างชัดเจน: <span class="code-pill">รอดำเนินการ</span> ➔ <span class="code-pill">กำลังปรุงอาหาร</span> ➔ <span class="code-pill">กำลังออกไปส่ง</span> ➔ <span class="code-pill">ส่งถึงมือแล้ว</span> เชื่อมต่อ Real-time Listener ทำให้หน้าจอลูกค้าอัปเดตทันทีที่ร้านค้ากดเปลี่ยนสถานะ
+    </li>
+    <li class="feature-item">
+      <strong>3. ระบบแชทสดสองทางในออเดอร์ (2-Way Real-time Order Chat)</strong>
+      ห้องสนทนาแยกตามรายออเดอร์ระหว่างลูกค้าและร้านค้าผู้ส่ง ช่วยให้สอบถามเส้นทาง สอบถามรายละเอียดเมนู หรือแจ้งการส่งมอบได้อย่างสะดวกรวดเร็ว ไม่ต้องสลับไปแอปอื่น
+    </li>
+    <li class="feature-item">
+      <strong>4. แดชบอร์ดร้านค้าพร้อมเสียงกริ่งเตือนและระบบนำทาง (Merchant Dashboard, Buzzer & 1-Click GPS)</strong>
+      หน้าจอสำหรับพ่อค้าแม่ค้า มีระบบสังเคราะห์เสียงกริ่ง (Audio Chime) ดังเตือนทันทีเมื่อมีออเดอร์ใหม่เข้า พร้อมปุ่มลัด 1-Click เปิดแอป Google Maps นำทางไปยังหมุดหอพักของลูกค้าได้ทันที
+    </li>
+    <li class="feature-item">
+      <strong>5. เครื่องมือตัดแต่งและบีบอัดรูปภาพในตัว (Built-in In-App Image Cropper & Compressor)</strong>
+      ระบบจัดการรูปภาพเมนูและหน้าร้านที่สามารถซูม หมุน และตัดขอบภาพ (สัดส่วน 1:1, 4:3, 16:9) ได้จากหน้าจอมือถือ พร้อมบีบอัดไฟล์ภาพให้โหลดไว ไม่เปลืองแบนด์วิดท์
+    </li>
+    <li class="feature-item">
+      <strong>6. ระบบแผนที่ปักหมุดจัดส่ง (Interactive Leaflet Map Pinning)</strong>
+      ลูกค้าสามารถค้นหาพิกัด ลากหมุดระบุตำแหน่งหอพัก/อาคาร พร้อมช่องระบุชื่อหอและเลขที่ห้องอย่างละเอียด ป้องกันปัญหาคนส่งหาที่อยู่ไม่เจอ
+    </li>
+    <li class="feature-item">
+      <strong>7. แดชบอร์ดแอดมินและการส่งออกรายงาน (Admin Monitoring & Thai UTF-8 CSV Export)</strong>
+      หน้าจอตรวจสอบออเดอร์ทั้งหมดในระบบ สามารถค้นหา กรองตามช่วงเวลา (วันนี้, เมื่อวาน, 7 วันล่าสุด, กำหนดเอง) และดาวน์โหลดรายงานเป็นไฟล์ CSV (Excel ภาษาไทย) สำหรับตรวจสอบยอดขายและค่า GP
+    </li>
+  </ul>
+
+  <!-- UI SCREENS SUMMARY -->
+  <div class="section-title">🎨 ส่วนที่ 4: สรุปหน้าจอต้นแบบและการใช้งานจริง (UI Screens & Experience)</div>
+  <p style="margin: 0 0 10px 0; font-size: 12px; color: #475569;">
+    โครงสร้างหน้าจอได้รับการออกแบบให้เป็นมิตรกับผู้ใช้ทุกวัย โทนสีอบอุ่น ชัดเจน ใช้งานง่ายบนสมาร์ตโฟน:
+  </p>
+  
+  <div class="concept-grid">
+    <div class="concept-card">
+      <strong>📱 1. หน้ารวมร้านค้า (Home Feed)</strong>
+      <p>แบนเนอร์ชุมชน, ตัวกรองหมวดหมู่อาหาร/เครื่องดื่ม, ช่องค้นหาร้าน, แสดงสถานะเปิด-ปิดร้าน และคะแนนดาว</p>
+    </div>
+    <div class="concept-card">
+      <strong>🍲 2. หน้ารายการเมนู (Shop Detail)</strong>
+      <p>รูปภาพหน้าร้าน, เมนูอาหารแยกหมวดหมู่, ตัวเลือกพิเศษ (Options), ปุ่มเพิ่ม/ลดจำนวน และแถบสรุปยอดตะกร้าลอย</p>
+    </div>
+    <div class="concept-card">
+      <strong>📍 3. ตะกร้าและปักหมุด (Cart & Checkout)</strong>
+      <p>สรุปรายการอาหารแยกตามร้าน, แผนที่ปักหมุดที่อยู่, ช่องระบุเงินทอน และปุ่มยืนยันสั่งซื้อ</p>
+    </div>
+    <div class="concept-card">
+      <strong>🛵 4. หน้าติดตามสถานะ & แชท (Tracking & Chat)</strong>
+      <p>สเต็ปบาร์สถานะสด, ปุ่มโทรหาร้านค้า, ปุ่มเปิดห้องแชทสดสองทาง และฟอร์มให้คะแนนรีวิวหลังส่งเสร็จ</p>
+    </div>
+    <div class="concept-card">
+      <strong>🏪 5. หน้าจอร้านค้า (Merchant Dashboard)</strong>
+      <p>แท็บออเดอร์กำลังทำ/ส่งสำเร็จ, ปุ่มเปลี่ยนสถานะ, ปุ่มนำทาง Google Maps, ระบบจัดการเมนู และสรุปยอดขาย</p>
+    </div>
+    <div class="concept-card">
+      <strong>⚙️ 6. หน้าจอผู้ดูแลระบบ (Admin Dashboard)</strong>
+      <p>มอนิเตอร์ภาพรวม, กรองคำสั่งซื้อตามวัน, ส่งออกรายงาน Excel CSV และระบบจัดการสิทธิ์ผู้ใช้งาน</p>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    รายงานความก้าวหน้าโครงการ "ห้วยชันหิวข้าว" ครั้งที่ 1 • เข้าชมระบบจริงได้ที่: https://huaychan.web.app
+  </div>
+
+</body>
+</html>

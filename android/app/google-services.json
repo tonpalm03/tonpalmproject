@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "854984707571",
+    "firebase_url": "https://tonpalmproject-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "tonpalmproject",
+    "storage_bucket": "tonpalmproject.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:854984707571:android:c49803ed296a5c406e1686",
+        "android_client_info": {
+          "package_name": "com.tonpalm.merchant"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB320wBnbZjY_7OC4NdN3yPYg3cxp8GWZc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>การ์ดโปรโมทห้วยชันหิวข้าว (Print Ready A4)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,700&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      font-family: 'Kanit', 'Prompt', sans-serif;
+      background-color: #f1f5f9;
+      color: #1e293b;
+      min-height: 100vh;
+    }
+
+    /* Top Control Bar (Screen Only) */
+    .control-panel {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: #ffffff;
+      border-bottom: 2px solid #e2e8f0;
+      padding: 14px 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    .control-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #ea580c;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: #ea580c;
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(234, 88, 12, 0.35);
+    }
+    .btn-primary:hover {
+      background: #c2410c;
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: #fff;
+      color: #475569;
+      border-color: #cbd5e1;
+    }
+    .btn-outline:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .btn-outline.active {
+      background: #fff7ed;
+      color: #ea580c;
+      border-color: #ea580c;
+      font-weight: 700;
+    }
+
+    .input-field {
+      padding: 7px 10px;
+      font-size: 13px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-family: inherit;
+      outline: none;
+    }
+    .input-field:focus {
+      border-color: #ea580c;
+    }
+
+    /* Print Preview Wrapper */
+    .preview-wrapper {
+      padding: 30px 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .page-note {
+      font-size: 13px;
+      color: #64748b;
+      background: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      max-width: 800px;
+      text-align: center;
+    }
+
+    /* A4 Sheet Container */
+    .a4-sheet {
+      width: 210mm;
+      min-height: 297mm;
+      height: 297mm;
+      padding: 7mm 8mm;
+      background: #ffffff;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      box-sizing: border-box;
+    }
+
+    /* Layout 8 Cards (2 cols x 4 rows) - Approx 97mm x 69mm */
+    .layout-8 {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 5mm;
+    }
+
+    /* Layout 10 Cards (2 cols x 5 rows) - Standard Business Card Size ~97mm x 55mm */
+    .layout-10 {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      gap: 3.5mm;
+    }
+
+    /* Individual Card Box */
+    .card-item {
+      position: relative;
+      border: 1px dashed #cbd5e1;
+      border-radius: 8px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    /* Cut Guides */
+    .card-item::before {
+      content: "✂";
+      position: absolute;
+      top: -9px;
+      right: 12px;
+      font-size: 10px;
+      color: #94a3b8;
+      background: #fff;
+      padding: 0 2px;
+      line-height: 1;
+    }
+
+    /* Theme 1: Vibrant Orange Delivery */
+    .theme-vibrant {
+      background: linear-gradient(135deg, #ffffff 0%, #fff7ed 60%, #ffedd5 100%);
+      border: 1.5px dashed #f97316;
+    }
+
+    .theme-vibrant .card-badge {
+      background: linear-gradient(90deg, #ea580c, #f97316);
+      color: #ffffff;
+    }
+
+    .theme-vibrant .highlight-pill {
+      background: #ea580c;
+      color: #fff;
+    }
+
+    /* Theme 2: Eco Print (Save Ink) */
+    .theme-eco {
+      background: #ffffff;
+      border: 1px dashed #94a3b8;
+    }
+
+    .theme-eco .card-badge {
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    .theme-eco .highlight-pill {
+      border: 2px solid #ea580c;
+      color: #ea580c;
+      background: #fff;
+      font-weight: 800;
+    }
+
+    /* Theme 3: Merchant Recruitment */
+    .theme-merchant {
+      background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 60%, #dcfce7 100%);
+      border: 1.5px dashed #16a34a;
+    }
+
+    .theme-merchant .card-badge {
+      background: linear-gradient(90deg, #15803d, #16a34a);
+      color: #ffffff;
+    }
+
+    .theme-merchant .highlight-pill {
+      background: #16a34a;
+      color: #fff;
+    }
+
+    /* Card Content Structure */
+    .card-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      min-width: 0;
+    }
+
+    .card-header-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+
+    .app-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .app-name-block {
+      line-height: 1.1;
+    }
+
+    .app-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.2px;
+      white-space: nowrap;
+    }
+
+    .app-sub {
+      font-size: 9px;
+      color: #64748b;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 140px;
+    }
+
+    .card-badge {
+      display: inline-block;
+      align-self: flex-start;
+      font-size: 8px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.2px;
+      margin: 2px 0 3px 0;
+      white-space: nowrap;
+    }
+
+    .highlight-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 6px;
+      margin-bottom: 3px;
+      width: fit-content;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .features-list {
+      list-style: none;
+      font-size: 9px;
+      line-height: 1.35;
+      color: #334155;
+      font-weight: 500;
+      margin-bottom: 3px;
+    }
+
+    .features-list li {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .features-list li span.dot {
+      color: #f97316;
+      font-weight: bold;
+    }
+
+    .card-footer {
+      font-size: 8px;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-top: 1px solid rgba(0,0,0,0.05);
+      padding-top: 2px;
+      margin-top: auto;
+    }
+
+    /* QR Code Column */
+    .card-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: #ffffff;
+      padding: 5px;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      border: 1px solid #e2e8f0;
+      text-align: center;
+    }
+
+    .qr-container {
+      width: 68px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qr-container img, .qr-container canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+
+    .qr-label {
+      font-size: 8.5px;
+      font-weight: 700;
+      color: #ea580c;
+      margin-top: 3px;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+
+    .qr-sublabel {
+      font-size: 7px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+
+    /* Print Specific Media Rules */
+    @media print {
+      body {
+        background: #fff;
+        margin: 0;
+        padding: 0;
+      }
+      .control-panel, .page-note {
+        display: none !important;
+      }
+      .preview-wrapper {
+        padding: 0;
+        gap: 0;
+      }
+      .a4-sheet {
+        box-shadow: none;
+        page-break-after: always;
+        break-after: page;
+        margin: 0 auto;
+        padding: 5mm 6mm;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Controls for Customizing & 1-Click Print -->
+  <header class="control-panel">
+    <div class="control-container">
+      <div class="brand-title">
+        <span id="brand-header-title">🛵 ห้วยชันเดลิเวอรี่</span>
+        <span style="font-size: 13px; font-weight: normal; color: #64748b;">| เครื่องมือพิมพ์การ์ดแจก (A4 Print Ready)</span>
+      </div>
+
+      <div class="control-group">
+        <label style="font-size: 13px; font-weight: 600; color: #334155;">สไตล์:</label>
+        <button class="btn btn-outline active" id="btn-theme-vibrant" onclick="setTheme('theme-vibrant')">🔥 สีส้มเดลิเวอรี่</button>
+        <button class="btn btn-outline" id="btn-theme-eco" onclick="setTheme('theme-eco')">🌱 ประหยัดหมึก</button>
+        <button class="btn btn-outline" id="btn-theme-merchant" onclick="setTheme('theme-merchant')">🏪 ใบรับสมัครร้านค้า</button>
+      </div>
+
+      <div class="control-group">
+        <label style="font-size: 13px; font-weight: 600; color: #334155;">จำนวนต่อ A4:</label>
+        <button class="btn btn-outline active" id="btn-layout-8" onclick="setLayout(8)">8 ใบ/แผ่น (จับถนัด)</button>
+        <button class="btn btn-outline" id="btn-layout-10" onclick="setLayout(10)">10 ใบ/แผ่น (เท่านามบัตร)</button>
+      </div>
+
+      <div class="control-group">
+        <button class="btn btn-primary" onclick="window.print()">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+          พิมพ์ลงกระดาษ A4 (Print)
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Text Customizer Drawer -->
+    <div style="max-width: 1200px; margin: 10px auto 0; padding-top: 10px; border-top: 1px dashed #e2e8f0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+      <span style="font-size: 12px; font-weight: 600; color: #64748b;">✏️ ปรับแก้ข้อความสด:</span>
+      <div style="display: inline-flex; align-items: center; gap: 4px;">
+        <input type="text" class="input-field" id="input-appname" value="ห้วยชันเดลิเวอรี่" style="width: 140px; font-weight: bold;" placeholder="ชื่อแอพ" oninput="updateCards()">
+        <button type="button" onclick="setAppName('ห้วยชันเดลิเวอรี่')" style="font-size: 11px; padding: 3px 6px; border-radius: 4px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer;">เดลิเวอรี่</button>
+        <button type="button" onclick="setAppName('ห้วยชันไดวีอารี')" style="font-size: 11px; padding: 3px 6px; border-radius: 4px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer;">ไดวีอารี</button>
+      </div>
+      <input type="text" class="input-field" id="input-headline" value="สั่งง่าย ส่งตรงถึงหน้าหอพัก" style="width: 165px;" placeholder="จุดเด่นหลัก" oninput="updateCards()">
+      <input type="text" class="input-field" id="input-sub" value="ส่งถึงหน้าหอพัก มรภ.ชัยภูมิ & ชุมชนห้วยชัน" style="width: 250px;" placeholder="พื้นที่บริการ" oninput="updateCards()">
+      <input type="text" class="input-field" id="input-url" value="https://huaychan.web.app" style="width: 190px;" placeholder="URL สแกน QR" onchange="regenerateQRs()">
+      <input type="text" class="input-field" id="input-contact" value="LINE: @huaychan | เว็บ: huaychan.web.app" style="width: 230px;" placeholder="เบอร์โทร / LINE" oninput="updateCards()">
+    </div>
+  </header>
+
+  <!-- Sheet Area -->
+  <main class="preview-wrapper">
+    <div class="page-note">
+      💡 <b>คำแนะนำการพิมพ์:</b> กดปุ่ม <b>"พิมพ์ลงกระดาษ A4"</b> &bull; ในหน้าตั้งค่าเครื่องพิมพ์ให้เลือก <b>Margins: None (ไม่มีขอบ)</b> หรือ <b>Minimum</b> และติ๊กถูก <b>Background graphics (พิมพ์พื้นหลัง)</b> เพื่อให้สีและเส้นประตัดกระดาษออกมาสมบูรณ์แบบ
+    </div>
+
+    <div class="a4-sheet layout-8" id="sheet-container">
+      <!-- Cards rendered here -->
+    </div>
+  </main>
+
+  <script>
+    let currentLayout = 8;
+    let currentTheme = 'theme-vibrant';
+
+    const presets = {
+      'theme-vibrant': {
+        badge: '🛵 สั่งอาหารชุมชน & มรภ.ชัยภูมิ',
+        headline: 'สั่งง่าย ส่งตรงถึงหน้าหอพัก',
+        features: [
+          'รวมร้านเด็ดรอบ มรภ.ชัยภูมิ & ชุมชนห้วยชัน',
+          'ไม่ต้องโหลดแอพ สแกนแล้วสั่งได้ทันที',
+          'จ่ายปลายทางได้ เงินสด / สแกนจ่ายกับคนส่ง'
+        ],
+        qrLabel: 'สแกนสั่งเลย 📲',
+        qrSub: 'huaychan.web.app'
+      },
+      'theme-eco': {
+        badge: '🛵 ห้วยชันหิวข้าว เดลิเวอรี่',
+        headline: 'หิวเมื่อไหร่ สแกนสั่งเลย!',
+        features: [
+          'รวมอาหารตามสั่ง ก๋วยเตี๋ยว เครื่องดื่ม ขนม',
+          'สั่งรวมหลายร้านได้ในครั้งเดียว',
+          'ส่งถึงหน้าหอพัก ไม่ต้องตากแดดตากฝน'
+        ],
+        qrLabel: 'สแกนดูเมนู 🍲',
+        qrSub: 'huaychan.web.app'
+      },
+      'theme-merchant': {
+        badge: '🏪 เปิดรับสมัครร้านค้าชุมชน',
+        headline: 'เพิ่มยอดขาย สมัครฟรี 0 บ.',
+        features: [
+          'ไม่มีค่าแรกเข้า ร้านกำหนดค่าส่งเองได้อิสระ',
+          'รับออเดอร์ง่ายผ่านมือถือ มีเสียงเตือน',
+          'ร้านค้าส่งเอง รับเงินค่าอาหารเต็มๆ'
+        ],
+        qrLabel: 'สแกนเปิดร้าน 👨‍🍳',
+        qrSub: 'เริ่มขายได้ทันที'
+      }
+    };
+
+    function renderCards() {
+      const container = document.getElementById('sheet-container');
+      container.className = `a4-sheet layout-${currentLayout}`;
+      container.innerHTML = '';
+
+      const count = currentLayout;
+      const preset = presets[currentTheme];
+      const appName = document.getElementById('input-appname') ? document.getElementById('input-appname').value : 'ห้วยชันเดลิเวอรี่';
+      const headline = document.getElementById('input-headline').value || preset.headline;
+      const sub = document.getElementById('input-sub').value;
+      const contact = document.getElementById('input-contact').value;
+      const url = document.getElementById('input-url').value || 'https://huaychan.web.app';
+
+      const headerTitle = document.getElementById('brand-header-title');
+      if (headerTitle) headerTitle.innerText = '🛵 ' + appName;
+
+      for (let i = 0; i < count; i++) {
+        const card = document.createElement('div');
+        card.className = `card-item ${currentTheme}`;
+        card.innerHTML = `
+          <div class="card-left">
+            <div>
+              <div class="card-header-row">
+                <img src="./logo.png" onerror="this.src='./icon-192.png'; this.onerror=null;" class="app-icon" alt="Logo">
+                <div class="app-name-block">
+                  <div class="app-name">${appName}</div>
+                  <div class="app-sub">${sub}</div>
+                </div>
+              </div>
+              <div class="card-badge">${preset.badge}</div>
+            </div>
+
+            <div>
+              <div class="highlight-pill">${headline}</div>
+              <ul class="features-list">
+                ${preset.features.map(f => `<li><span class="dot">•</span> ${f}</li>`).join('')}
+              </ul>
+            </div>
+
+            <div class="card-footer">
+              <span>${contact}</span>
+            </div>
+          </div>
+
+          <div class="card-right">
+            <div class="qr-container" id="qr-box-${i}"></div>
+            <div class="qr-label">${preset.qrLabel}</div>
+            <div class="qr-sublabel">${preset.qrSub}</div>
+          </div>
+        `;
+        container.appendChild(card);
+
+        // Generate QR Code
+        setTimeout(() => {
+          const qrBox = document.getElementById(`qr-box-${i}`);
+          if (qrBox) {
+            qrBox.innerHTML = '';
+            try {
+              if (window.QRCode) {
+                new QRCode(qrBox, {
+                  text: url,
+                  width: 68,
+                  height: 68,
+                  colorDark: currentTheme === 'theme-merchant' ? '#14532d' : (currentTheme === 'theme-eco' ? '#0f172a' : '#c2410c'),
+                  colorLight: "#ffffff",
+                  correctLevel: QRCode.CorrectLevel.M
+                });
+              } else {
+                throw new Error('QRCode lib not loaded');
+              }
+            } catch (e) {
+              qrBox.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}" style="width:68px;height:68px;" alt="QR">`;
+            }
+          }
+        }, 30);
+      }
+    }
+
+    function setAppName(name) {
+      const input = document.getElementById('input-appname');
+      if (input) input.value = name;
+      renderCards();
+    }
+
+    function setTheme(theme) {
+      currentTheme = theme;
+      document.querySelectorAll('[id^="btn-theme-"]').forEach(b => b.classList.remove('active'));
+      document.getElementById(`btn-${theme}`).classList.add('active');
+
+      const preset = presets[theme];
+      document.getElementById('input-headline').value = preset.headline;
+      renderCards();
+    }
+
+    function setLayout(layout) {
+      currentLayout = layout;
+      document.querySelectorAll('[id^="btn-layout-"]').forEach(b => b.classList.remove('active'));
+      document.getElementById(`btn-layout-${layout}`).classList.add('active');
+      renderCards();
+    }
+
+    function updateCards() {
+      renderCards();
+    }
+
+    function regenerateQRs() {
+      renderCards();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCards();
+    });
+  </script>
+</body>
+</html>

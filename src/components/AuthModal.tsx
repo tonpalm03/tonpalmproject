@@ -18,7 +18,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showTerms, setShowTerms] = useState(false);
-  const [showLineGuide, setShowLineGuide] = useState(false);
+  const [showMerchantLogin, setShowMerchantLogin] = useState(false);
   const [showFullImageModal, setShowFullImageModal] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,7 +50,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition"
+            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -98,9 +98,9 @@ export default function AuthModal({ onClose }: AuthModalProps) {
             <span>{loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบด้วย LINE'}</span>
           </button>
 
-          {/* LINE Login Tip & Visual Guide */}
+          {/* LINE Login Tip & Direct Visual Guide */}
           <div className="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-2.5 text-left transition-all">
-            <div className="flex items-start gap-2">
+            <div className="flex items-start gap-2 mb-2">
               <Smartphone className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
               <div className="flex-1 text-[11px] text-gray-600 leading-relaxed">
                 <p className="font-bold text-emerald-800">ทริค: ไม่ต้องจำรหัสผ่าน</p>
@@ -113,105 +113,102 @@ export default function AuthModal({ onClose }: AuthModalProps) {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setShowLineGuide(!showLineGuide)}
-              className="mt-2 w-full py-1.5 px-2 bg-white hover:bg-emerald-100/50 text-emerald-700 font-bold text-[11px] rounded-xl border border-emerald-200 flex items-center justify-center gap-1.5 transition cursor-pointer shadow-2xs"
+            {/* Direct Image Preview with Zoom on Click */}
+            <div
+              onClick={() => setShowFullImageModal(true)}
+              className="relative overflow-hidden rounded-xl border border-emerald-200 bg-white p-1 cursor-pointer group hover:border-emerald-400 transition"
             >
-              <ZoomIn className="w-3.5 h-3.5" />
-              <span>{showLineGuide ? 'ซ่อนรูปตัวอย่าง' : 'ดูรูปตัวอย่างปุ่มในหน้า LINE'}</span>
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${showLineGuide ? 'rotate-180' : ''}`} />
-            </button>
-
-            {showLineGuide && (
-              <div
-                onClick={() => setShowFullImageModal(true)}
-                className="mt-2 relative overflow-hidden rounded-xl border border-emerald-200 bg-white p-1 cursor-pointer group hover:border-emerald-400 transition"
-              >
-                <img
-                  src="/line-login-guide.png"
-                  alt="วิธีเข้าสู่ระบบด้วยแอป LINE"
-                  className="w-full h-auto max-h-52 object-contain rounded-lg group-hover:opacity-95 transition"
-                />
-                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition flex items-center justify-center rounded-xl">
-                  <span className="bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                    <ZoomIn className="w-3 h-3" /> แตะเพื่อดูรูปขยาย
-                  </span>
-                </div>
-                <p className="text-[10px] text-center text-gray-400 mt-1">แตะที่รูปเพื่อดูรูปภาพขนาดเต็ม</p>
+              <img
+                src="/line-login-guide.png"
+                alt="วิธีเข้าสู่ระบบด้วยแอป LINE"
+                className="w-full h-auto max-h-56 object-contain rounded-lg group-hover:opacity-95 transition"
+              />
+              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition flex items-center justify-center rounded-xl">
+                <span className="bg-black/70 text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                  <ZoomIn className="w-3 h-3" /> แตะเพื่อดูรูปขยาย
+                </span>
               </div>
-            )}
+              <p className="text-[10px] text-center text-gray-400 mt-1 font-medium">
+                แตะที่รูปเพื่อดูรูปภาพขนาดเต็ม
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-200" />
-          </div>
-          <div className="relative flex justify-center text-xs">
-            <span className="bg-white px-2.5 text-gray-400 font-bold text-[11px] flex items-center gap-1">
-              <Store className="w-3.5 h-3.5 text-amber-500" />
-              <span>สำหรับร้านค้าและผู้ดูแลระบบ</span>
-            </span>
-          </div>
-        </div>
-
-        {/* 2. Merchant / Admin Form */}
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <div>
-            <label className="text-xs font-semibold text-gray-700 block mb-1">อีเมลร้านค้า / แอดมิน (Email)</label>
-            <div className="relative">
-              <Mail className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="email"
-                required
-                placeholder="merchant@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="text-xs font-semibold text-gray-700 block mb-1">รหัสผ่าน (Password)</label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="password"
-                required
-                placeholder="กรอกรหัสผ่าน"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500"
-              />
-            </div>
-          </div>
-
+        {/* Divider & Merchant Collapsible Toggle */}
+        <div className="mt-4 pt-3 border-t border-gray-100">
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 disabled:opacity-50 text-white rounded-xl font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+            type="button"
+            onClick={() => setShowMerchantLogin(!showMerchantLogin)}
+            className="w-full py-2 px-3 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-2xl border border-gray-200/80 flex items-center justify-between text-xs font-bold transition cursor-pointer"
           >
-            <LogIn className="w-4 h-4" />
-            <span>{loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบร้านค้า / แอดมิน'}</span>
+            <div className="flex items-center gap-2">
+              <Store className="w-4 h-4 text-amber-500" />
+              <span>เข้าสู่ระบบสำหรับร้านค้า / แอดมิน</span>
+            </div>
+            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showMerchantLogin ? 'rotate-180' : ''}`} />
           </button>
-        </form>
 
-        {/* Merchant Provisioning Note */}
-        <div className="mt-3.5 pt-3 border-t border-gray-100 text-center">
-          <p className="text-[11px] text-gray-400 leading-relaxed flex items-center justify-center gap-1">
-            <Store className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-            <span>บัญชีร้านค้าจะได้รับการเปิดโดยผู้ดูแลระบบเท่านั้น</span>
-          </p>
-          <p className="text-[11px] text-gray-400 leading-relaxed">
-            หากต้องการเปิดร้านค้าใหม่ กรุณาติดต่อแอดมิน
-          </p>
+          {/* 2. Merchant / Admin Form (Collapsed by Default) */}
+          {showMerchantLogin && (
+            <form onSubmit={handleSubmit} className="mt-3 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div>
+                <label className="text-xs font-semibold text-gray-700 block mb-1">อีเมลร้านค้า / แอดมิน (Email)</label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="email"
+                    required
+                    placeholder="merchant@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-gray-700 block mb-1">รหัสผ่าน (Password)</label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="password"
+                    required
+                    placeholder="กรอกรหัสผ่าน"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 disabled:opacity-50 text-white rounded-xl font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>{loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบร้านค้า / แอดมิน'}</span>
+              </button>
+
+              <div className="text-center pt-1">
+                <p className="text-[11px] text-gray-400">
+                  บัญชีร้านค้าจะได้รับการเปิดโดยผู้ดูแลระบบเท่านั้น
+                </p>
+                <p className="text-[11px] text-gray-400">
+                  หากต้องการเปิดร้านค้าใหม่ กรุณาติดต่อแอดมิน
+                </p>
+              </div>
+            </form>
+          )}
+        </div>
+
+        {/* Terms of Service Button */}
+        <div className="mt-3 pt-2 text-center">
           <button
             type="button"
             onClick={() => setShowTerms(true)}
-            className="text-[11px] text-amber-600 hover:text-amber-700 underline font-semibold mt-1"
+            className="text-[11px] text-amber-600 hover:text-amber-700 underline font-semibold cursor-pointer"
           >
             ข้อกำหนดการใช้บริการ
           </button>
@@ -244,7 +241,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
               <button
                 type="button"
                 onClick={() => setShowFullImageModal(false)}
-                className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition"
+                className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>

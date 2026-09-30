@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               if (!active()) return;
               setIsLiffAvailable(result.isInitialized);
               if (result.isLoggedIn) {
-                const idToken = await getValidLineIdToken(10, 200);
+                const idToken = await getValidLineIdToken(8, 80);
                 if (idToken) {
                   try {
                     const exchange = httpsCallable<{ idToken: string }, { token: string }>(functions, 'signInWithLine');
@@ -88,25 +88,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (active()) setIsLoading(false);
           return;
         }
-        const ref = doc(db, 'users', firebaseUser.uid);
-        try {
-          await runTransaction(db, async tx => {
-            const snap = await tx.get(ref);
-            if (!snap.exists()) tx.set(ref, {
-              uid: firebaseUser.uid, display_name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'ผู้ใช้งาน',
-              picture_url: firebaseUser.photoURL || '', role: 'customer', created_at: new Date().toISOString(),
-            });
-          });
-        } catch (txErr) {
-          console.warn('User profile sync skipped:', txErr);
-        }
+
+        // Fast immediate profile publication
         if (!active()) return;
+        const ref = doc(db, 'users', firebaseUser.uid);
+
+        // Background non-blocking user doc baseline guarantee
+        setDoc(ref, {
+          uid: firebaseUser.uid,
+          display_name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'ผู้ใช้งาน',
+          picture_url: firebaseUser.photoURL || '',
+          role: 'customer',
+          last_active_at: new Date().toISOString(),
+        }, { merge: true }).catch((err) => console.warn('Background profile baseline check warning:', err));
+
         let profile: UserProfile | null = null;
         let accessReady = false;
         let authority: { role: UserRole; shop_id?: string } = { role: 'customer' };
         const publish = () => {
           if (!active() || !accessReady) return;
-          setUser(profile ? { ...profile, uid: firebaseUser.uid, role: authority.role, shop_id: authority.shop_id } : null);
+          const resolvedProfile = profile || {
+            uid: firebaseUser.uid,
+            display_name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'ผู้ใช้งาน',
+            picture_url: firebaseUser.photoURL || '',
+            role: authority.role,
+            created_at: new Date().toISOString(),
+          };
+          setUser({ ...resolvedProfile, uid: firebaseUser.uid, role: authority.role, shop_id: authority.shop_id });
           setIsLoading(false);
         };
         const fail = () => { if (active()) { generation++; stopListeners(); setUser(null); setIsLoading(false); setAuthError('ตรวจสอบสิทธิ์บัญชีไม่สำเร็จ กรุณาเข้าสู่ระบบใหม่'); } };
@@ -194,7 +202,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (initResult.isLoggedIn) {
-        const idToken = await getValidLineIdToken(10, 200);
+        const idToken = await getValidLineIdToken(8, 80);
         if (idToken) {
           try {
             const exchange = httpsCallable<{ idToken: string }, { token: string }>(functions, 'signInWithLine');

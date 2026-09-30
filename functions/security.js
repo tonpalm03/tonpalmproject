@@ -7,60 +7,71 @@ module.exports = function securityFunctions(functions, admin) {
     deleteUserAccount: region.runWith({ invoker: 'public' }).https.onCall(require('./delete-account')(admin, functions)),
     signInWithLine: region.https.onCall(async (data) => {
       let identity;
-      try { identity = await verifyLineIdentity(data?.idToken, process.env.LINE_LOGIN_CHANNEL_ID || '2011320201'); }
-      catch (error) {
+      try {
+        identity = await verifyLineIdentity(data?.idToken, process.env.LINE_LOGIN_CHANNEL_ID || '2011320201');
+      } catch (error) {
         console.error('signInWithLine verifyLineIdentity failure:', error.message);
         if (error.message === 'LINE_CHANNEL_NOT_CONFIGURED') throw new functions.https.HttpsError('failed-precondition', 'LINE login is not configured');
         throw new functions.https.HttpsError('unauthenticated', 'LINE verification failed');
       }
-      // Preserve legacy LINE subject IDs, but ensure account is not disabled.
-      try {
-        const existing = await admin.auth().getUser(identity.uid);
-        if (existing.disabled) throw new functions.https.HttpsError('permission-denied', 'Account is disabled');
-      } catch (error) { if (error.code !== 'auth/user-not-found') throw error; }
-      const profile = db.collection('users').doc(identity.uid);
-      await db.runTransaction(async tx => {
-        const deletion = await tx.get(db.collection('_account_deletions').doc(identity.uid));
-        if (deletion.exists && (deletion.data().state !== 'deleted'
-          || !Number.isFinite(identity.issuedAt) || identity.issuedAt <= deletion.data().revoked_before)) {
-          throw new functions.https.HttpsError('unauthenticated', 'กรุณาเข้าสู่ระบบ LINE ใหม่หลังจากบัญชีเดิมถูกลบ');
-        }
-        const snapshot = await tx.get(profile);
-        if (!snapshot.exists) {
-          tx.create(profile, {
-            uid: identity.uid,
-            line_user_id: identity.uid,
-            display_name: identity.name,
-            picture_url: identity.picture,
-            role: 'customer',
-            created_at: admin.firestore.FieldValue.serverTimestamp()
-          });
-        } else {
-          const updates = {};
-          if (identity.name && identity.name !== snapshot.data().display_name) updates.display_name = identity.name;
-          if (identity.picture && identity.picture !== snapshot.data().picture_url) updates.picture_url = identity.picture;
-          if (Object.keys(updates).length > 0) {
-            tx.update(profile, updates);
-          }
-        }
-      });
 
-      try {
-        await admin.auth().updateUser(identity.uid, {
-          displayName: identity.name,
-          photoURL: identity.picture || undefined,
+      // 1. Account deletion verification & Firestore profile sync in parallel
+      const profileSyncTask = (async () => {
+        const profile = db.collection('users').doc(identity.uid);
+        await db.runTransaction(async tx => {
+          const deletion = await tx.get(db.collection('_account_deletions').doc(identity.uid));
+          if (deletion.exists && (deletion.data().state !== 'deleted'
+            || !Number.isFinite(identity.issuedAt) || identity.issuedAt <= deletion.data().revoked_before)) {
+            throw new functions.https.HttpsError('unauthenticated', 'กรุณาเข้าสู่ระบบ LINE ใหม่หลังจากบัญชีเดิมถูกลบ');
+          }
+          const snapshot = await tx.get(profile);
+          if (!snapshot.exists) {
+            tx.create(profile, {
+              uid: identity.uid,
+              line_user_id: identity.uid,
+              display_name: identity.name,
+              picture_url: identity.picture,
+              role: 'customer',
+              created_at: admin.firestore.FieldValue.serverTimestamp()
+            });
+          } else {
+            const updates = {};
+            if (identity.name && identity.name !== snapshot.data().display_name) updates.display_name = identity.name;
+            if (identity.picture && identity.picture !== snapshot.data().picture_url) updates.picture_url = identity.picture;
+            if (Object.keys(updates).length > 0) {
+              tx.update(profile, updates);
+            }
+          }
         });
-      } catch (authSyncErr) {
-        if (authSyncErr.code === 'auth/user-not-found') {
-          await admin.auth().createUser({
-            uid: identity.uid,
+      })();
+
+      // 2. Auth user sync & disabled check in parallel
+      const authSyncTask = (async () => {
+        try {
+          const existing = await admin.auth().getUser(identity.uid);
+          if (existing.disabled) throw new functions.https.HttpsError('permission-denied', 'Account is disabled');
+          await admin.auth().updateUser(identity.uid, {
             displayName: identity.name,
             photoURL: identity.picture || undefined,
-          }).catch(() => {});
+          });
+        } catch (error) {
+          if (error.code === 'auth/user-not-found') {
+            await admin.auth().createUser({
+              uid: identity.uid,
+              displayName: identity.name,
+              photoURL: identity.picture || undefined,
+            }).catch(() => {});
+          } else {
+            throw error;
+          }
         }
-      }
+      })();
 
-      return { token: await admin.auth().createCustomToken(identity.uid) };
+      // 3. Custom token creation in parallel
+      const customTokenTask = admin.auth().createCustomToken(identity.uid);
+
+      const [, , token] = await Promise.all([profileSyncTask, authSyncTask, customTokenTask]);
+      return { token };
     }),
     reserveOrderNumbers: region.https.onCall(async (data, context) => {
       if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Sign in first');

@@ -24,6 +24,19 @@ export interface LineLoginResult {
 // Store the initialization promise alone so subsequent calls check live SDK status
 let sdkInitPromise: Promise<boolean> | null = null;
 
+// Eagerly pre-warm LIFF SDK on client evaluation so it is ready instantly when user taps login
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    ensureLiffSdkInitialized().catch(() => {});
+  }, 0);
+}
+
+export function preloadLiff() {
+  if (typeof window !== 'undefined') {
+    ensureLiffSdkInitialized().catch(() => {});
+  }
+}
+
 export function isLineTokenValid(): boolean {
   try {
     if (typeof window === 'undefined') return false;
@@ -41,9 +54,9 @@ export function isLineTokenValid(): boolean {
 
 /**
  * Polls and waits for LIFF to populate and validate the ID token
- * Critical for mobile browsers (iOS Safari / Android Chrome / WebViews) where token storage hydration is async.
+ * Fast progressive polling (80ms intervals) for immediate responsiveness.
  */
-export async function getValidLineIdToken(maxAttempts: number = 8, intervalMs: number = 200): Promise<string | null> {
+export async function getValidLineIdToken(maxAttempts: number = 10, intervalMs: number = 80): Promise<string | null> {
   if (typeof window === 'undefined') return null;
 
   for (let i = 0; i < maxAttempts; i++) {

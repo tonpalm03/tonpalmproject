@@ -135,6 +135,7 @@ export default function ChatModal({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isFirstLoadRef = useRef(true);
+  const playedMsgIdsRef = useRef<Set<string>>(new Set());
 
   // Auto-scroll to bottom
   const scrollToBottom = () => {
@@ -145,8 +146,8 @@ export default function ChatModal({
     scrollToBottom();
   }, [messages, selectedImage]);
 
-  // Clear unread notification on parent order when chat is opened
-  useEffect(() => {
+  // Clear unread notification on parent order when chat is opened or tab becomes active
+  const clearUnreadStatus = () => {
     if (!orderId) return;
     try {
       if (currentUser.role === 'merchant') {
@@ -155,6 +156,21 @@ export default function ChatModal({
         updateDoc(doc(db, 'orders', orderId), { has_customer_unread_message: false }).catch(() => {});
       }
     } catch (e) {}
+  };
+
+  useEffect(() => {
+    clearUnreadStatus();
+    const handleVisibilityChange = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        clearUnreadStatus();
+      }
+    };
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
+    }
   }, [orderId, currentUser.role]);
 
   // Auto-fetch profile picture or shop payment info from Firestore if missing
@@ -233,15 +249,30 @@ export default function ChatModal({
         });
 
         if (loaded.length > 0) {
-          // Play notification chime for new incoming messages
+          // Play notification chime for new incoming messages and deduplicate
           if (isFirstLoadRef.current) {
             isFirstLoadRef.current = false;
+            loaded.forEach((m) => playedMsgIdsRef.current.add(m.id));
           } else {
-            const latest = loaded[loaded.length - 1];
-            if (latest && latest.sender_uid !== currentUser.uid && latest.sender_uid !== 'system') {
-              soundAlert.playMessageSound();
+            const incomingUnplayed = loaded.filter((m) => !playedMsgIdsRef.current.has(m.id));
+            if (incomingUnplayed.length > 0) {
+              incomingUnplayed.forEach((m) => playedMsgIdsRef.current.add(m.id));
+              const latest = incomingUnplayed[incomingUnplayed.length - 1];
+              if (latest && latest.sender_uid !== currentUser.uid && latest.sender_uid !== 'system') {
+                soundAlert.playMessageSound();
+              }
             }
           }
+
+          // Dynamic unread clearing while chat modal is currently visible
+          if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+            if (currentUser.role === 'merchant') {
+              updateDoc(doc(db, 'orders', orderId), { has_unread_message: false }).catch(() => {});
+            } else if (currentUser.role === 'customer') {
+              updateDoc(doc(db, 'orders', orderId), { has_customer_unread_message: false }).catch(() => {});
+            }
+          }
+
           setMessages(loaded);
         } else {
           isFirstLoadRef.current = false;
@@ -271,7 +302,7 @@ export default function ChatModal({
     } catch (e) {
       console.error(e);
     }
-  }, [orderId, currentUser.uid]); // BUG-12: only depend on stable IDs, not prop strings
+  }, [orderId, currentUser.uid, currentUser.role]); // Stable dependencies
 
   const handleImageFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -320,6 +351,9 @@ export default function ChatModal({
       };
       if (currentUser.role === 'customer') {
         unreadUpdate.has_unread_message = true;
+      } else if (currentUser.role === 'admin') {
+        unreadUpdate.has_unread_message = true;
+        unreadUpdate.has_customer_unread_message = true;
       } else {
         unreadUpdate.has_customer_unread_message = true;
       }

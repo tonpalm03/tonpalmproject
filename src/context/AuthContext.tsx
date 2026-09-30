@@ -280,6 +280,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateUserPhone = async (phone: string): Promise<{ success: boolean; error?: string }> => {
     if (!user) return { success: false, error: 'ยังไม่ได้เข้าสู่ระบบ' };
+    const prev = user;
     const cleanPhone = phone.trim();
     const updated = { ...user, phone: cleanPhone };
     setUser(updated);
@@ -289,6 +290,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { success: true };
     } catch (e: any) {
       console.warn('Phone update to Firestore failed:', e);
+      if (prev) {
+        setUser(prev);
+        localStorage.setItem('hchk_user_cache', JSON.stringify(prev));
+      }
       return { success: false, error: e?.message || 'บันทึกเบอร์โทรศัพท์ไม่สำเร็จ' };
     }
   };
@@ -301,6 +306,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     default_location?: { lat: number; lng: number };
   }): Promise<{ success: boolean; error?: string }> => {
     if (!user) return { success: false, error: 'ยังไม่ได้เข้าสู่ระบบ' };
+    const prev = user;
     const allowedKeys = ['display_name', 'picture_url', 'phone', 'default_address', 'default_location'] as const;
     const cleanUpdates: Record<string, any> = {};
     for (const key of allowedKeys) {
@@ -319,6 +325,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { success: true };
     } catch (e: any) {
       console.warn('Profile update to Firestore failed:', e);
+      if (prev) {
+        setUser(prev);
+        localStorage.setItem('hchk_user_cache', JSON.stringify(prev));
+      }
       return { success: false, error: e?.message || 'บันทึกข้อมูลไม่สำเร็จ' };
     }
   };

@@ -77,8 +77,12 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
   const handleCropComplete = async (croppedDataUrl: string) => {
     try {
       setIsSaving(true);
-      await updateUserProfile({ picture_url: croppedDataUrl });
-      alert('อัปเดตรูปโปรไฟล์สำเร็จแล้ว!');
+      const res = await updateUserProfile({ picture_url: croppedDataUrl });
+      if (res && !res.success) {
+        alert(res.error || 'เกิดข้อผิดพลาดในการบันทึกรูปโปรไฟล์');
+      } else {
+        alert('อัปเดตรูปโปรไฟล์สำเร็จแล้ว!');
+      }
     } catch (e) {
       console.error('Update profile picture error:', e);
       alert('เกิดข้อผิดพลาดในการบันทึกรูปโปรไฟล์');
@@ -95,8 +99,12 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
     }
     try {
       setIsSaving(true);
-      await updateUserProfile({ picture_url: '' });
-      alert('ลบรูปโปรไฟล์เรียบร้อยแล้ว');
+      const res = await updateUserProfile({ picture_url: '' });
+      if (res && !res.success) {
+        alert(res.error || 'เกิดข้อผิดพลาดในการลบรูปโปรไฟล์');
+      } else {
+        alert('ลบรูปโปรไฟล์เรียบร้อยแล้ว');
+      }
     } catch (e) {
       console.error('Remove profile picture error:', e);
       alert('เกิดข้อผิดพลาดในการลบรูปโปรไฟล์');
@@ -115,10 +123,14 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
 
     try {
       setIsSaving(true);
-      await updateUserProfile({
+      const res = await updateUserProfile({
         display_name: displayName.trim(),
         phone: phone.trim(),
       });
+      if (res && !res.success) {
+        alert(res.error || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+        return;
+      }
       setIsEditingInfo(false);
       alert('บันทึกข้อมูลส่วนตัวเรียบร้อยแล้ว!');
     } catch (e) {
@@ -139,10 +151,14 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
 
     try {
       setIsSavingAddress(true);
-      await updateUserProfile({
+      const res = await updateUserProfile({
         default_address: defaultAddress.trim(),
         default_location: defaultLocation,
       });
+      if (res && !res.success) {
+        alert(res.error || 'เกิดข้อผิดพลาดในการบันทึกที่อยู่');
+        return;
+      }
       setIsEditingAddress(false);
       alert('บันทึกที่อยู่และหมุดพิกัดจัดส่งสำเร็จแล้ว!');
     } catch (e) {

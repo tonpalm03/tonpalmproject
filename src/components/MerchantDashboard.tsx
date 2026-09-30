@@ -307,6 +307,8 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
   const knownPendingOrderIdsRef = useRef<Set<string>>(new Set());
   const knownUnreadMessagesMapRef = useRef<Map<string, string>>(new Map());
+  const activeChatOrderIdRef = useRef<string | null>(null);
+  useEffect(() => { activeChatOrderIdRef.current = activeChatOrder?.id || null; }, [activeChatOrder]);
   const isInitialLoadRef = useRef(true);
   // BUG-11: keep isSoundEnabled in a ref so the orders listener doesn't rebuild on toggle
   const isSoundEnabledRef = useRef(isSoundEnabled);
@@ -564,8 +566,9 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
               knownUnreadMessagesMapRef.current.set(o.id, sig);
             });
 
-            // Play message sound chime
-            if (isSoundEnabledRef.current) {
+            // Play message sound chime (skip if only for the chat modal currently open to avoid double chime)
+            const hasMessagesOutsideOpenChat = newMsgOrders.some((o) => o.id !== activeChatOrderIdRef.current);
+            if (isSoundEnabledRef.current && hasMessagesOutsideOpenChat) {
               soundAlert.playMessageSound();
             }
 

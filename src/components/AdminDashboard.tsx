@@ -142,6 +142,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
   const [topupNote, setTopupNote] = useState<string>('');
   const [isSubmittingCredit, setIsSubmittingCredit] = useState<boolean>(false);
   const [creditError, setCreditError] = useState<string | null>(null);
+  const creditIdempotencyKeyRef = useRef<string>('');
 
   // Real-time listener for System Settings (GP toggle & percentage)
   useEffect(() => {
@@ -622,57 +623,29 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
     setIsSubmittingCredit(true);
     setCreditError(null);
 
+    if (!creditIdempotencyKeyRef.current) {
+      creditIdempotencyKeyRef.current = `topup_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    }
+
     try {
-      let newBal = 0;
-      let willClose = false;
+      const callTopup = httpsCallable<
+        { shopId: string; amount: number; note?: string; idempotencyKey?: string },
+        { success: boolean; newBalance: number; is_open?: boolean; alreadyProcessed?: boolean }
+      >(functions, 'topUpMerchantCredit');
 
-      try {
-        const callTopup = httpsCallable<
-          { shopId: string; amount: number; note?: string },
-          { success: boolean; newBalance: number; is_open?: boolean }
-        >(functions, 'topUpMerchantCredit');
+      const res = await callTopup({
+        shopId: selectedShopForCredit.id,
+        amount: finalAmount,
+        note: topupNote.trim() || (topupType === 'topup' ? 'แอดมินเติมเครดิต' : 'แอดมินปรับลดยอดเครดิต'),
+        idempotencyKey: creditIdempotencyKeyRef.current,
+      });
 
-        const res = await callTopup({
-          shopId: selectedShopForCredit.id,
-          amount: finalAmount,
-          note: topupNote.trim() || (topupType === 'topup' ? 'แอดมินเติมเครดิต' : 'แอดมินปรับลดยอดเครดิต'),
-        });
-
-        if (res.data?.success) {
-          newBal = res.data.newBalance ?? 0;
-          willClose = gpEnabled && newBal <= 0;
-        } else {
-          throw new Error('Callable returned failure');
-        }
-      } catch (callableErr: any) {
-        console.warn('topUpMerchantCredit callable fallback, attempting direct Firestore transaction:', callableErr);
-        const shopRef = doc(db, 'shops', selectedShopForCredit.id);
-        const txDocRef = doc(collection(db, 'credit_transactions'));
-        
-        await runTransaction(db, async (transaction) => {
-          const shopSnap = await transaction.get(shopRef);
-          if (!shopSnap.exists()) throw new Error('ไม่พบข้อมูลร้านค้า');
-          const currentBal = typeof shopSnap.data().credit_balance === 'number' ? shopSnap.data().credit_balance : 0;
-          newBal = Math.round((currentBal + finalAmount) * 100) / 100;
-          willClose = gpEnabled && newBal <= 0;
-
-          transaction.update(shopRef, {
-            credit_balance: newBal,
-            ...(willClose ? { is_open: false } : {}),
-          });
-
-          transaction.set(txDocRef, {
-            id: txDocRef.id,
-            shop_id: selectedShopForCredit.id,
-            shop_name: selectedShopForCredit.name || '',
-            amount: finalAmount,
-            type: finalAmount > 0 ? 'topup' : 'deduct',
-            note: topupNote.trim() || (topupType === 'topup' ? 'แอดมินเติมเครดิต' : 'แอดมินปรับลดยอดเครดิต'),
-            created_by: currentUser.uid,
-            created_at: serverTimestamp(),
-          });
-        });
+      if (!res.data?.success) {
+        throw new Error('ไม่สามารถปรับยอดเครดิตได้ กรุณาลองใหม่อีกครั้ง');
       }
+
+      const newBal = res.data.newBalance ?? 0;
+      const willClose = gpEnabled && newBal <= 0;
 
       soundAlert.playAdminTopupSound().catch(() => {});
       
@@ -685,17 +658,18 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
         )
       );
 
+      creditIdempotencyKeyRef.current = '';
       alert(
         `${topupType === 'topup' ? 'เติมเครดิต' : 'ปรับลดเครดิต'} ให้ร้าน "${selectedShopForCredit.name}" สำเร็จ!\nยอดคงเหลือใหม่: ฿${newBal.toFixed(2)}${
           willClose ? '\n\nยอดเครดิตไม่เพียงพอ ระบบได้ทำการปิดร้านค้านี้ชั่วคราวอัตโนมัติ' : ''
         }`
       );
       setSelectedShopForCredit(null);
-      setTopupAmount('100');
+      setTopupAmount('');
       setTopupNote('');
     } catch (err: any) {
-      console.error('Top-up credit error:', err);
-      setCreditError(err.message || 'เกิดข้อผิดพลาดในการทำรายการเครดิต');
+      console.error('topUpMerchantCredit error:', err);
+      setCreditError(err?.message || 'เกิดข้อผิดพลาดในการทำรายการ กรุณาลองใหม่อีกครั้ง');
     } finally {
       setIsSubmittingCredit(false);
     }

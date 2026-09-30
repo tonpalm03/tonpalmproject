@@ -11,7 +11,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { Shop, MenuItem, Order, UserRole } from '@/types';
 import { db } from '@/lib/firebase';
-import { collection, onSnapshot, doc, query, where, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot, doc, getDoc, query, where, getDocs } from 'firebase/firestore';
 import { soundAlert } from '@/lib/soundAlert';
 
 import CartCheckoutModal from '@/components/CartCheckoutModal';
@@ -213,6 +213,40 @@ export default function HomePage() {
     restoreOrders();
   }, [user]);
 
+  // Deep link support for web push notifications / direct chat links (e.g. ?order_id=...&open_chat=1)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const targetOrderId = params.get('order_id');
+    const openChat = params.get('open_chat');
+
+    if (targetOrderId) {
+      const loadDeepLinkOrder = async () => {
+        try {
+          const docSnap = await getDoc(doc(db, 'orders', targetOrderId));
+          if (docSnap.exists()) {
+            const orderData = { id: docSnap.id, ...docSnap.data() } as Order;
+            setTrackingOrders((prev) => {
+              const existingIdx = prev.findIndex((o) => o.id === targetOrderId);
+              if (existingIdx >= 0) {
+                const next = [...prev];
+                next.splice(existingIdx, 1);
+                return [orderData, ...next];
+              }
+              return [orderData, ...prev];
+            });
+            if (openChat === '1' || openChat === 'true') {
+              setAutoOpenChatInTracking(true);
+            }
+            setShowTrackingModal(true);
+          }
+        } catch (err) {
+          console.warn('Deep link order load failed:', err);
+        }
+      };
+      loadDeepLinkOrder();
+    }
+  }, []);
 
   const orderSubscribersRef = useRef<Map<string, () => void>>(new Map());
 
@@ -250,11 +284,14 @@ export default function HomePage() {
                     soundAlert.playCustomerStatusSound(updated.status).catch(() => {});
                   }
                 }
-                // If new unread message arrived from shop, play chime sound
-                if (
-                  updated.has_customer_unread_message &&
-                  !prevOrder?.has_customer_unread_message
-                ) {
+                // If new unread message arrived from shop (or subsequent message), play chime sound
+                const prevMsgAt = (prevOrder as any)?.last_message_at?.seconds ?? (prevOrder as any)?.last_message_at;
+                const newMsgAt = (updated as any)?.last_message_at?.seconds ?? (updated as any)?.last_message_at;
+                const isNewMessageArrival = updated.has_customer_unread_message && (
+                  !prevOrder?.has_customer_unread_message ||
+                  (newMsgAt && prevMsgAt !== newMsgAt)
+                );
+                if (isNewMessageArrival && !showTrackingModal) {
                   soundAlert.playMessageSound();
                 }
                 // Keep completed orders for 24h (post-delivery chat); remove cancelled immediately

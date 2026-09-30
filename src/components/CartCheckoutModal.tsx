@@ -224,8 +224,8 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
       const pos = await getCurrentLocation();
       setLocation(pos);
       const dist = getDistanceKm(shopCenterLocation.lat, shopCenterLocation.lng, pos.lat, pos.lng);
-      if (dist > MAX_DELIVERY_RADIUS_KM) {
-        setErrorMsg(`พิกัด GPS ปัจจุบันของคุณ (${formatDistance(dist)}) อยู่นอกรัศมีบริการ ${MAX_DELIVERY_RADIUS_KM} กม. กรุณาเลื่อนหมุดมาอยู่ในเขตบริการ`);
+      if (dist > activeAllowedRadius) {
+        setErrorMsg(`พิกัด GPS ปัจจุบันของคุณ (${formatDistance(dist)}) อยู่นอกรัศมีบริการ ${activeAllowedRadius} กม. กรุณาเลื่อนหมุดมาอยู่ในเขตบริการ`);
       }
     } catch (error) {
       setErrorMsg(locationErrorMessage(error));
@@ -264,7 +264,10 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
     }
 
     if (isDeliveryOutOfRange) {
-      setErrorMsg(`ขออภัย จุดจัดส่งของคุณอยู่นอกพื้นที่บริการ (${formatDistance(deliveryDistanceKm)}) ระบบจำกัดระยะจัดส่งไม่เกิน ${MAX_DELIVERY_RADIUS_KM} กม. กรุณาเลื่อนหมุดมาอยู่ในเขตบริการ`);
+      const radiusDesc = outOfRangeShops.length > 0
+        ? `ร้าน "${outOfRangeShops[0].shop.name}" จำกัดระยะไม่เกิน ${outOfRangeShops[0].allowedRadius} กม.`
+        : `ระบบจำกัดระยะจัดส่งไม่เกิน ${activeAllowedRadius} กม.`;
+      setErrorMsg(`ขออภัย จุดจัดส่งของคุณอยู่นอกพื้นที่บริการ (${formatDistance(deliveryDistanceKm)}) ${radiusDesc} กรุณาเลื่อนหมุดมาอยู่ในเขตบริการ`);
       return;
     }
 

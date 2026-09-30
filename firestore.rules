@@ -39,9 +39,10 @@ service cloud.firestore {
    allow read: if true;
    allow create, delete: if admin();
    allow update: if admin() || (merchant(shop)
-    && changedOnly(['name','phone','promptpay_number','image_url','address_detail','location','category','is_open','delivery_fee','bank_name','bank_account_number','bank_account_name','promptpay_qr_url','allow_cod'])
+    && changedOnly(['name','phone','promptpay_number','image_url','address_detail','location','category','is_open','delivery_fee','delivery_radius_km','bank_name','bank_account_number','bank_account_name','promptpay_qr_url','allow_cod'])
     && request.resource.data.name is string && request.resource.data.is_open is bool
     && (!('delivery_fee' in request.resource.data) || (request.resource.data.delivery_fee is number && request.resource.data.delivery_fee >= 0))
+    && (!('delivery_radius_km' in request.resource.data) || (request.resource.data.delivery_radius_km is number && request.resource.data.delivery_radius_km > 0 && request.resource.data.delivery_radius_km <= 50))
     && (request.resource.data.is_open == false
         || !exists(/databases/$(database)/documents/system_settings/general)
         || get(/databases/$(database)/documents/system_settings/general).data.get('gp_enabled', false) != true

@@ -82,6 +82,7 @@ function setup({ gpEnabled = true, gpPercent = 5, deliveryFee = 10, isShopOpen =
     documents,
     notifications,
     pushedOrders,
+    handler,
     checkout: (payload, userUid = uid) => handler(payload, { auth: userUid ? { uid: userUid } : null }),
     validOrderPayload,
   };
@@ -567,6 +568,39 @@ test('checkoutOrder respects shop custom delivery_radius_km', async () => {
   await assert.rejects(
     async () => s.checkout(rejectedPayload),
     (err) => err.code === 'failed-precondition' && err.message.includes('เกินรัศมีที่ร้านกำหนด 3 กิโลเมตร')
+  );
+});
+
+test('checkoutOrder rejects caller during deleting state', async () => {
+  const s = setup();
+  s.documents.set('_account_deletions/cust_123', { state: 'deleting', revoked_before: 100 });
+  const payload = s.validOrderPayload('deleting_user_key');
+  await assert.rejects(
+    async () => s.checkout(payload),
+    (err) => err.code === 'unauthenticated' && err.message.includes('อยู่ระหว่างดำเนินการลบ')
+  );
+});
+
+test('checkoutOrder allows re-registered caller when auth_time > revoked_before', async () => {
+  const s = setup();
+  s.documents.set('_account_deletions/cust_123', { state: 'deleted', revoked_before: 1000 });
+  const payload = s.validOrderPayload('fresh_reregistered_key');
+  // Caller auth token has auth_time 1005 (after revoked_before 1000)
+  const context = { auth: { uid: 'cust_123', token: { auth_time: 1005 } } };
+  const res = await s.handler(payload, context);
+  assert.equal(res.success, true);
+  assert.equal(res.orders.length, 1);
+});
+
+test('checkoutOrder rejects stale session when auth_time <= revoked_before', async () => {
+  const s = setup();
+  s.documents.set('_account_deletions/cust_123', { state: 'deleted', revoked_before: 1000 });
+  const payload = s.validOrderPayload('stale_deleted_key');
+  // Caller auth token has auth_time 900 (before revoked_before 1000)
+  const context = { auth: { uid: 'cust_123', token: { auth_time: 900 } } };
+  await assert.rejects(
+    async () => s.handler(payload, context),
+    (err) => err.code === 'unauthenticated' && err.message.includes('ถูกลบแล้ว')
   );
 });
 

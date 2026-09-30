@@ -15,6 +15,17 @@ module.exports = function securityFunctions(functions, admin) {
         throw new functions.https.HttpsError('unauthenticated', 'LINE verification failed');
       }
 
+      // Verify if account is disabled in Firebase Auth (A06)
+      try {
+        const existingUser = await admin.auth().getUser(identity.uid);
+        if (existingUser.disabled) {
+          throw new functions.https.HttpsError('permission-denied', 'บัญชีผู้ใช้นี้ถูกระงับการใช้งาน');
+        }
+      } catch (authCheckErr) {
+        if (authCheckErr instanceof functions.https.HttpsError) throw authCheckErr;
+        if (authCheckErr.code !== 'auth/user-not-found') throw authCheckErr;
+      }
+
       // Parallelize deletion check and fast JWT token creation
       const [deletionDoc, customToken] = await Promise.all([
         db.collection('_account_deletions').doc(identity.uid).get(),

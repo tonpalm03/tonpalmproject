@@ -56,6 +56,23 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
 
     const trimmedKey = idempotency_key.trim();
     const reqRef = db.collection('_checkout_requests').doc(trimmedKey);
+    const authTime = context.auth?.token?.auth_time;
+
+    function checkAccountActive(deletionSnap) {
+      if (!deletionSnap || !deletionSnap.exists) return;
+      const data = deletionSnap.data() || {};
+      if (data.state === 'deleting') {
+        throw new functions.https.HttpsError('unauthenticated', 'บัญชีนี้อยู่ระหว่างดำเนินการลบ กรุณาเข้าสู่ระบบใหม่');
+      }
+      if (data.state === 'deleted') {
+        const revokedBefore = data.revoked_before;
+        if (typeof authTime === 'number' && typeof revokedBefore === 'number' && authTime > revokedBefore) {
+          // Allowed: fresh login/re-registration after deletion completed
+          return;
+        }
+        throw new functions.https.HttpsError('unauthenticated', 'บัญชีผู้ใช้นี้ถูกลบแล้ว กรุณาเข้าสู่ระบบใหม่');
+      }
+    }
 
     async function replayCheckout(reqData) {
       if (reqData.customer_uid !== customerUid) {
@@ -74,7 +91,10 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
       };
     }
 
-    // 1. Check idempotency before transaction
+    // 1. Verify caller account status and idempotency before transaction
+    const initialDeletionSnap = await db.collection('_account_deletions').doc(customerUid).get();
+    checkAccountActive(initialDeletionSnap);
+
     const existingReq = await reqRef.get();
     if (existingReq.exists) return replayCheckout(existingReq.data());
 
@@ -111,12 +131,9 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
         throw new functions.https.HttpsError('failed-precondition', 'Invalid order counter');
       }
 
-      // Verify unique shops
-      // Verify caller is not deleted (F03)
+      // Verify caller is not deleted / deleting (A04)
       const callerDeletionSnap = await tx.get(db.collection('_account_deletions').doc(customerUid));
-      if (callerDeletionSnap.exists && callerDeletionSnap.data().state === 'deleted') {
-        throw new functions.https.HttpsError('unauthenticated', 'บัญชีผู้ใช้นี้ถูกลบแล้ว กรุณาเข้าสู่ระบบใหม่');
-      }
+      checkAccountActive(callerDeletionSnap);
 
       // Verify unique shops
       const uniqueShopIds = [...new Set(rawOrders.map(o => o.shop_id).filter(Boolean))];

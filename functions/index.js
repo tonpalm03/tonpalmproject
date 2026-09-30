@@ -706,3 +706,65 @@ exports.sendOrderPush = functions.region('us-central1').https.onRequest((req, re
   res.status(200).json({ ok: true });
 });
 
+/**
+ * Realtime Chat Message Push Notification Trigger
+ * Listens for new messages on orders/{orderId}/messages/{messageId} and sends push alerts
+ */
+exports.onChatMessageCreated = region.firestore
+  .document('orders/{orderId}/messages/{messageId}')
+  .onCreate(async (snap, context) => {
+    const message = snap.data();
+    if (!message) return null;
+    const { orderId } = context.params;
+    const senderUid = message.sender_uid;
+    const senderRole = message.sender_role;
+
+    // Do not notify for system messages
+    if (senderUid === 'system') return null;
+
+    try {
+      const orderSnap = await admin.firestore().collection('orders').doc(orderId).get();
+      if (!orderSnap.exists) return null;
+      const order = orderSnap.data();
+
+      // If message sent by customer or admin, notify merchant devices
+      if (senderRole === 'customer' || senderRole === 'admin') {
+        const shopId = order.shop_id;
+        if (shopId) {
+          const tokens = await merchantTokens(shopId);
+          if (tokens.length > 0) {
+            const senderName = message.sender_name || 'ลูกค้า';
+            const title = `💬 ข้อความใหม่จาก ${senderName}`;
+            const body = `${message.text ? message.text.slice(0, 100) : '📷 ส่งรูปภาพ'} (ออเดอร์ #${order.order_number || orderId.slice(0, 5)})`;
+
+            await admin.messaging().sendEachForMulticast({
+              tokens,
+              notification: { title, body },
+              data: {
+                orderId: String(orderId),
+                shopId: String(shopId),
+                type: 'CHAT_MESSAGE',
+                url: `/?order_id=${orderId}&open_chat=1`,
+              },
+              android: {
+                priority: 'high',
+                notification: {
+                  channelId: 'orders_channel',
+                  sound: 'default',
+                  defaultSound: true,
+                  defaultVibrateTimings: true,
+                  notificationPriority: 'PRIORITY_MAX',
+                  visibility: 'PUBLIC',
+                },
+              },
+            }).catch((err) => console.warn('Chat push multicast error:', err));
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('onChatMessageCreated error:', err);
+    }
+    return null;
+  });
+
+

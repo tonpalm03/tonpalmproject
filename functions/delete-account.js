@@ -42,10 +42,13 @@ module.exports = function createDeleteAccountHandler(admin, functions) {
     if (shopId) {
       batch.delete(db.collection('shop_private').doc(shopId).collection('devices').doc(uid));
       batch.delete(db.collection('admin_merchant_credentials').doc(shopId));
-      batch.update(db.collection('shops').doc(shopId), {
-        is_open: false,
-        updated_at: admin.firestore.FieldValue.serverTimestamp(),
-      });
+      const shopSnap = await db.collection('shops').doc(shopId).get();
+      if (shopSnap.exists) {
+        batch.update(db.collection('shops').doc(shopId), {
+          is_open: false,
+          updated_at: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      }
     }
     batch.update(marker, { state: 'deleted' });
     await batch.commit();

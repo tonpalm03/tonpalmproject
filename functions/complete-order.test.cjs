@@ -34,10 +34,14 @@ function setup({ gpEnabled = true, status = 'delivering', balance = 3, gpAmount 
   } };
   const firestore = Object.assign(() => db, { FieldValue: { increment: value => ({ increment: value }), serverTimestamp: () => 'timestamp' } });
   const admin = { initializeApp() {}, firestore };
-  const region = { https: { onCall: fn => fn, onRequest: fn => fn }, runWith: options => {
-    assert.equal(options.invoker, 'public', 'Firebase Auth clients must be able to reach the callable');
-    return region;
-  } };
+  const region = {
+    https: { onCall: fn => fn, onRequest: fn => fn },
+    firestore: { document: () => ({ onCreate: fn => fn, onUpdate: fn => fn, onDelete: fn => fn }) },
+    runWith: options => {
+      assert.equal(options.invoker, 'public', 'Firebase Auth clients must be able to reach the callable');
+      return region;
+    }
+  };
   const functions = { https: { HttpsError: class extends Error { constructor(code, msg) { super(msg); this.code = code; } } }, region: () => region };
   const sandbox = { exports: {}, console, require: name => name === './security' || name === './checkout' ? () => ({}) : name === 'firebase-functions' ? functions : admin };
   vm.runInNewContext(fs.readFileSync(`${__dirname}/index.js`, 'utf8'), sandbox);

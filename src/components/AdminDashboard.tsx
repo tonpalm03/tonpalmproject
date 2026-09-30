@@ -2346,7 +2346,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
               <div className="p-3.5 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl text-xs text-emerald-900 space-y-1">
                 <p className="font-bold flex items-center gap-1.5 text-emerald-800">
                   <Sparkles className="w-4 h-4 text-emerald-600" />
-                  <span>กำลังเปิดใช้งานโหมด &ldquo;ช่วงเปิดตัวฟรี (GP 0%)&rdquo;</span>
+                  <span>กำลังเปิดใช้งานโหมด &ldquo;ฟรีค่าคอมมิชชั่น (GP 0%)&rdquo;</span>
                 </p>
                 <p className="text-[11px] text-emerald-700 leading-relaxed">
                   ร้านค้าจะได้รับยอดขายอาหารเต็ม 100% โดยระบบจะไม่หักเครดิตหรือคิดค่าคอมมิชชั่นใด ๆ เมื่อออเดอร์จัดส่งสำเร็จ

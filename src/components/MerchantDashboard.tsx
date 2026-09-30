@@ -1267,7 +1267,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
             </div>
             {systemSettings?.gp_enabled === false ? (
               <p className="text-[11px] text-emerald-600 font-bold flex items-center gap-1 mt-0.5">
-                <span>สิทธิ์พิเศษช่วงเปิดตัว: ฟรีค่าคอมมิชชั่น 0%! (ไม่ต้องเติมเครดิต)</span>
+                <span>ฟรีค่าคอมมิชชั่น 0% (ไม่ต้องเติมเครดิต)</span>
               </p>
             ) : (
               <p className="text-[11px] text-gray-500 mt-0.5">

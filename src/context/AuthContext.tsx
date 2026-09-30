@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               if (!active()) return;
               setIsLiffAvailable(result.isInitialized);
               if (result.isLoggedIn) {
-                const idToken = await getValidLineIdToken(8, 80);
+                const idToken = await getValidLineIdToken(25, 120);
                 if (idToken) {
                   try {
                     const exchange = httpsCallable<{ idToken: string }, { token: string }>(functions, 'signInWithLine');
@@ -73,12 +73,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     await signInWithCustomToken(auth, response.data.token);
                     return;
                   } catch (exchangeErr) {
-                    console.warn('Auto LINE token exchange failed (token expired?), clearing stale session:', exchangeErr);
-                    triggerLineLogout();
+                    console.warn('Auto LINE token exchange failed:', exchangeErr);
                   }
                 } else {
-                  console.warn('LIFF reports logged in but no valid ID token found, clearing stale LIFF session');
-                  triggerLineLogout();
+                  console.warn('LIFF reports logged in but token not yet populated');
                 }
               }
             } catch (lineErr) {
@@ -206,7 +204,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (initResult.isLoggedIn) {
-        const idToken = await getValidLineIdToken(8, 80);
+        const idToken = await getValidLineIdToken(25, 120);
         if (idToken) {
           try {
             const exchange = httpsCallable<{ idToken: string }, { token: string }>(functions, 'signInWithLine');
@@ -215,31 +213,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setIsLoading(false);
             return { success: true };
           } catch (exchangeErr: any) {
-            console.warn('Cached LINE token exchange failed:', exchangeErr);
-            const errCode = exchangeErr?.code || '';
-            const isTokenInvalid = errCode === 'unauthenticated' || errCode === 'invalid-argument' || exchangeErr?.message?.includes('token');
-            if (isTokenInvalid) {
-              // Stale token, clear session and re-trigger fresh login
-              triggerLineLogout();
-              const redirectRes = triggerLineLogin(true);
-              if (redirectRes.status === 'redirecting') {
-                return { success: true, redirecting: true };
-              }
+            console.warn('LINE token exchange failed, refreshing session:', exchangeErr);
+            triggerLineLogout();
+            const redirectRes = triggerLineLogin(true);
+            if (redirectRes.status === 'redirecting') {
+              return { success: true, redirecting: true };
             }
             setIsLoading(false);
-            const msg = 'ไม่สามารถยืนยันตัวตนกับ LINE ได้ กรุณาตรวจสอบการเชื่อมต่อแล้วลองใหม่อีกครั้ง';
+            const msg = 'ไม่สามารถยืนยันตัวตนกับ LINE ได้ กรุณาลองใหม่อีกครั้ง';
             setAuthError(msg);
             return { success: false, error: msg };
           }
-        } else {
-          // No valid ID token in logged in state, clear stale session and redirect
-          triggerLineLogout();
-          const redirectRes = triggerLineLogin(true);
-          if (redirectRes.status === 'redirecting') {
-            return { success: true, redirecting: true };
-          }
-          setIsLoading(false);
-          return { success: false, error: 'ไม่พบข้อมูลการเข้าสู่ระบบ LINE กรุณาลองใหม่อีกครั้ง' };
         }
       }
 

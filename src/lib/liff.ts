@@ -56,7 +56,7 @@ export function isLineTokenValid(): boolean {
  * Polls and waits for LIFF to populate and validate the ID token
  * Fast progressive polling (80ms intervals) for immediate responsiveness.
  */
-export async function getValidLineIdToken(maxAttempts: number = 10, intervalMs: number = 80): Promise<string | null> {
+export async function getValidLineIdToken(maxAttempts: number = 25, intervalMs: number = 120): Promise<string | null> {
   if (typeof window === 'undefined') return null;
 
   for (let i = 0; i < maxAttempts; i++) {
@@ -70,6 +70,8 @@ export async function getValidLineIdToken(maxAttempts: number = 10, intervalMs: 
             if (decoded.exp > nowSec + 30) {
               return token;
             }
+          } else {
+            return token;
           }
         }
       }
@@ -113,9 +115,9 @@ async function ensureLiffSdkInitialized(): Promise<boolean> {
 
       const timeoutTask = new Promise<boolean>((resolve) => {
         setTimeout(() => {
-          console.warn('LINE LIFF init timed out after 8s');
+          console.warn('LINE LIFF init timed out after 15s');
           resolve(false);
-        }, 8000);
+        }, 15000);
       });
 
       const success = await Promise.race([initTask, timeoutTask]);
@@ -123,14 +125,6 @@ async function ensureLiffSdkInitialized(): Promise<boolean> {
         sdkInitPromise = null;
         return false;
       }
-
-      // Clean up OAuth query parameters from URL without reloading
-      try {
-        if (typeof window !== 'undefined' && (window.location.search.includes('code=') || window.location.search.includes('liffClientId='))) {
-          const cleanUrl = `${window.location.origin}${window.location.pathname}`;
-          window.history.replaceState({}, document.title, cleanUrl);
-        }
-      } catch (_) {}
 
       return true;
     } catch (err) {

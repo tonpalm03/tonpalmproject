@@ -28,7 +28,7 @@ import UserAvatar from '@/components/UserAvatar';
 import { formatOrderCode } from '@/lib/orderNumber';
 
 export default function HomePage() {
-  const { user, role, logout } = useAuth();
+  const { user, role, isLineLoggingIn, logout } = useAuth();
   const {
     items,
     currentShop,
@@ -1208,6 +1208,27 @@ export default function HomePage() {
         isOpen={showContactModal}
         onClose={() => setShowContactModal(false)}
       />
+
+      {/* LINE Login Global Loading Overlay */}
+      {isLineLoggingIn && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-6 text-center max-w-xs w-full shadow-2xl space-y-3.5 border border-emerald-100 animate-in zoom-in-95">
+            <div className="w-16 h-16 rounded-2xl bg-[#06C755]/10 text-[#06C755] flex items-center justify-center mx-auto relative shadow-inner">
+              <svg className="w-9 h-9 fill-current" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 5.91 2 10.74c0 2.94 1.67 5.53 4.25 7.03-.18.66-.67 2.42-.77 2.79-.12.46.17.45.36.33.15-.09 2.06-1.4 2.89-1.97.42.06.84.09 1.27.09 5.52 0 10-3.91 10-8.74S17.52 2 12 2z"/>
+              </svg>
+              <div className="absolute inset-0 rounded-2xl border-2 border-[#06C755] border-t-transparent animate-spin" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="font-black text-base text-gray-900">กำลังเข้าสู่ระบบ LINE</h4>
+              <p className="text-xs text-gray-500 mt-1">กำลังยืนยันข้อมูลผู้ใช้งาน กรุณารอสักครู่...</p>
+            </div>
+            <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+              <div className="bg-gradient-to-r from-emerald-400 to-[#06C755] h-full w-2/3 rounded-full animate-pulse" />
+            </div>
+          </div>
+        </div>
+      )}
 
     </main>
   );

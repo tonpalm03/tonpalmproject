@@ -15,6 +15,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const [isLineLoading, setIsLineLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showTerms, setShowTerms] = useState(false);
@@ -37,8 +38,26 @@ export default function AuthModal({ onClose }: AuthModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3">
-      <div className="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl flex flex-col max-h-[92vh] overflow-y-auto border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl flex flex-col max-h-[92vh] overflow-y-auto border border-gray-100 animate-in fade-in zoom-in-95 duration-200 relative">
         
+        {/* Loading Overlay inside AuthModal when logging in with LINE */}
+        {isLineLoading && (
+          <div className="absolute inset-0 bg-white/95 backdrop-blur-xs rounded-3xl z-30 flex flex-col items-center justify-center p-6 text-center space-y-3.5 animate-in fade-in duration-200">
+            <div className="w-16 h-16 rounded-2xl bg-[#06C755]/10 text-[#06C755] flex items-center justify-center mx-auto shadow-inner relative">
+              <svg className="w-9 h-9 fill-current" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 5.91 2 10.74c0 2.94 1.67 5.53 4.25 7.03-.18.66-.67 2.42-.77 2.79-.12.46.17.45.36.33.15-.09 2.06-1.4 2.89-1.97.42.06.84.09 1.27.09 5.52 0 10-3.91 10-8.74S17.52 2 12 2z"/>
+              </svg>
+              <div className="absolute inset-0 rounded-2xl border-2 border-[#06C755] border-t-transparent animate-spin" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="font-black text-base text-gray-900">กำลังเข้าสู่ระบบด้วย LINE</h4>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                กำลังเปิดหน้าต่างยืนยันตัวตน LINE... กรุณารอสักครู่
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-gray-100">
           <div>
@@ -74,29 +93,38 @@ export default function AuthModal({ onClose }: AuthModalProps) {
 
           <button
             type="button"
-            disabled={loading}
+            disabled={isLineLoading || loading}
             onClick={async () => {
-              if (loading) return;
-              setLoading(true);
+              if (isLineLoading || loading) return;
+              setIsLineLoading(true);
               setError('');
               const res = await loginWithLine();
               if (res.redirecting) {
                 // Keep loading indicator while browser initiates OAuth redirect
                 return;
               }
-              setLoading(false);
+              setIsLineLoading(false);
               if (res.success) {
                 onClose();
               } else if (res.error) {
                 setError(res.error);
               }
             }}
-            className="w-full py-3 bg-[#06C755] hover:bg-[#05b34c] disabled:opacity-50 text-white rounded-2xl font-black text-sm shadow-md flex items-center justify-center gap-2 transition active:scale-98 cursor-pointer"
+            className="w-full py-3 bg-[#06C755] hover:bg-[#05b34c] disabled:opacity-75 text-white rounded-2xl font-black text-sm shadow-md flex items-center justify-center gap-2 transition active:scale-98 cursor-pointer"
           >
-            <svg className="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 5.91 2 10.74c0 2.94 1.67 5.53 4.25 7.03-.18.66-.67 2.42-.77 2.79-.12.46.17.45.36.33.15-.09 2.06-1.4 2.89-1.97.42.06.84.09 1.27.09 5.52 0 10-3.91 10-8.74S17.52 2 12 2z"/>
-            </svg>
-            <span>{loading ? 'กำลังเชื่อมต่อ LINE...' : 'เข้าสู่ระบบด้วย LINE'}</span>
+            {isLineLoading ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>กำลังเข้าสู่ระบบ...</span>
+              </div>
+            ) : (
+              <>
+                <svg className="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 5.91 2 10.74c0 2.94 1.67 5.53 4.25 7.03-.18.66-.67 2.42-.77 2.79-.12.46.17.45.36.33.15-.09 2.06-1.4 2.89-1.97.42.06.84.09 1.27.09 5.52 0 10-3.91 10-8.74S17.52 2 12 2z"/>
+                </svg>
+                <span>เข้าสู่ระบบด้วย LINE</span>
+              </>
+            )}
           </button>
 
           {/* LINE Login Tip & Direct Visual Guide */}

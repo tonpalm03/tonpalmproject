@@ -22,6 +22,7 @@ interface AuthContextType {
   user: UserProfile | null;
   role: UserRole;
   isLoading: boolean;
+  isLineLoggingIn: boolean;
   isLiffAvailable: boolean;
   loginWithLine: () => Promise<{ success: boolean; redirecting?: boolean; error?: string }>;
   loginWithEmail: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
@@ -42,6 +43,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLineLoggingIn, setIsLineLoggingIn] = useState<boolean>(false);
   const [isLiffAvailable, setIsLiffAvailable] = useState<boolean>(false);
   const [authError, setAuthError] = useState('');
   const allowLineLogin = useRef(true);
@@ -64,12 +66,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               if (!active()) return;
               setIsLiffAvailable(result.isInitialized);
               if (result.isLoggedIn) {
+                setIsLineLoggingIn(true);
                 const idToken = await getValidLineIdToken(30, 50);
                 if (idToken) {
                   try {
                     const exchange = httpsCallable<{ idToken: string }, { token: string }>(functions, 'signInWithLine');
                     const response = await exchange({ idToken });
-                    if (!active() || !allowLineLogin.current) return;
+                    if (!active() || !allowLineLogin.current) {
+                      setIsLineLoggingIn(false);
+                      return;
+                    }
                     await signInWithCustomToken(auth, response.data.token);
                     return;
                   } catch (exchangeErr) {
@@ -78,12 +84,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 } else {
                   console.warn('LIFF reports logged in but token not yet populated');
                 }
+                setIsLineLoggingIn(false);
               }
             } catch (lineErr) {
               console.warn('Auto LINE login check skipped:', lineErr);
+              setIsLineLoggingIn(false);
             }
           }
-          if (active()) setIsLoading(false);
+          if (active()) {
+            setIsLoading(false);
+            setIsLineLoggingIn(false);
+          }
           return;
         }
 
@@ -99,6 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (cached && cached.uid === firebaseUser.uid) {
               setUser(cached);
               setIsLoading(false);
+              setIsLineLoggingIn(false);
             }
           }
         } catch (_) {}
@@ -134,8 +146,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(fullUser);
           localStorage.setItem('hchk_user_cache', JSON.stringify(fullUser));
           setIsLoading(false);
+          setIsLineLoggingIn(false);
         };
-        const fail = () => { if (active()) { generation++; stopListeners(); setUser(null); setIsLoading(false); setAuthError('ตรวจสอบสิทธิ์บัญชีไม่สำเร็จ กรุณาเข้าสู่ระบบใหม่'); } };
+        const fail = () => { if (active()) { generation++; stopListeners(); setUser(null); setIsLoading(false); setIsLineLoggingIn(false); setAuthError('ตรวจสอบสิทธิ์บัญชีไม่สำเร็จ กรุณาเข้าสู่ระบบใหม่'); } };
         listeners.push(onSnapshot(ref, snapshot => { profile = snapshot.exists() ? snapshot.data() as UserProfile : null; publish(); }, fail));
         listeners.push(onSnapshot(doc(db, 'access', firebaseUser.uid), snapshot => {
           const data = snapshot.data();
@@ -147,6 +160,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (active()) {
           setUser(null);
           setIsLoading(false);
+          setIsLineLoggingIn(false);
           console.warn('Authentication initialization warning:', error instanceof Error ? error.message : 'unknown');
         }
       }
@@ -209,11 +223,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loginWithLine = async (): Promise<{ success: boolean; redirecting?: boolean; error?: string }> => {
     try {
       allowLineLogin.current = true;
+      setIsLineLoggingIn(true);
       setIsLoading(true);
       setAuthError('');
       const initResult = await initLiff();
       if (!initResult.isInitialized) {
         setIsLoading(false);
+        setIsLineLoggingIn(false);
         const err = 'ไม่สามารถเชื่อมต่อระบบ LINE ได้ กรุณาลองใหม่อีกครั้ง';
         setAuthError(err);
         return { success: false, error: err };
@@ -227,6 +243,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const response = await exchange({ idToken });
             await signInWithCustomToken(auth, response.data.token);
             setIsLoading(false);
+            setIsLineLoggingIn(false);
             return { success: true };
           } catch (exchangeErr: any) {
             console.warn('LINE token exchange failed, refreshing session:', exchangeErr);
@@ -236,6 +253,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               return { success: true, redirecting: true };
             }
             setIsLoading(false);
+            setIsLineLoggingIn(false);
             const msg = 'ไม่สามารถยืนยันตัวตนกับ LINE ได้ กรุณาลองใหม่อีกครั้ง';
             setAuthError(msg);
             return { success: false, error: msg };
@@ -248,9 +266,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { success: true, redirecting: true };
       }
       setIsLoading(false);
+      setIsLineLoggingIn(false);
       return { success: false, error: redirectRes.error || 'ไม่สามารถเปิดหน้าเข้าสู่ระบบ LINE ได้' };
     } catch (err: unknown) {
       setIsLoading(false);
+      setIsLineLoggingIn(false);
       const msg = err instanceof Error ? err.message : 'เข้าสู่ระบบ LINE ไม่สำเร็จ';
       setAuthError(msg);
       console.error('loginWithLine error:', err);
@@ -329,6 +349,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user,
       role: user?.role || 'customer',
       isLoading,
+      isLineLoggingIn,
       isLiffAvailable,
       loginWithLine,
       loginWithEmail,

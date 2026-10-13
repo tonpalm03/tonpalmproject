@@ -43,7 +43,7 @@ function setup({ gpEnabled = true, status = 'delivering', balance = 3, gpAmount 
     }
   };
   const functions = { https: { HttpsError: class extends Error { constructor(code, msg) { super(msg); this.code = code; } } }, region: () => region };
-  const sandbox = { exports: {}, console, require: name => name === './security' || name === './checkout' ? () => ({}) : name === 'firebase-functions' ? functions : admin };
+  const sandbox = { exports: {}, console, require: name => name === './mock-data' ? { MOCK_SHOPS: [], MOCK_MENUS: [] } : name === './security' || name === './checkout' ? () => ({}) : name === 'firebase-functions' ? functions : admin };
   vm.runInNewContext(fs.readFileSync(`${__dirname}/index.js`, 'utf8'), sandbox);
   return { documents, complete: () => sandbox.exports.completeOrder({ orderId: 'order' }, { auth: uid ? { uid } : null }) };
 }

@@ -770,4 +770,50 @@ exports.notifyChatMessage = region.runWith({ invoker: 'public' }).https.onCall(a
   }
 });
 
+const { MOCK_SHOPS, MOCK_MENUS } = require('./mock-data');
+
+exports.seedMockShops = functions.region('us-central1').https.onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  if (req.method === 'OPTIONS') { res.status(204).send(''); return; }
+
+  try {
+    const db = admin.firestore();
+    const batch = db.batch();
+
+    let shopCount = 0;
+    for (const shop of MOCK_SHOPS) {
+      const ref = db.collection('shops').doc(shop.id);
+      batch.set(ref, {
+        ...shop,
+        updated_at: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
+      shopCount++;
+    }
+
+    let menuCount = 0;
+    for (const menu of MOCK_MENUS) {
+      const ref = db.collection('menu_items').doc(menu.id);
+      batch.set(ref, {
+        ...menu,
+        updated_at: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
+      menuCount++;
+    }
+
+    await batch.commit();
+
+    res.status(200).json({
+      success: true,
+      message: `Seeded ${shopCount} shops and ${menuCount} menu items successfully!`,
+      shopsCount: shopCount,
+      menusCount: menuCount,
+    });
+  } catch (err) {
+    console.error('seedMockShops error:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+
 

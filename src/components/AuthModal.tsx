@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Mail, Lock, LogIn, AlertCircle, Store, Smartphone, ChevronDown, ZoomIn, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import TermsModal from './TermsModal';
@@ -10,7 +10,7 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ onClose }: AuthModalProps) {
-  const { loginWithEmail, loginWithLine, loginWithGoogle } = useAuth();
+  const { user, loginWithEmail, loginWithLine, loginWithGoogle } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,6 +22,12 @@ export default function AuthModal({ onClose }: AuthModalProps) {
   const [showTerms, setShowTerms] = useState(false);
   const [showMerchantLogin, setShowMerchantLogin] = useState(false);
   const [showFullImageModal, setShowFullImageModal] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      onClose();
+    }
+  }, [user, onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

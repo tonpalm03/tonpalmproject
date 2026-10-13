@@ -297,9 +297,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
 
-      let cred;
       try {
-        cred = await signInWithPopup(auth, provider);
+        await signInWithPopup(auth, provider);
       } catch (popupErr: unknown) {
         const code = popupErr instanceof FirebaseError ? popupErr.code : '';
         if (code === 'auth/popup-blocked') {
@@ -308,22 +307,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return { success: true };
         }
         throw popupErr;
-      }
-
-      if (cred?.user) {
-        const userRef = doc(db, 'users', cred.user.uid);
-        const userSnap = await getDoc(userRef);
-        if (!userSnap.exists()) {
-          const newProfile: UserProfile = {
-            uid: cred.user.uid,
-            display_name: cred.user.displayName || cred.user.email?.split('@')[0] || 'ผู้ใช้งาน Google',
-            picture_url: cred.user.photoURL || '',
-            phone: cred.user.phoneNumber || '',
-            role: 'customer',
-            created_at: new Date().toISOString(),
-          };
-          await setDoc(userRef, newProfile);
-        }
       }
 
       setIsLoading(false);

@@ -14,7 +14,10 @@ const config: CapacitorConfig = {
       '*.firebaseapp.com',
       'images.unsplash.com',
       'api.line.me',
-      'access.line.me'
+      'access.line.me',
+      'accounts.google.com',
+      '*.google.com',
+      '*.googleusercontent.com'
     ],
   },
   plugins: {

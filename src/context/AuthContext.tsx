@@ -11,6 +11,10 @@ import {
   signOut as firebaseSignOut,
   onAuthStateChanged,
   signInWithCustomToken,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
 } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 import { httpsCallable } from 'firebase/functions';
@@ -25,6 +29,7 @@ interface AuthContextType {
   isLineLoggingIn: boolean;
   isLiffAvailable: boolean;
   loginWithLine: () => Promise<{ success: boolean; redirecting?: boolean; error?: string }>;
+  loginWithGoogle: () => Promise<{ success: boolean; error?: string }>;
   loginWithEmail: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
   registerWithEmail: (email: string, pass: string, name: string, phone: string) => Promise<{ success: boolean; error?: string }>;
   updateUserPhone: (phone: string) => Promise<{ success: boolean; error?: string }>;
@@ -52,6 +57,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let disposed = false, generation = 0, lineAttempted = false;
     let listeners: Array<() => void> = [];
     const stopListeners = () => { listeners.forEach(stop => stop()); listeners = []; };
+
+    // Process any Google sign-in redirect completions gracefully
+    getRedirectResult(auth).catch((redirectErr) => {
+      console.warn('Google redirect result info:', redirectErr);
+    });
+
     const unsubscribe = onAuthStateChanged(auth, async firebaseUser => {
       const current = ++generation;
       stopListeners(); setUser(null); setIsLoading(true); setAuthError('');
@@ -278,6 +289,70 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const loginWithGoogle = async (): Promise<{ success: boolean; error?: string }> => {
+    try {
+      allowLineLogin.current = false;
+      setIsLoading(true);
+      setAuthError('');
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+
+      let cred;
+      try {
+        cred = await signInWithPopup(auth, provider);
+      } catch (popupErr: unknown) {
+        const code = popupErr instanceof FirebaseError ? popupErr.code : '';
+        if (code === 'auth/popup-blocked') {
+          // Fallback to redirect if popup is blocked by mobile browser
+          await signInWithRedirect(auth, provider);
+          return { success: true };
+        }
+        throw popupErr;
+      }
+
+      if (cred?.user) {
+        const userRef = doc(db, 'users', cred.user.uid);
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) {
+          const newProfile: UserProfile = {
+            uid: cred.user.uid,
+            display_name: cred.user.displayName || cred.user.email?.split('@')[0] || 'ผู้ใช้งาน Google',
+            picture_url: cred.user.photoURL || '',
+            phone: cred.user.phoneNumber || '',
+            role: 'customer',
+            created_at: new Date().toISOString(),
+          };
+          await setDoc(userRef, newProfile);
+        }
+      }
+
+      setIsLoading(false);
+      return { success: true };
+    } catch (err: unknown) {
+      setIsLoading(false);
+      const code = err instanceof FirebaseError ? err.code : '';
+      if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+        return { success: false, error: 'ยกเลิกการเข้าสู่ระบบด้วย Google' };
+      }
+      if (code === 'auth/user-disabled') {
+        return { success: false, error: 'บัญชีนี้ถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ' };
+      }
+      if (code === 'auth/account-exists-with-different-credential') {
+        return { success: false, error: 'อีเมลนี้ถูกใช้งานกับช่องทางอื่นแล้ว กรุณาเข้าสู่ระบบด้วยช่องทางเดิม' };
+      }
+      if (code === 'auth/unauthorized-domain') {
+        return {
+          success: false,
+          error: 'โดเมนนี้ยังไม่ได้รับอนุญาตใน Firebase Console (กรุณาไปที่ Firebase Console > Authentication > Settings > Authorized domains แล้วเพิ่มโดเมนนี้)',
+        };
+      }
+      const msg = err instanceof Error ? err.message : 'เข้าสู่ระบบด้วย Google ไม่สำเร็จ';
+      setAuthError(msg);
+      console.error('loginWithGoogle error:', err);
+      return { success: false, error: msg };
+    }
+  };
+
   const updateUserPhone = async (phone: string): Promise<{ success: boolean; error?: string }> => {
     if (!user) return { success: false, error: 'ยังไม่ได้เข้าสู่ระบบ' };
     const prev = user;
@@ -362,6 +437,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLineLoggingIn,
       isLiffAvailable,
       loginWithLine,
+      loginWithGoogle,
       loginWithEmail,
       registerWithEmail,
       updateUserPhone,

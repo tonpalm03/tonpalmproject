@@ -10,7 +10,7 @@ export async function seedInitialFirestoreData(): Promise<{ success: boolean; co
     await setDoc(doc(db, 'system_settings', 'general'), {
       gp_percent: 5,
       delivery_fee: 10,
-      platform_name: 'huaychan',
+      platform_name: 'CPRUFood',
       updated_at: serverTimestamp(),
     }, { merge: true });
     count += 1;

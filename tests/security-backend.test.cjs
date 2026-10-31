@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const admin = require('../functions/node_modules/firebase-admin');
 const { HttpsError } = require('../functions/node_modules/firebase-functions').https;
 if (!process.env.FIRESTORE_EMULATOR_HOST?.startsWith('127.0.0.1:')) throw Error('Local emulator required');
-admin.initializeApp({ projectId: 'demo-huaychan-security' });
+admin.initializeApp({ projectId: 'demo-cprufood-security' });
 const db = admin.firestore();
 const functions = { https: { HttpsError }, region: () => ({ runWith: () => ({ https: { onCall: f => f } }), https: { onCall: f => f }, firestore: { document: () => ({ onUpdate: f => f, onWrite: f => f }) } }) };
 const handlers = require('../functions/security')(functions, admin);
@@ -100,7 +100,7 @@ test('verified LINE subject signs into Auth emulator; submitted role/uid cannot 
   global.fetch = async (url, options) => String(url) === 'https://api.line.me/oauth2/v2.1/verify'
     ? { ok: true, json: async () => ({ iss: 'https://access.line.me', aud: '12345', sub: uid, iat: issuedAt, exp: Date.now() / 1000 + 60, name: 'Verified LINE' }) }
     : originalFetch(url, options);
-  const app = initializeApp({ apiKey: 'demo-key', projectId: 'demo-huaychan-security' }, 'line-security-test');
+  const app = initializeApp({ apiKey: 'demo-key', projectId: 'demo-cprufood-security' }, 'line-security-test');
   try {
     const { token } = await handlers.signInWithLine({ idToken: 'token'.repeat(10), uid: 'admin', role: 'admin' });
     const auth = getAuth(app);

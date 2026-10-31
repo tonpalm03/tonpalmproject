@@ -11,7 +11,7 @@ export default function PWAProvider() {
   const [showIOSGuide, setShowIOSGuide] = useState(false);
 
   useEffect(() => {
-    const CURRENT_BUILD = 'huaychan-20260917-v6';
+    const CURRENT_BUILD = 'cprufood-20261031-v1';
 
     // 0. Auto-Purge Old CacheStorage directly from browser window.caches
     if (typeof window !== 'undefined' && typeof caches !== 'undefined') {
@@ -25,9 +25,9 @@ export default function PWAProvider() {
 
     // 1. Check version migration: force-clean and reload once on version mismatch
     if (typeof window !== 'undefined') {
-      const lastVersion = localStorage.getItem('huaychan_build_version');
+      const lastVersion = localStorage.getItem('cprufood_build_version');
       if (lastVersion !== CURRENT_BUILD) {
-        localStorage.setItem('huaychan_build_version', CURRENT_BUILD);
+        localStorage.setItem('cprufood_build_version', CURRENT_BUILD);
         if (typeof caches !== 'undefined') {
           caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).finally(() => {
             (window as any).location.reload();

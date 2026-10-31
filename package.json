@@ -9,10 +9,10 @@
     "lint": "eslint",
     "build:android": "next build && npx cap sync android",
     "open:android": "npx cap open android",
-    "test:security": "firebase emulators:exec --config firebase.emulators.json --project demo-huaychan-security --only firestore,auth \"node --test --test-concurrency=1 tests/firestore.rules.test.mjs tests/security-backend.test.cjs\"",
+    "test:security": "firebase emulators:exec --config firebase.emulators.json --project demo-cprufood-security --only firestore,auth \"node --test --test-concurrency=1 tests/firestore.rules.test.mjs tests/security-backend.test.cjs\"",
     "test:functions": "node --test functions/badge.test.cjs functions/line-identity.test.cjs functions/complete-order.test.cjs functions/checkout.test.cjs",
     "test:sales": "node --test tests/sales-summary.test.mjs",
-    "test:readiness": "firebase emulators:exec --config firebase.emulators.json --project demo-huaychan-security --only firestore \"node --test --test-concurrency=1 tests/launch-readiness.test.mjs\"",
+    "test:readiness": "firebase emulators:exec --config firebase.emulators.json --project demo-cprufood-security --only firestore \"node --test --test-concurrency=1 tests/launch-readiness.test.mjs\"",
     "deploy:rules": "firebase deploy --only firestore:rules",
     "deploy:functions": "firebase deploy --only functions",
     "deploy:hosting": "next build && firebase deploy --only hosting"

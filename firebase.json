@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "huaychan",
+    "site": "cprufood",
     "public": "out",
     "ignore": [
       "firebase.json",

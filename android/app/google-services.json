@@ -1,27 +1,36 @@
 {
   "project_info": {
-    "project_number": "854984707571",
-    "firebase_url": "https://tonpalmproject-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "project_id": "tonpalmproject",
-    "storage_bucket": "tonpalmproject.firebasestorage.app"
+    "project_number": "1006595574687",
+    "project_id": "cprufood",
+    "storage_bucket": "cprufood.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:854984707571:android:c49803ed296a5c406e1686",
+        "mobilesdk_app_id": "1:1006595574687:android:47d5a20c215367dd31cbaa",
         "android_client_info": {
-          "package_name": "com.tonpalm.merchant"
+          "package_name": "com.cprufood.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1006595574687-7q0c9kcnj25g9s9c6f52navjn9cib9qj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyB320wBnbZjY_7OC4NdN3yPYg3cxp8GWZc"
+          "current_key": "AIzaSyC7c0znnNbvmfau-r4R9_4jetP_vGj6gqI"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1006595574687-7q0c9kcnj25g9s9c6f52navjn9cib9qj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

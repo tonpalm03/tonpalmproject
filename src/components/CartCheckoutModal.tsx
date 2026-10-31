@@ -727,7 +727,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
           <div className="pt-2">
             <p className="text-center text-[11px] text-gray-600 mb-2 leading-relaxed">
               คุณกำลังสั่งซื้อจากร้านค้าโดยตรง ร้านรับผิดชอบอาหารและจัดส่งเอง<br />
-              huaychan ดูแลระบบสั่งซื้อและช่วยประสานงานเมื่อมีปัญหา
+              CPRUFood ดูแลระบบสั่งซื้อและช่วยประสานงานเมื่อมีปัญหา
             </p>
             <p className="text-center text-[11px] text-gray-500 mb-2">
               การกดสั่งซื้อถือว่าคุณยอมรับ{' '}

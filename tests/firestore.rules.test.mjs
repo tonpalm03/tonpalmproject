@@ -5,7 +5,7 @@ import { doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs, collection, query, 
 
 if (!process.env.FIRESTORE_EMULATOR_HOST?.startsWith('127.0.0.1:')) throw new Error('Local emulator required');
 let env;
-before(async () => { env = await initializeTestEnvironment({ projectId: 'demo-huaychan-security', firestore: { rules: readFileSync('firestore.rules', 'utf8') } }); });
+before(async () => { env = await initializeTestEnvironment({ projectId: 'demo-cprufood-security', firestore: { rules: readFileSync('firestore.rules', 'utf8') } }); });
 after(async () => { await env?.cleanup(); });
 beforeEach(async () => {
   await env.clearFirestore();
@@ -124,4 +124,33 @@ test('menu ownership, price checks, role revocation and counter are protected', 
   await deny(setDoc(doc(db('alice'), 'system_settings/order_counter'), { last_order_number: 0 }));
   await allow(setDoc(doc(db('admin'), 'access/merchantA'), { role: 'customer' }));
   await deny(getDoc(doc(db('merchantA'), 'orders/one')));
+});
+test('merchant applications: customers apply for themselves, only admins approve', async () => {
+  const app = uid => ({ uid, applicant_name: 'Alice', shop_name: 'Somtam', phone: '0812345678', category: 'food', address_detail: '', note: '', status: 'pending', created_at: serverTimestamp(), updated_at: serverTimestamp() });
+  await allow(setDoc(doc(db('alice'), 'merchant_applications/alice'), app('alice')));
+  await deny(setDoc(doc(db('bob'), 'merchant_applications/alice'), app('alice')));
+  await deny(setDoc(doc(db('bob'), 'merchant_applications/bob'), { ...app('bob'), status: 'approved' }));
+  await deny(setDoc(doc(db('bob'), 'merchant_applications/bob'), { ...app('bob'), shop_id: 'a' }));
+  await deny(setDoc(doc(db('merchantA'), 'merchant_applications/merchantA'), app('merchantA')));
+  await deny(setDoc(doc(db(), 'merchant_applications/guest'), app('guest')));
+  await allow(getDoc(doc(db('alice'), 'merchant_applications/alice')));
+  await deny(getDoc(doc(db('bob'), 'merchant_applications/alice')));
+  await deny(updateDoc(doc(db('alice'), 'merchant_applications/alice'), { status: 'approved' }));
+  await allow(getDocs(query(collection(db('admin'), 'merchant_applications'), where('status', '==', 'pending'))));
+  await deny(getDocs(query(collection(db('alice'), 'merchant_applications'), where('status', '==', 'pending'))));
+  await allow(updateDoc(doc(db('admin'), 'merchant_applications/alice'), { status: 'rejected', reject_reason: 'missing info' }));
+  await deny(deleteDoc(doc(db('alice'), 'merchant_applications/alice')));
+  await allow(setDoc(doc(db('alice'), 'merchant_applications/alice'), { ...app('alice'), created_at: new Date() }));
+  await allow(deleteDoc(doc(db('alice'), 'merchant_applications/alice')));
+});
+test('shop owner transfers: admin-only, append-only audit log', async () => {
+  const entry = { shop_id: 'a', from_uid: 'merchantA', to_uid: 'alice', reason: 'lost LINE', transferred_by: 'admin', created_at: serverTimestamp() };
+  await allow(setDoc(doc(db('admin'), 'shop_owner_transfers/t1'), entry));
+  await deny(setDoc(doc(db('merchantA'), 'shop_owner_transfers/t2'), entry));
+  await deny(updateDoc(doc(db('admin'), 'shop_owner_transfers/t1'), { reason: 'edited' }));
+  await deny(deleteDoc(doc(db('admin'), 'shop_owner_transfers/t1')));
+  await deny(getDoc(doc(db('alice'), 'shop_owner_transfers/t1')));
+  await allow(updateDoc(doc(db('admin'), 'shops/a'), { owner_uid: 'alice' }));
+  await allow(setDoc(doc(db('admin'), 'access/alice'), { role: 'merchant', shop_id: 'a' }));
+  await allow(deleteDoc(doc(db('admin'), 'shop_private/a/devices/merchantA')));
 });

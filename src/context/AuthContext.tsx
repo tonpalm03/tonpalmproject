@@ -4,10 +4,8 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { X } from 'lucide-react';
 import { UserProfile, UserRole } from '@/types';
 import { db, auth } from '@/lib/firebase';
-import { doc, getDoc, setDoc, onSnapshot, runTransaction } from 'firebase/firestore';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
   onAuthStateChanged,
   signInWithCustomToken,
@@ -30,8 +28,6 @@ interface AuthContextType {
   isLiffAvailable: boolean;
   loginWithLine: () => Promise<{ success: boolean; redirecting?: boolean; error?: string }>;
   loginWithGoogle: () => Promise<{ success: boolean; error?: string }>;
-  loginWithEmail: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
-  registerWithEmail: (email: string, pass: string, name: string, phone: string) => Promise<{ success: boolean; error?: string }>;
   updateUserPhone: (phone: string) => Promise<{ success: boolean; error?: string }>;
   updateUserProfile: (updates: {
     display_name?: string;
@@ -178,58 +174,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     return () => { disposed = true; generation++; unsubscribe(); stopListeners(); };
   }, []);
-
-  const loginWithEmail = async (email: string, pass: string): Promise<{ success: boolean; error?: string }> => {
-    try {
-      setIsLoading(true);
-      await signInWithEmailAndPassword(auth, email.trim(), pass);
-      return { success: true };
-    } catch (err: unknown) {
-      const code = err instanceof FirebaseError ? err.code : '';
-      setIsLoading(false);
-      let errorMsg = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
-      if (code === 'auth/user-not-found') errorMsg = 'ไม่พบบัญชีผู้ใช้นี้ในระบบ';
-      if (code === 'auth/wrong-password') errorMsg = 'รหัสผ่านไม่ถูกต้อง';
-      if (code === 'auth/invalid-email') errorMsg = 'รูปแบบอีเมลไม่ถูกต้อง';
-      return { success: false, error: errorMsg };
-    }
-  };
-
-  const registerWithEmail = async (
-    email: string,
-    pass: string,
-    name: string,
-    phone: string
-  ): Promise<{ success: boolean; error?: string }> => {
-    try {
-      setIsLoading(true);
-      const cred = await createUserWithEmailAndPassword(auth, email.trim(), pass);
-      const userRef = doc(db, 'users', cred.user.uid);
-      const newProfile: UserProfile = {
-        uid: cred.user.uid,
-        line_user_id: `EMAIL_${cred.user.uid}`,
-        display_name: name.trim() || email.split('@')[0],
-        picture_url: '',
-        phone: phone.trim() || '',
-        role: 'customer', // Always customer by default, admin can promote to merchant
-        created_at: new Date().toISOString(),
-      };
-      await runTransaction(db, async tx => {
-        if ((await tx.get(userRef)).exists()) tx.update(userRef, { display_name: newProfile.display_name, phone: newProfile.phone });
-        else tx.set(userRef, newProfile);
-      });
-
-      return { success: true };
-    } catch (err: unknown) {
-      const code = err instanceof FirebaseError ? err.code : '';
-      setIsLoading(false);
-      let errorMsg = 'ไม่สามารถสมัครสมาชิกได้';
-      if (code === 'auth/email-already-in-use') errorMsg = 'อีเมลนี้ถูกใช้งานไปแล้ว';
-      if (code === 'auth/weak-password') errorMsg = 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
-      if (code === 'auth/invalid-email') errorMsg = 'รูปแบบอีเมลไม่ถูกต้อง';
-      return { success: false, error: errorMsg };
-    }
-  };
 
   const loginWithLine = async (): Promise<{ success: boolean; redirecting?: boolean; error?: string }> => {
     try {
@@ -421,8 +365,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLiffAvailable,
       loginWithLine,
       loginWithGoogle,
-      loginWithEmail,
-      registerWithEmail,
       updateUserPhone,
       updateUserProfile,
       logout,

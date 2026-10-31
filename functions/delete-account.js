@@ -38,10 +38,9 @@ module.exports = function createDeleteAccountHandler(admin, functions) {
     batch.delete(profile);
     batch.delete(access);
     batch.delete(db.collection('admins').doc(uid));
-    batch.delete(db.collection('admin_merchant_credentials').doc(uid));
+    batch.delete(db.collection('merchant_applications').doc(uid));
     if (shopId) {
       batch.delete(db.collection('shop_private').doc(shopId).collection('devices').doc(uid));
-      batch.delete(db.collection('admin_merchant_credentials').doc(shopId));
       const shopSnap = await db.collection('shops').doc(shopId).get();
       if (shopSnap.exists) {
         batch.update(db.collection('shops').doc(shopId), {

@@ -17,12 +17,27 @@ export interface UserProfile {
   created_at?: any;
 }
 
+export interface MerchantApplication {
+  uid: string;
+  applicant_name: string;
+  shop_name: string;
+  phone: string;
+  category: 'food' | 'drink_dessert';
+  address_detail?: string;
+  note?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  reject_reason?: string;
+  shop_id?: string;
+  reviewed_by?: string;
+  reviewed_at?: any;
+  created_at?: any;
+  updated_at?: any;
+}
+
 export interface Shop {
   id: string;
   owner_uid?: string;
   name: string;
-  merchant_email?: string;
-  merchant_password?: string;
   phone: string;
   promptpay_number?: string;
   bank_name?: string;

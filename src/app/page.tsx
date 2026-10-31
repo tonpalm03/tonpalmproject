@@ -530,13 +530,13 @@ export default function HomePage() {
           <div className="flex items-center gap-2 sm:gap-3 shrink-0 min-w-0">
             <img
               src="/logo.png?v=5"
-              alt="huaychan"
+              alt="CPRUFood"
               className="w-9 h-9 sm:w-11 sm:h-11 object-contain hover:scale-105 active:scale-95 transition shrink-0 drop-shadow-sm"
             />
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <h1 className="text-sm sm:text-base md:text-lg font-black tracking-tight text-gray-900 leading-tight whitespace-nowrap">
-                  huaychan
+                  CPRUFood
                 </h1>
                 <span className="hidden lg:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200/80 shrink-0">
                   ส่งรอบ มรภ. ชัยภูมิ
@@ -724,7 +724,7 @@ export default function HomePage() {
                 <strong>อุดหนุนร้านใกล้บ้าน ผ่านพื้นที่กลางของชุมชน</strong>
                 <span className="block text-amber-800">ร้านค้าขายและส่งเอง • คุยกับร้านได้โดยตรง • เราดูแลระบบและช่วยประสานงาน</span>
               </p>
-              <a href="#about-huaychan" className="shrink-0 font-bold underline underline-offset-4 text-amber-700 hover:text-amber-900">รู้จัก huaychan</a>
+              <a href="#about-cprufood" className="shrink-0 font-bold underline underline-offset-4 text-amber-700 hover:text-amber-900">รู้จัก CPRUFood</a>
             </div>
 
             {/* Search Input & Category Filter Tabs */}
@@ -1006,8 +1006,8 @@ export default function HomePage() {
         {/* Community Footer */}
         {viewMode === 'customer' && (
           <footer className="mt-14 pt-8 pb-28 border-t border-gray-200/80 text-center text-xs text-gray-500 space-y-2.5 animate-in fade-in">
-            <section id="about-huaychan" aria-labelledby="about-huaychan-title" className="scroll-mt-24 mx-auto mb-6 max-w-2xl rounded-3xl border border-amber-150 bg-amber-50/70 p-5 sm:p-6 text-left shadow-2xs">
-              <h2 id="about-huaychan-title" className="text-lg sm:text-xl font-black text-slate-900">จากโพสต์ขายของในชุมชน สู่หน้าร้านที่หาเจอง่ายขึ้น</h2>
+            <section id="about-cprufood" aria-labelledby="about-cprufood-title" className="scroll-mt-24 mx-auto mb-6 max-w-2xl rounded-3xl border border-amber-150 bg-amber-50/70 p-5 sm:p-6 text-left shadow-2xs">
+              <h2 id="about-cprufood-title" className="text-lg sm:text-xl font-black text-slate-900">จากโพสต์ขายของในชุมชน สู่หน้าร้านที่หาเจอง่ายขึ้น</h2>
               <p className="mt-3 text-sm leading-relaxed text-slate-600">
                 เราเห็นพ่อค้าแม่ค้าใกล้บ้านโพสต์ขายอาหารบน Facebook อยู่ทุกวัน จึงอยากทำพื้นที่เล็ก ๆ
                 ที่ช่วยรวมร้านและเมนูให้หาเจอง่าย สั่งสะดวก และคุยกับคนขายได้โดยตรง
@@ -1015,7 +1015,7 @@ export default function HomePage() {
               </p>
               <p className="mt-3 text-sm leading-relaxed text-slate-600">
                 ที่นี่ ร้านค้าเป็นคนขาย ปรุงอาหาร รับเงิน และจัดส่งเอง โดยรับผิดชอบอาหารและบริการของร้าน
-                ส่วน huaychan ดูแลระบบที่ช่วยให้ร้านกับลูกค้ามาเจอกัน หากมีปัญหา ติดต่อร้านผ่านออเดอร์ได้เลย
+                ส่วน CPRUFood ดูแลระบบที่ช่วยให้ร้านกับลูกค้ามาเจอกัน หากมีปัญหา ติดต่อร้านผ่านออเดอร์ได้เลย
                 หรือแจ้งแอดมินให้ช่วยประสานงาน
               </p>
               <p className="mt-3 font-bold text-amber-900">ร้านเล็ก ๆ ก็มีหน้าร้านออนไลน์ของตัวเองได้ และทุกออเดอร์คือการอุดหนุนคนในชุมชน</p>
@@ -1049,7 +1049,7 @@ export default function HomePage() {
               </button>
             </div>
             <p className="text-[11px] text-gray-400">
-              huaychan • แพลตฟอร์มสั่งอาหารชุมชนบ้านห้วยชัน - นาฝาย และ มหาวิทยาลัยราชภัฏชัยภูมิ
+              CPRUFood • แพลตฟอร์มสั่งอาหารชุมชนบ้านห้วยชัน - นาฝาย และ มหาวิทยาลัยราชภัฏชัยภูมิ
             </p>
           </footer>
         )}

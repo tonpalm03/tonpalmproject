@@ -3403,7 +3403,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
 
               <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-emerald-900 flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] text-emerald-700 font-bold">LINE Official (HuayChan)</p>
+                  <p className="text-[10px] text-emerald-700 font-bold">LINE Official (CPRUFood)</p>
                   <p className="text-sm font-black text-emerald-950 font-mono">@887nrlyw</p>
                 </div>
                 <a

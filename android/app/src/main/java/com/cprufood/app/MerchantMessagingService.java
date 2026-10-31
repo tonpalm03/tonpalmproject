@@ -1,4 +1,4 @@
-package com.tonpalm.merchant;
+package com.cprufood.app;
 
 import com.google.firebase.messaging.RemoteMessage;
 import com.capacitorjs.plugins.pushnotifications.MessagingService;

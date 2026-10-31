@@ -23,6 +23,6 @@ try {
 }
 const auth = getAuth(app);
 const storage = getStorage(app);
-const functions = getFunctions(app, 'us-central1');
+const functions = getFunctions(app, 'asia-southeast3');
 
 export { app, db, auth, storage, functions };

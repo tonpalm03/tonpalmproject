@@ -12,13 +12,13 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "huaychan | สั่งอาหารชุมชนรอบ มรภ. ชัยภูมิ",
-  description: "เว็บแอพสั่งอาหาร huaychan สำหรับชุมชนห้วยชัน นาฝาย และนักศึกษา มรภ. ชัยภูมิ ร้านค้าในชุมชนจัดส่งเอง",
+  title: "CPRUFood | สั่งอาหารชุมชนรอบ มรภ. ชัยภูมิ",
+  description: "เว็บแอพสั่งอาหาร CPRUFood สำหรับชุมชนห้วยชัน นาฝาย และนักศึกษา มรภ. ชัยภูมิ ร้านค้าในชุมชนจัดส่งเอง",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "huaychan",
+    title: "CPRUFood",
   },
   icons: {
     icon: [

@@ -26,7 +26,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                 ติดต่อเรา & ฝ่ายบริการ
               </h2>
               <p className="text-xs text-amber-100 font-medium mt-0.5">
-                huaychan • ชุมชนห้วยชัน - นาฝาย & มรภ. ชัยภูมิ
+                CPRUFood • ชุมชนห้วยชัน - นาฝาย & มรภ. ชัยภูมิ
               </p>
             </div>
           </div>
@@ -49,14 +49,14 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-ping" />
                 <span className="text-xs font-black uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">
-                  HuayChan Official Account
+                  CPRUFood Official Account
                 </span>
               </div>
             </div>
 
             <div>
               <h3 className="text-lg sm:text-xl font-black">
-                LINE Official Account (HuayChan)
+                LINE Official Account (CPRUFood)
               </h3>
               <p className="text-xs text-emerald-100 mt-1 leading-relaxed">
                 ทักแชทสอบถามปัญหา แจ้งเรื่องออเดอร์ สมัครเปิดร้านค้า หรือติดต่อแอดมินได้โดยตรง
@@ -124,7 +124,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
           <div className="p-3.5 bg-amber-50/70 border border-amber-200/70 rounded-2xl text-[11px] text-amber-900 space-y-1">
             <p className="font-bold flex items-center gap-1">
               <MapPin className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-              <span>พื้นที่ให้บริการ huaychan</span>
+              <span>พื้นที่ให้บริการ CPRUFood</span>
             </p>
             <p className="text-amber-800 leading-relaxed">ชุมชนห้วยชัน - นาฝาย และรอบ มรภ. ชัยภูมิ (ส่งตรงถึงหน้าบ้านและหอพัก)</p>
           </div>

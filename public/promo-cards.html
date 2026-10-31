@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>การ์ดโปรโมทห้วยชันหิวข้าว (Print Ready A4)</title>
+  <title>การ์ดโปรโมทCPRUFood (Print Ready A4)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,700&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -460,8 +460,8 @@
       </div>
       <input type="text" class="input-field" id="input-headline" value="สั่งง่าย ส่งตรงถึงหน้าหอพัก" style="width: 165px;" placeholder="จุดเด่นหลัก" oninput="updateCards()">
       <input type="text" class="input-field" id="input-sub" value="ส่งถึงหน้าหอพัก มรภ.ชัยภูมิ & ชุมชนห้วยชัน" style="width: 250px;" placeholder="พื้นที่บริการ" oninput="updateCards()">
-      <input type="text" class="input-field" id="input-url" value="https://huaychan.web.app" style="width: 190px;" placeholder="URL สแกน QR" onchange="regenerateQRs()">
-      <input type="text" class="input-field" id="input-contact" value="LINE: @huaychan | เว็บ: huaychan.web.app" style="width: 230px;" placeholder="เบอร์โทร / LINE" oninput="updateCards()">
+      <input type="text" class="input-field" id="input-url" value="https://cprufood.web.app" style="width: 190px;" placeholder="URL สแกน QR" onchange="regenerateQRs()">
+      <input type="text" class="input-field" id="input-contact" value="LINE: @887nrlyw | เว็บ: cprufood.web.app" style="width: 230px;" placeholder="เบอร์โทร / LINE" oninput="updateCards()">
     </div>
   </header>
 
@@ -490,10 +490,10 @@
           'จ่ายปลายทางได้ เงินสด / สแกนจ่ายกับคนส่ง'
         ],
         qrLabel: 'สแกนสั่งเลย 📲',
-        qrSub: 'huaychan.web.app'
+        qrSub: 'cprufood.web.app'
       },
       'theme-eco': {
-        badge: '🛵 ห้วยชันหิวข้าว เดลิเวอรี่',
+        badge: '🛵 CPRUFood เดลิเวอรี่',
         headline: 'หิวเมื่อไหร่ สแกนสั่งเลย!',
         features: [
           'รวมอาหารตามสั่ง ก๋วยเตี๋ยว เครื่องดื่ม ขนม',
@@ -501,7 +501,7 @@
           'ส่งถึงหน้าหอพัก ไม่ต้องตากแดดตากฝน'
         ],
         qrLabel: 'สแกนดูเมนู 🍲',
-        qrSub: 'huaychan.web.app'
+        qrSub: 'cprufood.web.app'
       },
       'theme-merchant': {
         badge: '🏪 เปิดรับสมัครร้านค้าชุมชน',
@@ -527,7 +527,7 @@
       const headline = document.getElementById('input-headline').value || preset.headline;
       const sub = document.getElementById('input-sub').value;
       const contact = document.getElementById('input-contact').value;
-      const url = document.getElementById('input-url').value || 'https://huaychan.web.app';
+      const url = document.getElementById('input-url').value || 'https://cprufood.web.app';
 
       const headerTitle = document.getElementById('brand-header-title');
       if (headerTitle) headerTitle.innerText = '🛵 ' + appName;

@@ -1,15 +1,15 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.tonpalm.merchant',
-  appName: 'huaychan',
+  appId: 'com.cprufood.app',
+  appName: 'CPRUFood',
   webDir: 'out',
   server: {
-    url: 'https://huaychan.web.app',
+    url: 'https://cprufood.web.app',
     cleartext: true,
     androidScheme: 'https',
     allowNavigation: [
-      'huaychan.web.app',
+      'cprufood.web.app',
       '*.web.app',
       '*.firebaseapp.com',
       'images.unsplash.com',

@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "huaychan - เดลิเวอรีส่งถึงที่",
-  "short_name": "huaychan",
-  "description": "เว็บแอพสั่งอาหาร huaychan สำหรับชุมชนห้วยชันและนักศึกษา มรภ. ชัยภูมิ ร้านค้าส่งเอง ค่าส่ง 10 บาท",
+  "name": "CPRUFood - เดลิเวอรีส่งถึงที่",
+  "short_name": "CPRUFood",
+  "description": "เว็บแอพสั่งอาหาร CPRUFood สำหรับชุมชนห้วยชันและนักศึกษา มรภ. ชัยภูมิ ร้านค้าส่งเอง ค่าส่ง 10 บาท",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

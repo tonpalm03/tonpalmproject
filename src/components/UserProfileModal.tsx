@@ -192,7 +192,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
               await r.unregister();
             }
           }
-          localStorage.removeItem('huaychan_build_version');
+          localStorage.removeItem('cprufood_build_version');
           window.location.reload();
         }
       } catch (err) {
@@ -566,6 +566,20 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
               </div>
               <span className="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-bold">รีเฟรช</span>
             </button>
+
+            {/* Customers can apply to open a shop later */}
+            {role === 'customer' && (
+              <a
+                href="/merchant"
+                className="w-full py-2.5 px-4 rounded-2xl border border-orange-200 bg-orange-50/70 hover:bg-orange-100 text-orange-900 font-bold text-xs flex items-center justify-between transition active:scale-98"
+              >
+                <div className="flex items-center gap-2">
+                  <Store className="w-3.5 h-3.5 text-orange-500" />
+                  <span>สมัครเปิดร้านค้ากับ CPRUFood</span>
+                </div>
+                <span className="text-[10px] bg-orange-200 text-orange-900 px-2 py-0.5 rounded-full font-bold">สมัคร</span>
+              </a>
+            )}
 
             {/* 4. Logout Button */}
             <button

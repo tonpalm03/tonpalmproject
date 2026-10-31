@@ -4,10 +4,10 @@ import { Geolocation } from '@capacitor/geolocation';
 export function locationErrorMessage(error: unknown, native = Capacitor.isNativePlatform()): string {
   const code = (error as { code?: string | number } | null)?.code;
   const manual = ' หรือแตะปักหมุดบนแผนที่แทนได้';
-  if (code === 'APP_UPDATE_REQUIRED') return 'กรุณาติดตั้งแอป huaychan เวอร์ชันล่าสุดเพื่อใช้ GPS' + manual;
+  if (code === 'APP_UPDATE_REQUIRED') return 'กรุณาติดตั้งแอป CPRUFood เวอร์ชันล่าสุดเพื่อใช้ GPS' + manual;
   if (code === 1 || code === 'OS-PLUG-GLOC-0003') {
     return (native
-      ? 'ยังไม่ได้รับสิทธิ์ตำแหน่ง กรุณาไปที่การตั้งค่า Android > แอป > huaychan > สิทธิ์ > ตำแหน่ง แล้วอนุญาตขณะใช้แอป'
+      ? 'ยังไม่ได้รับสิทธิ์ตำแหน่ง กรุณาไปที่การตั้งค่า Android > แอป > CPRUFood > สิทธิ์ > ตำแหน่ง แล้วอนุญาตขณะใช้แอป'
       : 'กรุณาอนุญาตสิทธิ์ตำแหน่งให้เว็บไซต์นี้ในการตั้งค่าเบราว์เซอร์') + manual;
   }
   if (['OS-PLUG-GLOC-0007', 'OS-PLUG-GLOC-0009', 'OS-PLUG-GLOC-0017'].includes(String(code))) {

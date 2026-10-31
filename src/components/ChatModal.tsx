@@ -283,7 +283,7 @@ export default function ChatModal({
               id: 'init_welcome',
               order_id: orderId,
               sender_uid: 'system',
-              sender_name: 'ระบบ huaychan',
+              sender_name: 'ระบบ CPRUFood',
               sender_role: 'admin',
               text: `ระบบแชทประสานงานออเดอร์ #${orderCode || orderId.slice(0, 5)} ระหว่างคุณ ${customerName} และร้าน ${shopName} สามารถพิมพ์ข้อความหรือส่งรูปถ่ายยืนยันจุดรับส่ง/สลิปโอนเงินได้ตลอดเวลาครับ`,
               created_at: 'ตอนนี้',
@@ -851,7 +851,7 @@ export default function ChatModal({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDownloadImage(selectedImageForView, `huaychan_image_${Date.now()}.jpg`);
+                    handleDownloadImage(selectedImageForView, `cprufood_image_${Date.now()}.jpg`);
                   }}
                   className="px-3 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 text-xs font-bold transition active:scale-95 shadow-md"
                 >
@@ -877,7 +877,7 @@ export default function ChatModal({
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleDownloadImage(selectedImageForView, `huaychan_image_${Date.now()}.jpg`);
+                  handleDownloadImage(selectedImageForView, `cprufood_image_${Date.now()}.jpg`);
                 }}
                 className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 text-white rounded-2xl text-xs font-bold flex items-center gap-2 shadow-lg transition active:scale-95 cursor-pointer"
               >

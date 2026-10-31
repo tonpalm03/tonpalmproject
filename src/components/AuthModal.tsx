@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Mail, Lock, LogIn, AlertCircle, Store, Smartphone, ChevronDown, ZoomIn, ExternalLink } from 'lucide-react';
+import { X, AlertCircle, Store, Smartphone, ZoomIn, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import TermsModal from './TermsModal';
 
@@ -10,17 +10,12 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ onClose }: AuthModalProps) {
-  const { user, loginWithEmail, loginWithLine, loginWithGoogle } = useAuth();
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { user, loginWithLine, loginWithGoogle } = useAuth();
 
   const [isLineLoading, setIsLineLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showTerms, setShowTerms] = useState(false);
-  const [showMerchantLogin, setShowMerchantLogin] = useState(false);
   const [showFullImageModal, setShowFullImageModal] = useState(false);
 
   useEffect(() => {
@@ -28,20 +23,6 @@ export default function AuthModal({ onClose }: AuthModalProps) {
       onClose();
     }
   }, [user, onClose]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    setLoading(true);
-    const res = await loginWithEmail(email, password);
-    setLoading(false);
-    if (res.success) {
-      onClose();
-    } else {
-      setError(res.error || 'อีเมลหรือรหัสผ่านไม่ถูกต้อง');
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3">
@@ -87,7 +68,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
             <h3 className="font-black text-lg text-gray-900">
               เข้าสู่ระบบ
             </h3>
-            <p className="text-xs text-amber-600 font-semibold">huaychan • มรภ. ชัยภูมิ</p>
+            <p className="text-xs text-amber-600 font-semibold">CPRUFood • มรภ. ชัยภูมิ</p>
           </div>
           <button
             type="button"
@@ -117,9 +98,9 @@ export default function AuthModal({ onClose }: AuthModalProps) {
           {/* LINE Login Button */}
           <button
             type="button"
-            disabled={isLineLoading || isGoogleLoading || loading}
+            disabled={isLineLoading || isGoogleLoading}
             onClick={async () => {
-              if (isLineLoading || isGoogleLoading || loading) return;
+              if (isLineLoading || isGoogleLoading) return;
               setIsLineLoading(true);
               setError('');
               const res = await loginWithLine();
@@ -154,9 +135,9 @@ export default function AuthModal({ onClose }: AuthModalProps) {
           {/* Google Login Button */}
           <button
             type="button"
-            disabled={isLineLoading || isGoogleLoading || loading}
+            disabled={isLineLoading || isGoogleLoading}
             onClick={async () => {
-              if (isLineLoading || isGoogleLoading || loading) return;
+              if (isLineLoading || isGoogleLoading) return;
               setIsGoogleLoading(true);
               setError('');
               const res = await loginWithGoogle();
@@ -224,81 +205,21 @@ export default function AuthModal({ onClose }: AuthModalProps) {
           </div>
         </div>
 
-        {/* Divider & Merchant Collapsible Toggle */}
+        {/* Merchants and applicants sign in with the same LINE / Google buttons */}
         <div className="mt-4 pt-3 border-t border-gray-100">
-          <button
-            type="button"
-            onClick={() => setShowMerchantLogin(!showMerchantLogin)}
-            className="w-full py-2 px-3 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-2xl border border-gray-200/80 flex items-center justify-between text-xs font-bold transition cursor-pointer"
+          <a
+            href="/merchant"
+            className="w-full py-2.5 px-3 bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-2xl border border-amber-200 flex items-center justify-between text-xs font-bold transition"
           >
-            <div className="flex items-center gap-2">
+            <span className="flex items-center gap-2">
               <Store className="w-4 h-4 text-amber-500" />
-              <span>เข้าสู่ระบบสำหรับร้านค้า / แอดมิน</span>
-            </div>
-            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showMerchantLogin ? 'rotate-180' : ''}`} />
-          </button>
-
-          {/* 2. Merchant / Admin Form (Collapsed by Default) */}
-          {showMerchantLogin && (
-            <form onSubmit={handleSubmit} className="mt-3 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
-              <div>
-                <label className="text-xs font-semibold text-gray-700 block mb-1">อีเมลร้านค้า / แอดมิน (Email)</label>
-                <div className="relative">
-                  <Mail className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="email"
-                    required
-                    placeholder="merchant@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs font-semibold text-gray-700 block mb-1">รหัสผ่าน (Password)</label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="password"
-                    required
-                    placeholder="กรอกรหัสผ่าน"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 disabled:opacity-50 text-white rounded-xl font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <LogIn className="w-4 h-4" />
-                <span>{loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบร้านค้า / แอดมิน'}</span>
-              </button>
-
-              <div className="text-center pt-1 space-y-0.5">
-                <p className="text-[11px] text-gray-400">
-                  บัญชีร้านค้าจะได้รับการเปิดโดยผู้ดูแลระบบเท่านั้น
-                </p>
-                <p className="text-[11px] text-gray-400">
-                  หากต้องการเปิดร้านค้าใหม่{' '}
-                  <a
-                    href="https://line.me/R/ti/p/@887nrlyw"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-emerald-600 hover:text-emerald-700 font-bold underline inline-flex items-center gap-0.5"
-                  >
-                    <span>ติดต่อ LINE Official (@887nrlyw)</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                </p>
-              </div>
-            </form>
-          )}
+              <span>เจ้าของร้าน / สมัครเปิดร้านค้า</span>
+            </span>
+            <ArrowRight className="w-4 h-4 text-amber-500" />
+          </a>
+          <p className="text-[11px] text-gray-400 text-center mt-1.5">
+            ร้านค้าและแอดมินเข้าสู่ระบบด้วย LINE หรือ Google ด้านบนได้เลย
+          </p>
         </div>
 
         {/* Terms of Service Button */}

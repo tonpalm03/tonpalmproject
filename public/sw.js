@@ -1,4 +1,4 @@
-const CACHE_NAME = 'huaychan-v6';
+const CACHE_NAME = 'cprufood-v1';
 
 // Clean old caches and claim clients immediately
 self.addEventListener('install', (event) => {

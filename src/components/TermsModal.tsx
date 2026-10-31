@@ -35,7 +35,7 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
                 ข้อกำหนดและนโยบาย
               </h2>
               <p className="text-xs text-amber-100 font-medium mt-0.5">
-                huaychan • ชุมชนห้วยชัน - นาฝาย & มรภ. ชัยภูมิ
+                CPRUFood • ชุมชนห้วยชัน - นาฝาย & มรภ. ชัยภูมิ
               </p>
             </div>
           </div>
@@ -94,7 +94,7 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
                   </h3>
                 </div>
                 <p className="text-[11px] text-amber-900 leading-relaxed">
-                  huaychan จัดทำขึ้นเพื่อสนับสนุนร้านค้าในชุมชนห้วยชัน-นาฝาย ให้ส่งต่ออาหารอร่อยถึงมือเพื่อนบ้านและนักศึกษา มรภ.ชัยภูมิ อย่างสะดวกและรวดเร็ว
+                  CPRUFood จัดทำขึ้นเพื่อสนับสนุนร้านค้าในชุมชนห้วยชัน-นาฝาย ให้ส่งต่ออาหารอร่อยถึงมือเพื่อนบ้านและนักศึกษา มรภ.ชัยภูมิ อย่างสะดวกและรวดเร็ว
                 </p>
               </div>
 
@@ -154,11 +154,11 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
                   <span className="w-6 h-6 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-black shrink-0">4</span>
                   <h4 className="font-bold text-gray-900 text-xs sm:text-sm flex items-center gap-1.5">
                     <Bike className="w-3.5 h-3.5 text-blue-500" />
-                    <span>บทบาทของ huaychan</span>
+                    <span>บทบาทของ CPRUFood</span>
                   </h4>
                 </div>
                 <p className="text-gray-600 text-xs pl-8 leading-relaxed">
-                  huaychan ทำหน้าที่เป็นระบบเทคโนโลยีตัวกลางในการจับคู่ออเดอร์และแชทติดต่อ หากเกิดข้อพิพาทหรือต้องการความช่วยเหลือ สามารถแจ้งผู้ดูแลระบบได้ทันที
+                  CPRUFood ทำหน้าที่เป็นระบบเทคโนโลยีตัวกลางในการจับคู่ออเดอร์และแชทติดต่อ หากเกิดข้อพิพาทหรือต้องการความช่วยเหลือ สามารถแจ้งผู้ดูแลระบบได้ทันที
                 </p>
               </div>
 
@@ -177,7 +177,7 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
                   </h3>
                 </div>
                 <p className="text-[11px] text-emerald-900 leading-relaxed">
-                  huaychan จัดเก็บเฉพาะข้อมูลที่จำเป็นเพื่อการจัดส่งอาหารในชุมชนเท่านั้น และไม่มีนโยบายจำหน่ายหรือส่งต่อข้อมูลให้บุคคลภายนอก
+                  CPRUFood จัดเก็บเฉพาะข้อมูลที่จำเป็นเพื่อการจัดส่งอาหารในชุมชนเท่านั้น และไม่มีนโยบายจำหน่ายหรือส่งต่อข้อมูลให้บุคคลภายนอก
                 </p>
               </div>
 
@@ -251,7 +251,7 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
         <div className="p-3.5 sm:p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between gap-3 shrink-0">
           <p className="text-[11px] text-gray-500 hidden sm:flex items-center gap-1">
             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span>huaychan ส่งตรงถึงหน้าบ้านและหอพัก</span>
+            <span>CPRUFood ส่งตรงถึงหน้าบ้านและหอพัก</span>
           </p>
           <button
             type="button"

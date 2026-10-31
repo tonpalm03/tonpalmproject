@@ -26,6 +26,9 @@ import {
 } from '@/lib/dateUtils';
 import { soundAlert } from '@/lib/soundAlert';
 import { readFileAsDataUrl } from '@/lib/imageUtils';
+import { grantMerchant, setAdminRole } from '@/lib/merchantAccess';
+import MerchantApplicationsAdmin from './MerchantApplicationsAdmin';
+import ShopOwnerTransferModal from './ShopOwnerTransferModal';
 
 interface AdminDashboardProps {
   currentUser: UserProfile;
@@ -88,31 +91,8 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
   const [editShopDeliveryFee, setEditShopDeliveryFee] = useState<string>('0');
   const [isSavingShopDetails, setIsSavingShopDetails] = useState(false);
 
-  // Admin Create Merchant Account Modal state
-  const [showCreateMerchantModal, setShowCreateMerchantModal] = useState(false);
-  const [createShopName, setCreateShopName] = useState('');
-  const [createMerchantEmail, setCreateMerchantEmail] = useState('');
-  const [createMerchantPassword, setCreateMerchantPassword] = useState('');
-  const [createShopPhone, setCreateShopPhone] = useState('');
-  const [createShopPromptpay, setCreateShopPromptpay] = useState('');
-  const [createShopAddress, setCreateShopAddress] = useState('');
-  const [createShopDeliveryFee, setCreateShopDeliveryFee] = useState('0');
-  const [createShopCategory, setCreateShopCategory] = useState<'food' | 'drink_dessert'>('food');
-  const [isCreatingMerchant, setIsCreatingMerchant] = useState(false);
-  const [createMerchantError, setCreateMerchantError] = useState('');
-
-  // Admin View / Edit Merchant Credentials Modal state
-  const [selectedShopForCredentials, setSelectedShopForCredentials] = useState<Shop | null>(null);
-  const [merchantCredEmail, setMerchantCredEmail] = useState('');
-  const [merchantCredPassword, setMerchantCredPassword] = useState('');
-  const [isFetchingCreds, setIsFetchingCreds] = useState(false);
-  const [isSavingCreds, setIsSavingCreds] = useState(false);
-  const [credError, setCredError] = useState('');
-  const [credSuccess, setCredSuccess] = useState('');
-  const [showCredPassword, setShowCredPassword] = useState(false);
-  const [editCredEmail, setEditCredEmail] = useState('');
-  const [editCredPassword, setEditCredPassword] = useState('');
-  const [copiedCredField, setCopiedCredField] = useState<'email' | 'password' | null>(null);
+  // Move shop ownership to another account (owner lost their LINE/Google login)
+  const [selectedShopForTransfer, setSelectedShopForTransfer] = useState<Shop | null>(null);
 
   const [isAddingNewMenu, setIsAddingNewMenu] = useState(false);
   const [newMenuName, setNewMenuName] = useState('');
@@ -431,29 +411,8 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
     e.preventDefault();
     if (!selectedUserForMerchant || !newShopName) return;
 
-    const shopId = `shop_${Date.now()}`;
-
     try {
-      const batch = writeBatch(db);
-      // Create the shop and its authority atomically.
-      batch.set(doc(db, 'shops', shopId), {
-        id: shopId,
-        owner_uid: selectedUserForMerchant.uid,
-        name: newShopName.trim(),
-        phone: newShopPhone.trim() || selectedUserForMerchant.phone || '0898765432',
-        is_open: true,
-        image_url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&auto=format&fit=crop&q=80',
-        created_at: new Date().toISOString(),
-      });
-
-      // 2. Update user role
-      batch.update(doc(db, 'users', selectedUserForMerchant.uid), {
-        role: 'merchant',
-        shop_id: shopId,
-      });
-
-      batch.set(doc(db, 'access', selectedUserForMerchant.uid), { role: 'merchant', shop_id: shopId });
-      await batch.commit();
+      await grantMerchant(selectedUserForMerchant, { name: newShopName, phone: newShopPhone.trim() || selectedUserForMerchant.phone });
       soundAlert.playAdminPromoteSound().catch(() => {});
       setSelectedUserForMerchant(null);
       setNewShopName('');
@@ -462,6 +421,20 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
     } catch (e: any) {
       console.error('Grant merchant error:', e);
       alert(`แต่งตั้งร้านค้าไม่สำเร็จ: ${e.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล'}`);
+    }
+  };
+
+  const handleToggleAdmin = async (u: UserProfile, makeAdmin: boolean) => {
+    const msg = makeAdmin
+      ? `แต่งตั้ง ${u.display_name} เป็นแอดมิน?
+แอดมินจัดการร้านค้า ผู้ใช้ และออเดอร์ได้ทั้งหมด`
+      : `ปลด ${u.display_name} จากแอดมินกลับเป็นลูกค้า?`;
+    if (!confirm(msg)) return;
+    try {
+      await setAdminRole(u, makeAdmin);
+    } catch (e: any) {
+      console.error('Toggle admin role error:', e);
+      alert(`เปลี่ยนยศไม่สำเร็จ: ${e.message || 'เกิดข้อผิดพลาด'}`);
     }
   };
 
@@ -739,175 +712,6 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
     } finally {
       setIsSavingShopDetails(false);
     }
-  };
-
-  // Handle Create Merchant Account (Admin)
-  const handleCreateMerchantSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setCreateMerchantError('');
-
-    if (!createShopName.trim()) {
-      setCreateMerchantError('กรุณากรอกชื่อร้านค้า');
-      return;
-    }
-    if (!createMerchantEmail.trim() || !createMerchantEmail.includes('@')) {
-      setCreateMerchantError('กรุณากรอกอีเมลร้านค้าที่ถูกต้อง');
-      return;
-    }
-    if (createMerchantPassword.length < 6) {
-      setCreateMerchantError('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
-      return;
-    }
-
-    setIsCreatingMerchant(true);
-    try {
-      const createMerchantCall = httpsCallable<
-        {
-          email: string;
-          password: string;
-          shopName: string;
-          shopPhone?: string;
-          promptpayNumber?: string;
-          addressDetail?: string;
-          deliveryFee?: number;
-          category?: string;
-        },
-        { success: boolean; uid: string; shopId: string }
-      >(functions, 'createMerchantAccount');
-
-      const res = await createMerchantCall({
-        email: createMerchantEmail.trim(),
-        password: createMerchantPassword,
-        shopName: createShopName.trim(),
-        shopPhone: createShopPhone.trim(),
-        promptpayNumber: createShopPromptpay.trim(),
-        addressDetail: createShopAddress.trim(),
-        deliveryFee: Number(createShopDeliveryFee) || 0,
-        category: createShopCategory,
-      });
-
-      if (res.data?.success) {
-        soundAlert.playAdminPromoteSound().catch(() => {});
-        alert(
-          `สร้างบัญชีร้านค้า "${createShopName}" สำเร็จแล้ว!\n\n` +
-          `อีเมล: ${createMerchantEmail.trim()}\n` +
-          `รหัสผ่าน: ${createMerchantPassword}\n\n` +
-          `ร้านค้าสามารถนำข้อมูลนี้ไปเข้าสู่ระบบเพื่อจัดการเมนูและรับออเดอร์ได้ทันที`
-        );
-        setShowCreateMerchantModal(false);
-        setCreateShopName('');
-        setCreateMerchantEmail('');
-        setCreateMerchantPassword('');
-        setCreateShopPhone('');
-        setCreateShopPromptpay('');
-        setCreateShopAddress('');
-        setCreateShopDeliveryFee('0');
-      } else {
-        throw new Error('Callable returned failure');
-      }
-    } catch (err: any) {
-      console.error('Create merchant account error:', err);
-      setCreateMerchantError(err.message || 'เกิดข้อผิดพลาดในการสร้างบัญชีร้านค้า');
-    } finally {
-      setIsCreatingMerchant(false);
-    }
-  };
-
-  // Handle Open Merchant Credentials Modal
-  const handleOpenCredentialsModal = async (shop: Shop) => {
-    setSelectedShopForCredentials(shop);
-    setMerchantCredEmail(shop.merchant_email || '');
-    setMerchantCredPassword('');
-    setEditCredEmail(shop.merchant_email || '');
-    setEditCredPassword('');
-    setCredError('');
-    setCredSuccess('');
-    setShowCredPassword(false);
-    setIsFetchingCreds(true);
-
-    try {
-      const getCreds = httpsCallable<{ shopId: string }, { email: string; password: string }>(
-        functions,
-        'getMerchantCredentials'
-      );
-      const res = await getCreds({ shopId: shop.id });
-      if (res.data) {
-        setMerchantCredEmail(res.data.email || shop.merchant_email || '');
-        setEditCredEmail(res.data.email || shop.merchant_email || '');
-        setMerchantCredPassword(res.data.password || '');
-      }
-    } catch (err: any) {
-      console.warn('getMerchantCredentials error:', err);
-      if (shop.merchant_email) {
-        setMerchantCredEmail(shop.merchant_email);
-        setEditCredEmail(shop.merchant_email);
-      }
-    } finally {
-      setIsFetchingCreds(false);
-    }
-  };
-
-  // Handle Save / Update Merchant Credentials
-  const handleSaveCredentials = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedShopForCredentials || isSavingCreds) return;
-    setCredError('');
-    setCredSuccess('');
-
-    const targetEmail = editCredEmail.trim();
-    const targetPassword = editCredPassword.trim();
-
-    if (!targetEmail && !targetPassword) {
-      setCredError('กรุณากรอกอีเมลหรือรหัสผ่านที่ต้องการแก้ไข');
-      return;
-    }
-    if (targetEmail && (!targetEmail.includes('@') || !targetEmail.includes('.'))) {
-      setCredError('รูปแบบอีเมลไม่ถูกต้อง');
-      return;
-    }
-    if (targetPassword && targetPassword.length < 6) {
-      setCredError('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
-      return;
-    }
-
-    setIsSavingCreds(true);
-    try {
-      const updateCreds = httpsCallable<
-        { shopId: string; email?: string; password?: string },
-        { success: boolean; email: string; password: string }
-      >(functions, 'updateMerchantCredentials');
-
-      const res = await updateCreds({
-        shopId: selectedShopForCredentials.id,
-        email: targetEmail || undefined,
-        password: targetPassword || undefined,
-      });
-
-      if (res.data?.success) {
-        if (targetEmail) setMerchantCredEmail(targetEmail);
-        if (targetPassword) {
-          setMerchantCredPassword(targetPassword);
-          setEditCredPassword('');
-        }
-        setCredSuccess('บันทึกข้อมูลเข้าสู่ระบบเรียบร้อยแล้ว! ร้านค้าสามารถนำข้อมูลนี้ไปเข้าสู่ระบบได้ทันที');
-        soundAlert.playOrderCompletedSound().catch(() => {});
-      } else {
-        throw new Error('บันทึกข้อมูลไม่สำเร็จ');
-      }
-    } catch (err: any) {
-      console.error('Update merchant credentials error:', err);
-      setCredError(err.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
-    } finally {
-      setIsSavingCreds(false);
-    }
-  };
-
-  const handleCopyCred = (text: string, field: 'email' | 'password') => {
-    if (!text) return;
-    navigator.clipboard.writeText(text).then(() => {
-      setCopiedCredField(field);
-      setTimeout(() => setCopiedCredField(null), 2000);
-    }).catch(() => {});
   };
 
   // Handle Add Menu Item by Admin
@@ -1368,7 +1172,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
             <span className="text-[10px] bg-rose-500/30 text-rose-300 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
               Super Admin Panel
             </span>
-            <h1 className="text-xl font-black mt-0.5">huaychan • หลังบ้าน</h1>
+            <h1 className="text-xl font-black mt-0.5">CPRUFood • หลังบ้าน</h1>
             <p className="text-xs text-gray-300">ดูแลร้านค้า ติดตามออเดอร์ และจัดการเครดิตกับค่าบริการระบบ</p>
           </div>
         </div>
@@ -1474,8 +1278,10 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
         <div className="space-y-3">
           {/* Instructions Box */}
           <div className="bg-amber-50/80 border border-amber-200 rounded-2xl p-3 text-xs text-amber-900 leading-relaxed">
-            <strong>วิธีแต่งตั้งร้านค้า:</strong> ค้นหาเบอร์โทรศัพท์ของคนที่ต้องการแต่งตั้งด้านล่าง จากนั้นกดปุ่ม <strong>"+ ให้ยศร้านค้า"</strong> และกรอกชื่อร้าน ระบบจะเปิดโหมดร้านค้าให้เขาทันที
+            <strong>วิธีแต่งตั้งร้านค้า:</strong> ให้เจ้าของร้านเข้าสู่ระบบด้วย LINE หรือ Google แล้วส่งคำขอที่หน้า <strong>/merchant</strong> หรือค้นหาบัญชีด้านล่างแล้วกด <strong>"+ ให้ยศร้านค้า"</strong> ได้ทันที
           </div>
+
+          <MerchantApplicationsAdmin users={users} currentUser={currentUser} />
 
           {/* Search by Phone & Name */}
           <div className="relative">
@@ -1576,6 +1382,24 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                         className="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-white rounded-xl font-bold text-xs shadow-xs transition active:scale-95"
                       >
                         + ให้ยศร้านค้า
+                      </button>
+                    )}
+                    {u.role === 'customer' && (
+                      <button
+                        type="button"
+                        onClick={() => handleToggleAdmin(u, true)}
+                        className="px-2.5 py-1 text-xs text-gray-400 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition"
+                      >
+                        ตั้งเป็นแอดมิน
+                      </button>
+                    )}
+                    {u.role === 'admin' && u.uid !== currentUser.uid && (
+                      <button
+                        type="button"
+                        onClick={() => handleToggleAdmin(u, false)}
+                        className="px-2.5 py-1 text-xs text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                      >
+                        ปลดแอดมิน
                       </button>
                     )}
                     {u.role === 'merchant' && (
@@ -1679,25 +1503,6 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                 จัดการข้อมูลร้านค้า, ค่าจัดส่ง, รูปหน้าร้าน, เมนู และยอดเครดิต
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                setShowCreateMerchantModal(true);
-                setCreateShopName('');
-                setCreateMerchantEmail('');
-                setCreateMerchantPassword('');
-                setCreateShopPhone('');
-                setCreateShopPromptpay('');
-                setCreateShopAddress('');
-                setCreateShopDeliveryFee('0');
-                setCreateShopCategory('food');
-                setCreateMerchantError('');
-              }}
-              className="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>+ สร้างบัญชีร้านค้าใหม่</span>
-            </button>
           </div>
 
           <div className="grid grid-cols-1 gap-4">
@@ -1851,12 +1656,12 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
 
                   <button
                     type="button"
-                    onClick={() => handleOpenCredentialsModal(shop)}
+                    onClick={() => setSelectedShopForTransfer(shop)}
                     className="py-1.5 px-2 bg-white hover:bg-purple-50 text-purple-900 hover:text-purple-950 border border-purple-200 hover:border-purple-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition shadow-2xs active:scale-95 cursor-pointer"
-                    title="ดูและแก้ไขอีเมล/รหัสผ่านเข้าสู่ระบบของร้านค้านี้"
+                    title="ย้ายสิทธิ์เจ้าของร้านไปยังบัญชี LINE/Google ใหม่"
                   >
                     <Key className="w-3.5 h-3.5 text-purple-600" />
-                    <span>รหัสผ่าน/อีเมล</span>
+                    <span>ย้ายเจ้าของร้าน</span>
                   </button>
                 </div>
 
@@ -2982,178 +2787,6 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
         </div>
       )}
 
-      {/* Admin Create Merchant Account Modal */}
-      {showCreateMerchantModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-5 space-y-4 shadow-2xl animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-gray-150 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl shadow-xs">
-                  <Store className="w-5 h-5 text-amber-600" />
-                </div>
-                <div>
-                  <h3 className="font-black text-gray-900 text-base">สร้างบัญชีร้านค้าใหม่</h3>
-                  <p className="text-[11px] text-gray-500">สร้าง User Auth และข้อมูลร้านค้าพร้อมใช้งานทันที</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowCreateMerchantModal(false)}
-                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {createMerchantError && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-2xl text-xs text-red-600 font-medium flex items-center gap-1.5">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{createMerchantError}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleCreateMerchantSubmit} className="space-y-3">
-              <div>
-                <label className="text-[11px] font-bold text-gray-700 block mb-1">
-                  ชื่อร้านค้า <span className="text-red-500">*</span>:
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="เช่น ส้มตำป้าศรี, กาแฟสดต้นปาล์ม"
-                  value={createShopName}
-                  onChange={(e) => setCreateShopName(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-medium"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="text-[11px] font-bold text-gray-700 block mb-1">
-                    อีเมลสำหรับเข้าสู่ระบบ <span className="text-red-500">*</span>:
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="shop@example.com"
-                    value={createMerchantEmail}
-                    onChange={(e) => setCreateMerchantEmail(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-medium"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-bold text-gray-700 block mb-1">
-                    รหัสผ่านเริ่มต้น <span className="text-red-500">*</span>:
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="อย่างน้อย 6 ตัวอักษร"
-                    value={createMerchantPassword}
-                    onChange={(e) => setCreateMerchantPassword(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-medium"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="text-[11px] font-bold text-gray-700 block mb-1">เบอร์โทรศัพท์ร้าน:</label>
-                  <input
-                    type="tel"
-                    placeholder="08x-xxx-xxxx"
-                    value={createShopPhone}
-                    onChange={(e) => setCreateShopPhone(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-medium"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-bold text-gray-700 block mb-1">เลขพร้อมเพย์ร้าน:</label>
-                  <input
-                    type="text"
-                    placeholder="08x-xxx-xxxx"
-                    value={createShopPromptpay}
-                    onChange={(e) => setCreateShopPromptpay(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-medium"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-[11px] font-bold text-gray-700 block mb-1">ที่อยู่ / จุดสังเกตร้าน:</label>
-                <input
-                  type="text"
-                  placeholder="เช่น ซอย 3 ตรงข้ามประตู 1 มรภ."
-                  value={createShopAddress}
-                  onChange={(e) => setCreateShopAddress(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-medium"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="text-[11px] font-bold text-gray-700 block mb-1">หมวดหมู่ร้าน:</label>
-                  <select
-                    value={createShopCategory}
-                    onChange={(e) => setCreateShopCategory(e.target.value as any)}
-                    className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-xl focus:outline-hidden font-medium"
-                  >
-                    <option value="food">อาหารจานเดียว / กับข้าว</option>
-                    <option value="drink_dessert">เครื่องดื่ม & ของหวาน</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-[11px] font-bold text-gray-700 block mb-1">ค่าจัดส่งของร้าน (บาท):</label>
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder="0 (ส่งฟรี)"
-                    value={createShopDeliveryFee}
-                    onChange={(e) => setCreateShopDeliveryFee(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-medium"
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-1.5 pt-1">
-                {[0, 10, 15, 20].map((preset) => (
-                  <button
-                    key={preset}
-                    type="button"
-                    onClick={() => setCreateShopDeliveryFee(String(preset))}
-                    className={`flex-1 py-1 text-[10px] font-bold rounded-lg border transition ${
-                      createShopDeliveryFee === String(preset)
-                        ? 'bg-amber-500 text-white border-amber-600 shadow-2xs'
-                        : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
-                    }`}
-                  >
-                    {preset === 0 ? 'ส่งฟรี (0฿)' : `${preset} ฿`}
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex justify-end gap-2 pt-3 border-t border-gray-150">
-                <button
-                  type="button"
-                  onClick={() => setShowCreateMerchantModal(false)}
-                  className="px-4 py-2 text-xs text-gray-500 hover:bg-gray-100 rounded-xl font-medium"
-                >
-                  ยกเลิก
-                </button>
-                <button
-                  type="submit"
-                  disabled={isCreatingMerchant}
-                  className="px-5 py-2.5 text-xs bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-xl shadow-md flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-                >
-                  <Check className="w-3.5 h-3.5" />
-                  <span>{isCreatingMerchant ? 'กำลังสร้างบัญชี...' : 'ยืนยันสร้างบัญชีร้านค้า'}</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
       {/* 3. Admin Shop Menus Management Modal */}
       {selectedShopForMenus && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
@@ -3838,197 +3471,14 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
         </div>
       )}
 
-      {/* 6. Admin View & Edit Merchant Credentials Modal */}
-      {selectedShopForCredentials && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in duration-150 border border-gray-100 my-8">
-            {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-150">
-                  <Key className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-black text-base text-gray-900">
-                    ข้อมูลเข้าสู่ระบบร้านค้า
-                  </h3>
-                  <p className="text-xs text-gray-500 font-medium">
-                    ร้าน: {selectedShopForCredentials.name}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedShopForCredentials(null);
-                  setCredError('');
-                  setCredSuccess('');
-                }}
-                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Fetching loading state */}
-            {isFetchingCreds ? (
-              <div className="py-8 flex flex-col items-center justify-center gap-2 text-purple-600">
-                <div className="w-7 h-7 border-3 border-purple-500 border-t-transparent rounded-full animate-spin" />
-                <span className="text-xs font-bold text-gray-600">กำลังดึงข้อมูลบัญชีร้านค้า...</span>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {/* Current Active Credentials Card */}
-                <div className="bg-gradient-to-br from-purple-50 to-indigo-50/50 p-4 rounded-2xl border border-purple-100 space-y-3">
-                  <span className="text-xs font-black text-purple-950 flex items-center gap-1.5">
-                    <Lock className="w-3.5 h-3.5 text-purple-600" />
-                    ข้อมูลที่บันทึกไว้ในปัจจุบัน
-                  </span>
-
-                  {/* Email */}
-                  <div className="bg-white p-2.5 rounded-xl border border-purple-100 flex items-center justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <span className="text-[10px] text-gray-400 font-bold block">อีเมลเข้าระบบ</span>
-                      <span className="text-xs font-mono font-bold text-gray-800 break-all select-all">
-                        {merchantCredEmail || '(ยังไม่มีอีเมล)'}
-                      </span>
-                    </div>
-                    {merchantCredEmail && (
-                      <button
-                        type="button"
-                        onClick={() => handleCopyCred(merchantCredEmail, 'email')}
-                        className="px-2 py-1 bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold text-[11px] rounded-lg transition shrink-0 flex items-center gap-1 cursor-pointer"
-                      >
-                        <Copy className="w-3 h-3" />
-                        <span>{copiedCredField === 'email' ? 'คัดลอกแล้ว!' : 'คัดลอก'}</span>
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Password */}
-                  <div className="bg-white p-2.5 rounded-xl border border-purple-100 flex items-center justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <span className="text-[10px] text-gray-400 font-bold block">รหัสผ่าน</span>
-                      {merchantCredPassword ? (
-                        <span className="text-xs font-mono font-bold text-gray-800 break-all select-all">
-                          {showCredPassword ? merchantCredPassword : '••••••••••••'}
-                        </span>
-                      ) : (
-                        <span className="text-[11px] text-amber-700 italic block mt-0.5">
-                          (ยังไม่ได้บันทึกรหัสผ่านเดิม สามารถตั้งรหัสผ่านใหม่ด้านล่างนี้ได้ทันที)
-                        </span>
-                      )}
-                    </div>
-                    {merchantCredPassword && (
-                      <div className="flex items-center gap-1 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => setShowCredPassword(!showCredPassword)}
-                          className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition cursor-pointer"
-                          title={showCredPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
-                        >
-                          {showCredPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleCopyCred(merchantCredPassword, 'password')}
-                          className="px-2 py-1 bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold text-[11px] rounded-lg transition flex items-center gap-1 cursor-pointer"
-                        >
-                          <Copy className="w-3 h-3" />
-                          <span>{copiedCredField === 'password' ? 'คัดลอกแล้ว!' : 'คัดลอก'}</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Edit Form */}
-                <form onSubmit={handleSaveCredentials} className="space-y-3 pt-1 border-t border-gray-100">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-gray-800">
-                      แก้ไข / เปลี่ยนอีเมลและรหัสผ่าน
-                    </span>
-                    <span className="text-[10px] text-gray-400">
-                      (ซิงค์กับระบบล็อกอินทันที)
-                    </span>
-                  </div>
-
-                  <div>
-                    <label className="text-[11px] font-bold text-gray-700 block mb-1">
-                      อีเมลร้านค้า
-                    </label>
-                    <input
-                      type="email"
-                      value={editCredEmail}
-                      onChange={(e) => setEditCredEmail(e.target.value)}
-                      placeholder="เช่น shop@huaychan.com"
-                      className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-medium"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[11px] font-bold text-gray-700 block mb-1">
-                      ตั้งรหัสผ่านใหม่ <span className="text-gray-400 font-normal">(เว้นว่างไว้หากไม่ต้องการเปลี่ยน)</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={editCredPassword}
-                      onChange={(e) => setEditCredPassword(e.target.value)}
-                      placeholder="รหัสผ่านใหม่อย่างน้อย 6 ตัวอักษร"
-                      className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono font-medium"
-                    />
-                  </div>
-
-                  {credError && (
-                    <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-medium flex items-center gap-1.5">
-                      <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
-                      <span>{credError}</span>
-                    </div>
-                  )}
-
-                  {credSuccess && (
-                    <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 font-medium flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
-                      <span>{credSuccess}</span>
-                    </div>
-                  )}
-
-                  <div className="flex gap-2 pt-2">
-                    <button
-                      type="button"
-                      disabled={isSavingCreds}
-                      onClick={() => {
-                        setSelectedShopForCredentials(null);
-                        setCredError('');
-                        setCredSuccess('');
-                      }}
-                      className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-xl transition cursor-pointer"
-                    >
-                      ปิด
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isSavingCreds}
-                      className="flex-1 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
-                    >
-                      {isSavingCreds ? (
-                        <>
-                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          <span>กำลังบันทึก...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Check className="w-3.5 h-3.5" />
-                          <span>บันทึกการเปลี่ยนแปลง</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
-          </div>
-        </div>
+      {/* Move shop ownership to a new LINE/Google account */}
+      {selectedShopForTransfer && (
+        <ShopOwnerTransferModal
+          shop={selectedShopForTransfer}
+          users={users}
+          currentUser={currentUser}
+          onClose={() => setSelectedShopForTransfer(null)}
+        />
       )}
 
       {/* Hidden file inputs for Admin */}

@@ -8,7 +8,7 @@ import { doc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 if (!process.env.FIRESTORE_EMULATOR_HOST?.startsWith('127.0.0.1:')) throw Error('Local emulator required');
 let env;
 before(async () => {
-  env = await initializeTestEnvironment({ projectId: 'demo-huaychan-security', firestore: { rules: readFileSync('firestore.rules', 'utf8') } });
+  env = await initializeTestEnvironment({ projectId: 'demo-cprufood-security', firestore: { rules: readFileSync('firestore.rules', 'utf8') } });
 });
 after(async () => { await env?.cleanup(); });
 beforeEach(async () => {

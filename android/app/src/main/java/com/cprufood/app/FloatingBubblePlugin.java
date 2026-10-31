@@ -1,4 +1,4 @@
-package com.tonpalm.merchant;
+package com.cprufood.app;
 
 import android.content.Intent;
 import android.net.Uri;

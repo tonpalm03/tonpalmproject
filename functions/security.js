@@ -2,7 +2,7 @@ const { verifyLineIdentity } = require('./line-identity');
 
 module.exports = function securityFunctions(functions, admin) {
   const db = admin.firestore();
-  const region = functions.region('asia-southeast3');
+  const region = functions.region('asia-southeast1');
   return {
     deleteUserAccount: region.runWith({ invoker: 'public' }).https.onCall(require('./delete-account')(admin, functions)),
     signInWithLine: region.https.onCall(async (data) => {

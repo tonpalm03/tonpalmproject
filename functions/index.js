@@ -94,7 +94,7 @@ async function notifyShopNewOrders(orders) {
 
 const createCheckoutHandler = require('./checkout');
 
-const region = functions.region('asia-southeast3');
+const region = functions.region('asia-southeast1');
 
 async function isCallerAdmin(callerUid) {
   if (!callerUid) return false;
@@ -400,7 +400,7 @@ exports.checkoutOrder = region.runWith({ invoker: 'public' }).https.onCall(
   createCheckoutHandler(admin, functions, { sendShopBadge, merchantTokens, notifyShopNewOrders })
 );
 
-exports.sendOrderPush = functions.region('asia-southeast3').https.onRequest((req, res) => {
+exports.sendOrderPush = functions.region('asia-southeast1').https.onRequest((req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
   res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.set('Access-Control-Allow-Headers', 'Content-Type');
@@ -409,7 +409,7 @@ exports.sendOrderPush = functions.region('asia-southeast3').https.onRequest((req
 });
 
 /**
- * Authenticated chat message notification callable (asia-southeast3)
+ * Authenticated chat message notification callable (asia-southeast1)
  */
 exports.notifyChatMessage = region.runWith({ invoker: 'public' }).https.onCall(async (data, context) => {
   if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Sign in required');
@@ -474,7 +474,7 @@ exports.notifyChatMessage = region.runWith({ invoker: 'public' }).https.onCall(a
 
 const { MOCK_SHOPS, MOCK_MENUS } = require('./mock-data');
 
-exports.seedMockShops = functions.region('asia-southeast3').https.onRequest(async (req, res) => {
+exports.seedMockShops = functions.region('asia-southeast1').https.onRequest(async (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
   res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   if (req.method === 'OPTIONS') { res.status(204).send(''); return; }

@@ -2,6 +2,7 @@
   "hosting": {
     "site": "cprufood",
     "public": "out",
+    "cleanUrls": true,
     "ignore": [
       "firebase.json",
       "**/.*",

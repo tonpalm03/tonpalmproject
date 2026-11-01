@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Store, UtensilsCrossed, CupSoda, ShoppingBag, MapPin, Phone,
   Plus, Search, ShieldCheck, UserCheck, ChevronRight, Sparkles,
-  Star, Flame, FileText, Bike, CheckCircle2, MessageSquare,
+  Star, FileText, Bike, CheckCircle2, MessageSquare,
   Lock, ChefHat, ShoppingCart
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -31,6 +31,8 @@ import DonateModal from '@/components/DonateModal';
 import SupportersModal from '@/components/SupportersModal';
 import HomeHero, { HomeHeroCompact } from '@/components/HomeHero';
 import WavePattern from '@/components/WavePattern';
+import { formatReviewCount } from '@/lib/reviewCount';
+import AndroidInstallLink from '@/components/AndroidInstallLink';
 
 export default function HomePage() {
   const { user, role, isLineLoggingIn, logout } = useAuth();
@@ -808,19 +810,20 @@ export default function HomePage() {
                             <span className="bg-black/70 text-white text-xs font-bold px-2.5 py-1 rounded-full">ปิดอยู่</span>
                           </span>
                         )}
-                        {(shop.sales_count ?? 0) > 0 && open && (
-                          <span className="absolute top-2 left-2 text-[10px] font-black px-1.5 py-0.5 rounded-full bg-brand-500 text-white flex items-center gap-0.5">
-                            <Flame className="w-3 h-3 fill-white" /> ขายแล้ว {shop.sales_count}
-                          </span>
-                        )}
                       </div>
                       <div className="p-2.5">
                         <h3 className="font-bold text-sm text-gray-900 leading-tight truncate">{shop.name}</h3>
                         <div className="flex items-center gap-1.5 mt-1 text-[11px] text-gray-500">
-                          <span className="flex items-center gap-0.5 font-bold text-gray-700">
-                            <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                            {(shop.rating ?? 0).toFixed(1)}
-                          </span>
+                          {/* Like GrabFood: rating with review count, no sales numbers */}
+                          {(shop.review_count ?? 0) > 0 ? (
+                            <span className="flex items-center gap-0.5 font-bold text-gray-700 shrink-0">
+                              <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                              {(shop.rating ?? 0).toFixed(1)}
+                              <span className="font-normal text-gray-400">({formatReviewCount(shop.review_count ?? 0)})</span>
+                            </span>
+                          ) : (
+                            <span className="text-gray-400 shrink-0">ยังไม่มีรีวิว</span>
+                          )}
                           <span className="text-gray-300">•</span>
                           {(shop.delivery_fee ?? 0) === 0
                             ? <span className="text-brand-600 font-bold">ส่งฟรี</span>
@@ -930,6 +933,7 @@ export default function HomePage() {
                 <MessageSquare className="w-3.5 h-3.5" />
                 <span>Contact us</span>
               </button>
+              <AndroidInstallLink variant="footer" />
             </div>
             <p className="text-[11px] text-gray-400">
               CPRUFood • แพลตฟอร์มสั่งอาหารชุมชนบ้านห้วยชัน - นาฝาย และ มหาวิทยาลัยราชภัฏชัยภูมิ

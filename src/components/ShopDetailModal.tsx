@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  X, Phone, MapPin, Plus, Store, Star, Flame, MessageSquare,
+  X, Phone, MapPin, Plus, Store, Star, MessageSquare,
   UtensilsCrossed, CupSoda, Search, Minus, Check, Navigation,
   Lock, Sparkles, FileEdit, Bike, AlertCircle, ArrowRight
 } from 'lucide-react';
@@ -13,6 +13,7 @@ import { db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import ReviewModal from './ReviewModal';
 import MascotWatermark from './MascotWatermark';
+import { formatReviewCount } from '@/lib/reviewCount';
 
 interface ShopDetailModalProps {
   shop: Shop;
@@ -249,15 +250,8 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                 
                 <span className="text-[10px] bg-brand-500/90 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                   <Star className="w-3 h-3 fill-white text-white" />
-                  <span>{displayRating.toFixed(1)} ({displayReviewCount})</span>
+                  <span>{displayReviewCount > 0 ? `${displayRating.toFixed(1)} (${formatReviewCount(displayReviewCount)})` : 'ยังไม่มีรีวิว'}</span>
                 </span>
-
-                {(shop.sales_count ?? 0) > 0 && (
-                  <span className="text-[10px] bg-brand-600/90 font-black px-2 py-0.5 rounded-full flex items-center gap-0.5">
-                    <Flame className="w-3 h-3 fill-white" />
-                    <span>ขายแล้ว {shop.sales_count}</span>
-                  </span>
-                )}
 
                 <span className="text-[10px] bg-white/20 backdrop-blur-xs px-2 py-0.5 rounded-full flex items-center gap-1">
                   <Bike className="w-3 h-3" />
@@ -463,11 +457,6 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                                   <h4 className="font-bold text-sm text-gray-800 leading-tight">{item.name}</h4>
                                   <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                                     <p className="text-xs font-black text-brand-600">{item.price} บาท</p>
-                                    {(item.sales_count ?? 0) > 0 && (
-                                      <span className="text-[10px] bg-brand-50 text-brand-600 font-bold px-1.5 py-0.2 rounded-md border border-brand-200 flex items-center gap-0.5">
-                                        <Flame className="w-3 h-3" /> ขายแล้ว {item.sales_count} จาน
-                                      </span>
-                                    )}
                                   </div>
                                   {item.options && item.options.length > 0 && (
                                     <span className="inline-flex items-center gap-1 mt-1 text-[10px] text-brand-700 bg-brand-50 px-1.5 py-0.5 rounded-md font-bold border border-brand-200">
@@ -544,11 +533,6 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                                   <h4 className="font-bold text-sm text-gray-800 leading-tight">{item.name}</h4>
                                   <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                                     <p className="text-xs font-black text-brand-600">{item.price} บาท</p>
-                                    {(item.sales_count ?? 0) > 0 && (
-                                      <span className="text-[10px] bg-brand-50 text-brand-600 font-bold px-1.5 py-0.2 rounded-md border border-brand-200 flex items-center gap-0.5">
-                                        <Flame className="w-3 h-3" /> ขายแล้ว {item.sales_count} แก้ว
-                                      </span>
-                                    )}
                                   </div>
                                   {item.options && item.options.length > 0 && (
                                     <span className="inline-flex items-center gap-1 mt-1 text-[10px] text-brand-700 bg-brand-50 px-1.5 py-0.5 rounded-md font-bold border border-brand-200">

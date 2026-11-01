@@ -5,7 +5,7 @@ import {
   ShieldCheck, Users, Store, TrendingUp, Calendar, Eye, CheckCircle2,
   AlertCircle, DollarSign, Clock, MessageSquare, Award, Search, Trash2, Phone, X,
   Camera, MapPin, Star, Power, Edit3, Download, Navigation, FileSpreadsheet, Check, Bike, ChefHat, Plus, Edit2, Scissors,
-  Key, Lock, Copy, EyeOff, Settings, ArrowRight, User, RefreshCw, Sparkles, Coffee, Utensils, Percent, Wallet, FileText, Heart
+  Key, Lock, Copy, EyeOff, Settings, ArrowRight, User, RefreshCw, Sparkles, Coffee, Utensils, Percent, Wallet, FileText, Heart, ChevronDown
 } from 'lucide-react';
 import { UserProfile, Order, UserRole, Shop, MenuItem, MenuItemOption, ShopCategory } from '@/types';
 import { db, functions } from '@/lib/firebase';
@@ -84,6 +84,8 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
   const [allMenuItems, setAllMenuItems] = useState<MenuItem[]>([]);
   const [selectedShopForReviews, setSelectedShopForReviews] = useState<Shop | null>(null);
   const [selectedShopForMenus, setSelectedShopForMenus] = useState<Shop | null>(null);
+  const [shopSearch, setShopSearch] = useState('');
+  const [expandedShopId, setExpandedShopId] = useState<string | null>(null);
   const [selectedShopForEdit, setSelectedShopForEdit] = useState<Shop | null>(null);
   const [editShopName, setEditShopName] = useState('');
   const [editShopPhone, setEditShopPhone] = useState('');
@@ -1304,12 +1306,61 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
 
           <MockShopsCard shops={shops} />
 
-          <div className="grid grid-cols-1 gap-4">
-            {shops.map((shop) => (
+          <div className="relative">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="search"
+              value={shopSearch}
+              onChange={(e) => setShopSearch(e.target.value)}
+              placeholder="ค้นหาชื่อร้าน เบอร์โทร หรือที่อยู่"
+              className="w-full h-10 pl-9 pr-3 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:border-brand-400"
+            />
+          </div>
+
+          {(() => {
+            const q = shopSearch.trim().toLowerCase();
+            const visibleShops = q
+              ? shops.filter((s) => [s.name, s.phone, s.address_detail, s.id].some((v) => v?.toLowerCase().includes(q)))
+              : shops;
+            return (
+          <div className="grid grid-cols-1 gap-2">
+            {visibleShops.length === 0 && (
+              <p className="text-center text-xs text-gray-400 py-6">ไม่พบร้านที่ค้นหา</p>
+            )}
+            {visibleShops.map((shop) => {
+              const expanded = expandedShopId === shop.id;
+              const open = shop.is_open ?? true;
+              return (
               <div
                 key={shop.id}
-                className="bg-white rounded-3xl overflow-hidden border border-gray-150 shadow-xs hover:shadow-md transition flex flex-col"
+                className={`bg-white rounded-2xl overflow-hidden border shadow-xs transition flex flex-col ${expanded ? 'border-brand-300 shadow-md' : 'border-gray-150'}`}
               >
+                {/* Compact row: tap to open the full management card */}
+                <button
+                  type="button"
+                  onClick={() => setExpandedShopId(expanded ? null : shop.id)}
+                  className="flex items-center gap-3 p-2.5 text-left hover:bg-gray-50 transition cursor-pointer"
+                >
+                  <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0 flex items-center justify-center">
+                    {shop.image_url ? (
+                      <img src={shop.image_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <Store className="w-5 h-5 text-gray-400" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-sm text-gray-800 truncate">{shop.name}</p>
+                    <p className="text-[11px] text-gray-400 truncate">
+                      เมนู {allMenuItems.filter(m => m.shop_id === shop.id).length} · {shop.address_detail || 'รอบ มรภ. ชัยภูมิ'}
+                    </p>
+                  </div>
+                  <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full ${open ? 'bg-brand-50 text-brand-700' : 'bg-red-50 text-red-600'}`}>
+                    {open ? 'เปิด' : 'ปิด'}
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 shrink-0 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+                </button>
+
+                {expanded && (<>
                 {/* Storefront Image Banner */}
                 <div className="relative h-44 bg-slate-100 group overflow-hidden">
                   {shop.image_url ? (
@@ -1500,9 +1551,13 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                     </button>
                   </div>
                 </div>
+                </>)}
               </div>
-            ))}
+              );
+            })}
           </div>
+            );
+          })()}
         </div>
       )}
 

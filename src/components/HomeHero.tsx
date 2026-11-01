@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Heart, Store, Bike, ChefHat, Clock, CheckCircle2, MapPin, Sparkles } from 'lucide-react';
 import { Order } from '@/types';
-import { Supporter } from '@/lib/donations';
+import { Supporter, formatBaht } from '@/lib/donations';
 import { formatOrderCode } from '@/lib/orderNumber';
 import UserAvatar from './UserAvatar';
 import WavePattern from './WavePattern';
@@ -24,6 +24,8 @@ const ORDER_STATUS: Record<string, { label: string; icon: typeof Bike }> = {
   completed: { label: 'ส่งถึงแล้ว', icon: CheckCircle2 },
 };
 
+const TICKER_MS = 2500;
+
 function mealPrompt(hour: number): string {
   if (hour >= 5 && hour < 11) return 'เช้านี้กินอะไรดี';
   if (hour >= 11 && hour < 14) return 'ได้เวลาข้าวเที่ยงแล้ว';
@@ -36,7 +38,14 @@ export default function HomeHero({
   supporters, userName, openShopCount, trackingOrders, onOpenSupporters, onOpenTracking,
 }: HomeHeroProps) {
   const firstName = userName?.split(' ')[0];
-  const faces = supporters.slice(0, 2);
+  // The supporters pill shows everyone in turn, one every few seconds, then starts over.
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    if (supporters.length < 2) return;
+    const id = setInterval(() => setTick(t => t + 1), TICKER_MS);
+    return () => clearInterval(id);
+  }, [supporters.length]);
+  const current = supporters.length ? supporters[tick % supporters.length] : null;
   // The most advanced active order is the most useful one to show at a glance.
   const rank = ['delivering', 'cooking', 'pending', 'completed'];
   const activeOrder = [...trackingOrders]
@@ -76,22 +85,27 @@ export default function HomeHero({
         <button
           type="button"
           onClick={onOpenSupporters}
-          className="h-9 rounded-full bg-white text-[#085041] border border-[#E1F5EE] shadow-[0_4px_12px_-4px_rgba(15,110,86,0.3)] pl-1 pr-2.5 flex items-center gap-1.5 active:scale-95 transition min-w-0"
+          className="h-9 rounded-full bg-white text-[#085041] border border-[#E1F5EE] shadow-[0_4px_12px_-4px_rgba(15,110,86,0.3)] pl-1 pr-2.5 flex items-center gap-1.5 active:scale-95 transition min-w-0 overflow-hidden"
         >
-          {faces.length > 0 ? (
-            <span className="flex -space-x-2 shrink-0">
-              {faces.map(s => (
-                <span key={s.key} className="w-6 h-6 rounded-full overflow-hidden ring-2 ring-white bg-white">
-                  <UserAvatar src={s.avatar_url} alt={s.display_name} />
-                </span>
-              ))}
+          {current ? (
+            // Keyed by supporter so each one slides in fresh
+            <span key={`${current.key}-${tick}`} className="flex items-center gap-1.5 min-w-0 animate-in fade-in slide-in-from-bottom-3 duration-500 motion-reduce:animate-none">
+              <span className="w-6 h-6 rounded-full overflow-hidden ring-2 ring-white bg-white shrink-0">
+                <UserAvatar src={current.avatar_url} alt={current.display_name} />
+              </span>
+              <span className="text-xs font-black truncate">{current.display_name}</span>
+              {current.total > 0 && (
+                <span className="text-[11px] font-bold text-[#1D9E75] shrink-0">{formatBaht(current.total)}</span>
+              )}
             </span>
           ) : (
-            <span className="w-6 h-6 rounded-full bg-rose-50 flex items-center justify-center shrink-0">
-              <Heart className="w-3.5 h-3.5 text-pink-500 fill-pink-500" />
-            </span>
+            <>
+              <span className="w-6 h-6 rounded-full bg-rose-50 flex items-center justify-center shrink-0">
+                <Heart className="w-3.5 h-3.5 text-pink-500 fill-pink-500" />
+              </span>
+              <span className="text-xs font-black truncate">ผู้สนับสนุน</span>
+            </>
           )}
-          <span className="text-xs font-black truncate">ผู้สนับสนุน</span>
         </button>
 
         {/* My order status, or how many shops are open */}

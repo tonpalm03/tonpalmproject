@@ -26,13 +26,6 @@ const ORDER_STATUS: Record<string, { label: string; icon: typeof Bike }> = {
 
 const TICKER_MS = 2500;
 
-function mealPrompt(hour: number): string {
-  if (hour >= 5 && hour < 11) return 'เช้านี้กินอะไรดี';
-  if (hour >= 11 && hour < 14) return 'ได้เวลาข้าวเที่ยงแล้ว';
-  if (hour >= 14 && hour < 17) return 'บ่ายนี้หาของหวานกินไหม';
-  if (hour >= 17 && hour < 21) return 'มื้อเย็นวันนี้กินอะไรดี';
-  return 'หิวดึกเหรอ';
-}
 
 /** The most advanced active order is the most useful one to show at a glance. */
 function pickActiveOrder(trackingOrders: Order[]) {
@@ -87,9 +80,6 @@ export function HomeHeroCompact({
     <div className="relative overflow-hidden isolate rounded-2xl bg-gradient-to-br from-[#C3EBDC] to-[#9FE1CB] px-1.5 py-1 flex items-center gap-1.5 shadow-[0_4px_12px_-6px_rgba(15,110,86,0.35)] animate-in fade-in slide-in-from-top-2 duration-300 motion-reduce:animate-none">
       <WavePattern className="text-white/70 -z-10" />
       <img src="/mascots/pung-deng-thanks.webp" alt="น้องพุงเด้ง" className="w-8 h-8 object-contain shrink-0 pointer-events-none select-none" />
-      <span suppressHydrationWarning className="text-xs font-black text-[#04342C] truncate min-w-0 max-w-[30%]">
-        {mealPrompt(new Date().getHours())}
-      </span>
       <button
         type="button"
         onClick={onOpenSupporters}
@@ -129,10 +119,13 @@ export default function HomeHero({
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#C3EBDC] to-[#9FE1CB] p-3.5 min-h-[128px] shadow-[0_6px_16px_-6px_rgba(15,110,86,0.35)]">
         <WavePattern />
         <p className="relative z-10 text-xs font-bold text-[#085041] truncate pr-16">สวัสดี{firstName ? ` ${firstName}` : ''}</p>
-        {/* Rendered from the device clock, so the prerendered text may differ */}
-        <h2 suppressHydrationWarning className="relative z-10 text-base font-black text-[#04342C] mt-1 leading-snug pr-[72px] sm:pr-24">
-          {mealPrompt(new Date().getHours())}
+        <h2 className="relative z-10 text-sm font-black text-[#04342C] mt-1 leading-snug pr-[64px] sm:pr-24">
+          {/* Break between phrases only, never mid-word */}
+          <span className="whitespace-nowrap">สั่งอาหาร</span><wbr /><span className="whitespace-nowrap">กับน้องพุงเด้ง</span>
         </h2>
+        <p className="relative z-10 text-xs font-bold text-[#085041] leading-snug pr-[64px] sm:pr-24">
+          <span className="whitespace-nowrap">จัดส่งถึง</span><wbr /><span className="whitespace-nowrap">หน้าบ้าน/หอพัก</span>
+        </p>
         <p className="relative z-10 mt-1.5 pr-[72px] sm:pr-24 text-[11px] font-medium text-[#0F6E56] leading-snug flex gap-1">
           <MapPin className="w-3 h-3 shrink-0 mt-0.5" />
           <span>

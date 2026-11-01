@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useMemo } from 'react';
-import { X, Trash2, Plus, Minus, MapPin, Navigation, Banknote, QrCode, ArrowRight, Store, Bike, Info, MessageCircle, Lock, ShoppingCart, AlertCircle, AlertTriangle, CheckCircle2, Home } from 'lucide-react';
+import { X, Trash2, Plus, Minus, MapPin, Navigation, Banknote, QrCode, ArrowRight, ArrowLeft, Store, Bike, Info, MessageCircle, Lock, ShoppingCart, AlertCircle, AlertTriangle, CheckCircle2, Home } from 'lucide-react';
 import { useCart, ShopCartGroup } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { functions } from '@/lib/firebase';
@@ -98,6 +98,9 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [showTerms, setShowTerms] = useState(false);
+  // Checkout is two pages: review the cart, then recipient, address and pin.
+  const [step, setStep] = useState<'cart' | 'delivery'>('cart');
+  const bodyRef = useRef<HTMLFormElement>(null);
   const idempotencyKeyRef = useRef<string>(`idemp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`);
 
   // Persist form draft across modal closes/refreshes
@@ -215,6 +218,12 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
       </div>
     );
   }
+
+  const goToStep = (next: 'cart' | 'delivery') => {
+    setErrorMsg('');
+    setStep(next);
+    bodyRef.current?.scrollTo({ top: 0 });
+  };
 
   const handleUseCurrentGPS = async () => {
     if (isLocatingGPS) return;
@@ -384,12 +393,23 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
         {/* Header */}
         <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] border-b border-[#9FE1CB] p-4 text-[#04342C] flex items-center justify-between shadow-sm relative overflow-hidden isolate">
           <WavePattern className="text-white/90 -z-10" />
-          <div className="flex items-center gap-2">
-            <Store className="w-5 h-5 text-[#0F6E56]" />
-            <div>
-              <h2 className="font-bold text-base leading-tight">ตะกร้าสั่งอาหาร</h2>
-              <p className="text-xs text-[#0F6E56]">
-                {shopCount === 1 ? shopsInCart[0]?.name : `${shopCount} ร้านค้า (ร้านแยกกันส่ง)`}
+          <div className="flex items-center gap-2 min-w-0">
+            {step === 'delivery' ? (
+              <button
+                type="button"
+                onClick={() => goToStep('cart')}
+                aria-label="กลับไปตะกร้า"
+                className="w-9 h-9 -ml-1 rounded-full bg-white hover:bg-brand-50 border border-[#9FE1CB] flex items-center justify-center transition active:scale-95 shrink-0"
+              >
+                <ArrowLeft className="w-5 h-5 text-[#0F6E56]" />
+              </button>
+            ) : (
+              <Store className="w-5 h-5 text-[#0F6E56] shrink-0" />
+            )}
+            <div className="min-w-0">
+              <h2 className="font-bold text-base leading-tight">{step === 'cart' ? 'ตะกร้าสั่งอาหาร' : 'ที่อยู่จัดส่ง'}</h2>
+              <p className="text-xs text-[#0F6E56] truncate">
+                ขั้นที่ {step === 'cart' ? 1 : 2}/2 · {shopCount === 1 ? shopsInCart[0]?.name : `${shopCount} ร้านค้า (ร้านแยกกันส่ง)`}
               </p>
             </div>
           </div>
@@ -402,7 +422,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
         </div>
 
         {/* Scrollable Body */}
-        <form onSubmit={handleSubmitOrder} className="flex-1 overflow-y-auto p-4 space-y-4">
+        <form ref={bodyRef} onSubmit={handleSubmitOrder} className="flex-1 overflow-y-auto p-4 space-y-4">
           
           {errorMsg && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-2xl text-xs text-red-600 font-medium flex items-center gap-1.5">
@@ -411,6 +431,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
             </div>
           )}
 
+          {step === 'cart' && (<>
           {/* Multi-shop Delivery Notice */}
           {shopCount > 1 && (
             <div className="p-3 bg-brand-50 border border-brand-200 rounded-2xl flex items-start gap-2.5 text-xs text-brand-900">
@@ -545,6 +566,35 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
               </div>
             </div>
           </div>
+
+          <button
+            type="button"
+            onClick={() => goToStep('delivery')}
+            disabled={hasOwnShopItems}
+            className={`w-full py-3.5 rounded-2xl font-bold text-sm sm:text-base shadow-lg flex items-center justify-center gap-2 active:scale-98 transition ${
+              hasOwnShopItems
+                ? 'bg-gray-300 shadow-none cursor-not-allowed text-gray-600'
+                : 'bg-gradient-to-r from-brand-500 to-brand-500 hover:from-brand-600 hover:to-brand-600 text-white shadow-brand-500/25'
+            }`}
+          >
+            <span>{hasOwnShopItems ? 'กรุณาลบเมนูร้านของตนเองออกก่อนสั่งซื้อ' : 'ถัดไป: ที่อยู่จัดส่ง'}</span>
+            {!hasOwnShopItems && <ArrowRight className="w-5 h-5" />}
+          </button>
+          </>)}
+
+          {step === 'delivery' && (<>
+          {/* Short order summary, tap to go back and edit */}
+          <button
+            type="button"
+            onClick={() => goToStep('cart')}
+            className="w-full flex items-center justify-between gap-2 p-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs text-left active:scale-98 transition"
+          >
+            <span className="flex items-center gap-2 min-w-0">
+              <ShoppingCart className="w-4 h-4 text-brand-600 shrink-0" />
+              <span className="text-gray-600 truncate">{items.length} รายการ จาก {shopCount} ร้าน · <span className="text-brand-700 font-bold">แก้ไขตะกร้า</span></span>
+            </span>
+            <span className="font-black text-brand-600 shrink-0">{total} ฿</span>
+          </button>
 
           {/* Delivery & Customer Info */}
           <div className="space-y-3">
@@ -766,6 +816,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
               โอนชำระเงินกับร้านค้าผ่านแชทสดก่อนเริ่มปรุงอาหาร • ร้านค้าเป็นผู้จัดส่งเอง
             </p>
           </div>
+          </>)}
 
         </form>
 

@@ -438,7 +438,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
               <Info className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
               <div>
                 <span className="font-bold block">คุณกำลังสั่งอาหารจาก {shopCount} ร้านค้า</span>
-                <span className="text-[11px] text-brand-800">
+                <span className="text-xs text-brand-800">
                   เนื่องจากแต่ละร้านเป็นผู้จัดส่งเอง แต่ละร้านจะแยกกันส่งถึงมือ คิดค่าจัดส่งตามแต่ละร้านกำหนดครับ
                 </span>
               </div>
@@ -447,12 +447,12 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
 
           {/* Cart Items Grouped by Shop */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs font-bold text-gray-500 px-1">
+            <div className="flex items-center justify-between gap-2 text-xs font-bold text-gray-500 px-1">
               <span>รายการสินค้า ({items.length} รายการ จาก {shopCount} ร้าน)</span>
               <button
                 type="button"
                 onClick={clearCart}
-                className="text-red-500 hover:text-red-600 flex items-center gap-0.5 text-[11px]"
+                className="text-red-500 hover:text-red-600 flex items-center gap-0.5 text-xs shrink-0 whitespace-nowrap"
               >
                 <Trash2 className="w-3 h-3" /> ล้างตะกร้า
               </button>
@@ -484,12 +484,12 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                         <h4 className="font-bold text-xs text-gray-800 leading-tight">
                           {group.shop.name}
                         </h4>
-                        <p className="text-[10px] text-gray-400">
+                        <p className="text-xs text-gray-400">
                           {group.items.length} เมนู • {group.deliveryFee === 0 ? 'ส่งฟรี (ร้านส่งเอง)' : `ค่าส่ง ${group.deliveryFee} บ. (ร้านส่งเอง)`}
                         </p>
                       </div>
                     </div>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                    <span className={`shrink-0 whitespace-nowrap text-xs font-bold px-2 py-0.5 rounded-full border ${
                       group.deliveryFee === 0
                         ? 'bg-brand-50 text-brand-700 border-brand-200'
                         : 'bg-brand-50 text-brand-800 border-brand-200'
@@ -503,19 +503,19 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                   {group.items.map((item) => (
                     <div key={item.cart_item_id || item.menu_id} className="py-2 flex items-center justify-between gap-2">
                       <div className="flex-1">
-                        <p className="text-xs font-semibold text-gray-800 leading-tight">{item.name}</p>
-                        <p className="text-xs text-brand-600 font-bold mt-0.5">
+                        <p className="text-sm font-semibold text-gray-800 leading-tight">{item.name}</p>
+                        <p className="text-sm text-brand-600 font-bold mt-0.5">
                           {item.unit_price ?? item.price} ฿
                         </p>
                         {item.selected_options && item.selected_options.length > 0 && (
-                          <div className="text-[10px] text-brand-800/90 pl-1 space-y-0.5 mt-0.5">
+                          <div className="text-xs text-brand-800/90 pl-1 space-y-0.5 mt-0.5">
                             {item.selected_options.map((opt, oIdx) => (
                               <div key={oIdx}>↳ + {opt.name} {opt.price > 0 ? `(+${opt.price} ฿)` : '(ฟรี)'}</div>
                             ))}
                           </div>
                         )}
                         {item.note && (
-                          <p className="text-[10px] text-gray-400 italic mt-0.5">({item.note})</p>
+                          <p className="text-xs text-gray-400 italic mt-0.5">({item.note})</p>
                         )}
                       </div>
 
@@ -543,7 +543,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                 </div>
 
                 {/* Subtotal of this shop */}
-                <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500">
+                <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
                   <span>อาหาร {group.subtotal} ฿ {group.deliveryFee === 0 ? '+ ส่งฟรี' : `+ ค่าส่ง ${group.deliveryFee} ฿`}</span>
                   <span className="font-bold text-gray-800">รวมร้านนี้: {group.total} ฿</span>
                 </div>
@@ -693,7 +693,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                   สถานที่ส่ง / จุดนัดรับ (พิมพ์เองอิสระ)
                 </label>
                 {addressMode === 'profile' && (
-                  <span className="text-[10px] text-brand-700 bg-brand-100 px-2 py-0.5 rounded-full font-bold">
+                  <span className="text-xs text-brand-700 bg-brand-100 px-2 py-0.5 rounded-full font-bold">
                     ใช้ที่อยู่จากโปรไฟล์
                   </span>
                 )}
@@ -733,7 +733,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                     ? `จุดจัดส่งอยู่นอกรัศมีบริการของร้าน "${outOfRangeShops[0].shop.name}" (ระยะทาง: ${formatDistance(outOfRangeShops[0].distanceKm)} / ร้านรับส่งไม่เกิน ${outOfRangeShops[0].allowedRadius} กม.)`
                     : `จุดจัดส่งอยู่นอกรัศมีบริการของ ${outOfRangeShops.length} ร้านค้า`}
                 </p>
-                <div className="text-[11px] text-rose-700 leading-relaxed space-y-0.5">
+                <div className="text-xs text-rose-700 leading-relaxed space-y-0.5">
                   {outOfRangeShops.map((item, idx) => (
                     <div key={idx} className="font-medium">
                       • {item.shop.name}: ระยะ {formatDistance(item.distanceKm)} (ร้านกำหนดไม่เกิน {item.allowedRadius} กม.)
@@ -753,7 +753,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
               <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider">
                 วิธีชำระเงิน (โอนผ่านแชทก่อนเริ่มทำอาหาร)
               </h3>
-              <span className="text-[10px] bg-brand-100 text-brand-800 font-bold px-2 py-0.5 rounded-full">
+              <span className="text-xs bg-brand-100 text-brand-800 font-bold px-2 py-0.5 rounded-full">
                 ร้านค้าส่งตรง
               </span>
             </div>
@@ -765,11 +765,11 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <p className="text-xs font-bold text-gray-900">โอนเงินผ่านแชทสดกับร้านค้า</p>
-                  <span className="bg-brand-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-full">
+                  <span className="bg-brand-600 text-white text-xs font-extrabold px-1.5 py-0.5 rounded-full">
                     แนะนำ
                   </span>
                 </div>
-                <p className="text-[11px] text-gray-600 mt-1 leading-relaxed">
+                <p className="text-xs text-gray-600 mt-1 leading-relaxed">
                   ร้านค้าจะส่ง QR พร้อมเพย์ / บัญชีธนาคารในห้องแชทสด โอนแล้วแนบสลิปเพื่อเริ่มทำอาหารทันที
                 </p>
               </div>
@@ -778,11 +778,11 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
 
           {/* Submit Button */}
           <div className="pt-2">
-            <p className="text-center text-[11px] text-gray-600 mb-2 leading-relaxed">
+            <p className="text-center text-xs text-gray-600 mb-2 leading-relaxed">
               คุณกำลังสั่งซื้อจากร้านค้าโดยตรง ร้านรับผิดชอบอาหารและจัดส่งเอง<br />
               CPRUFood ดูแลระบบสั่งซื้อและช่วยประสานงานเมื่อมีปัญหา
             </p>
-            <p className="text-center text-[11px] text-gray-500 mb-2">
+            <p className="text-center text-xs text-gray-500 mb-2">
               การกดสั่งซื้อถือว่าคุณยอมรับ{' '}
               <button
                 type="button"
@@ -812,7 +812,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
               </span>
               {!hasOwnShopItems && !isDeliveryOutOfRange && <ArrowRight className="w-5 h-5" />}
             </button>
-            <p className="text-center text-[11px] text-gray-400 mt-2">
+            <p className="text-center text-xs text-gray-400 mt-2">
               โอนชำระเงินกับร้านค้าผ่านแชทสดก่อนเริ่มปรุงอาหาร • ร้านค้าเป็นผู้จัดส่งเอง
             </p>
           </div>

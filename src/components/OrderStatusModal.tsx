@@ -10,6 +10,7 @@ import ReviewModal from './ReviewModal';
 import { formatOrderCode } from '@/lib/orderNumber';
 import { orderItemUnitPrice } from '@/lib/orderItemPrice';
 import MascotWatermark from './MascotWatermark';
+import { STATUS_MASCOT } from '@/lib/statusMascot';
 import WavePattern from './WavePattern';
 
 interface OrderStatusModalProps {
@@ -131,7 +132,7 @@ export default function OrderStatusModal({
           <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] border-b border-[#9FE1CB] p-4 text-[#04342C] flex items-center justify-between shadow-sm relative overflow-hidden isolate">
             <WavePattern className="text-white/90 -z-10" />
             <div>
-              <span className="text-[11px] bg-white text-[#0F6E56] border border-[#9FE1CB] px-2 py-0.5 rounded-full font-medium">
+              <span className="text-xs bg-white text-[#0F6E56] border border-[#9FE1CB] px-2 py-0.5 rounded-full font-medium">
                 {ordersList.length > 1 ? `สั่งอาหาร ${ordersList.length} ร้านค้า` : `ออเดอร์ #${formatOrderCode(activeOrder)}`}
               </span>
               <h2 className="font-black text-lg mt-0.5">สถานะการจัดส่ง</h2>
@@ -163,7 +164,7 @@ export default function OrderStatusModal({
                     <Store className="w-3.5 h-3.5" />
                     <span>{o.shop_name || 'ร้านค้า'}</span>
                     <span
-                      className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+                      className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${
                         isSelected
                           ? 'bg-white/25 text-white'
                           : o.status === 'completed'
@@ -204,7 +205,7 @@ export default function OrderStatusModal({
                     <Store className="w-3.5 h-3.5 text-brand-600" />
                     ร้าน {activeOrder.shop_name || 'ร้านค้าชุมชน'}
                   </span>
-                  <span className="text-[10px] bg-white px-2 py-0.5 rounded-full text-brand-800 font-bold border border-brand-200 flex items-center gap-1">
+                  <span className="text-xs bg-white px-2 py-0.5 rounded-full text-brand-800 font-bold border border-brand-200 flex items-center gap-1">
                     <Bike className="w-3 h-3" />
                     <span>{(activeOrder.delivery_fee ?? 0) === 0 ? 'ร้านส่งฟรี' : `ร้านส่งเอง (${activeOrder.delivery_fee} บ.)`}</span>
                   </span>
@@ -214,22 +215,25 @@ export default function OrderStatusModal({
                   {steps.map((s, idx) => {
                     const isPassed = currentStep >= idx;
                     const isCurrent = currentStep === idx;
-                    const Icon = s.icon;
+                    const mascot = STATUS_MASCOT[s.key];
 
                     return (
                       <div key={s.key} className="flex flex-col items-center text-center relative z-10">
-                        <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                            isCurrent
-                              ? 'bg-brand-500 text-white shadow-lg ring-4 ring-brand-200 animate-pulse'
-                              : isPassed
-                              ? 'bg-brand-500 text-white'
-                              : 'bg-gray-200 text-gray-400'
-                          }`}
-                        >
-                          <Icon className="w-5 h-5" />
+                        {/* น้องพุงเด้งในท่าของแต่ละขั้น: ขั้นปัจจุบันตัวใหญ่, ขั้นที่ยังไม่ถึงสีจาง */}
+                        <div className="h-16 flex items-end justify-center">
+                          <img
+                            src={mascot.src}
+                            alt={mascot.alt}
+                            className={`object-contain pointer-events-none select-none transition-all ${
+                              isCurrent
+                                ? 'w-16 h-16 drop-shadow-[0_4px_6px_rgba(29,158,117,0.35)]'
+                                : isPassed
+                                ? 'w-12 h-12'
+                                : 'w-12 h-12 grayscale opacity-35'
+                            }`}
+                          />
                         </div>
-                        <span className={`text-[11px] font-bold mt-1.5 ${isCurrent ? 'text-brand-700 font-extrabold' : isPassed ? 'text-brand-700' : 'text-gray-400'}`}>
+                        <span className={`text-xs font-bold mt-1.5 ${isCurrent ? 'text-brand-700 font-extrabold' : isPassed ? 'text-brand-700' : 'text-gray-400'}`}>
                           {s.label}
                         </span>
                       </div>
@@ -256,7 +260,7 @@ export default function OrderStatusModal({
                     <h4 className="font-black text-xs sm:text-sm leading-tight">
                       กรุณาโอนเงินผ่านแชทเพื่อเริ่มทำอาหาร
                     </h4>
-                    <p className="text-[11px] text-brand-100 mt-0.5 leading-snug">
+                    <p className="text-xs text-brand-100 mt-0.5 leading-snug">
                       ร้านค้าจะส่ง QR พร้อมเพย์ / บัญชีในแชทสด โอนแล้วแนบสลิปยืนยัน ร้านจะเริ่มทำอาหารทันทีหลังได้รับยอดครับ
                     </p>
                   </div>
@@ -281,7 +285,7 @@ export default function OrderStatusModal({
                     <CheckCircle2 className="w-4 h-4 text-brand-300 shrink-0" />
                     <span>อาหารร้านนี้ส่งถึงมือแล้ว!</span>
                   </p>
-                  <p className="text-[11px] text-brand-100">ช่วยให้คะแนนและรีวิวเพื่อเป็นกำลังใจให้ร้านค้า</p>
+                  <p className="text-xs text-brand-100">ช่วยให้คะแนนและรีวิวเพื่อเป็นกำลังใจให้ร้านค้า</p>
                 </div>
                 <button
                   type="button"
@@ -314,7 +318,7 @@ export default function OrderStatusModal({
             </div>
             {/* Post-delivery chat hint */}
             {activeOrder.status === 'completed' && (
-              <p className="text-[11px] text-gray-400 text-center flex items-center justify-center gap-1">
+              <p className="text-xs text-gray-400 text-center flex items-center justify-center gap-1">
                 <MessageSquare className="w-3 h-3 text-gray-400" />
                 <span>ยังคุยกับร้านได้ภายใน 24 ชั่วโมง หากมีปัญหาหลังรับอาหาร</span>
               </p>
@@ -399,14 +403,14 @@ export default function OrderStatusModal({
                       <span className="font-semibold text-gray-800">{item.name}</span>
                       <span className="text-xs text-gray-500 ml-1.5">x{item.quantity}</span>
                       {item.selected_options && item.selected_options.length > 0 && (
-                        <div className="text-[11px] text-brand-800/90 pl-1 space-y-0.5 mt-0.5">
+                        <div className="text-xs text-brand-800/90 pl-1 space-y-0.5 mt-0.5">
                           {item.selected_options.map((opt, oIdx) => (
                             <div key={oIdx}>↳ + {opt.name} {opt.price > 0 ? `(+${opt.price} ฿)` : '(ฟรี)'}</div>
                           ))}
                         </div>
                       )}
                       {item.note && (
-                        <p className="text-[11px] text-brand-700 mt-0.5">({item.note})</p>
+                        <p className="text-xs text-brand-700 mt-0.5">({item.note})</p>
                       )}
                     </div>
                     <span className="font-bold text-gray-700 shrink-0">
@@ -440,7 +444,7 @@ export default function OrderStatusModal({
                   <span className="font-bold">สถานที่ส่ง: </span>
                   <span>{activeOrder.delivery_address}</span>
                   {activeOrder.location && (
-                    <span className="text-[10px] text-gray-400 block">
+                    <span className="text-xs text-gray-400 block">
                       พิกัด GPS: {activeOrder.location.lat.toFixed(4)}, {activeOrder.location.lng.toFixed(4)}
                     </span>
                   )}

@@ -49,7 +49,7 @@ export default function SalesDashboard({ orders, shopId }: {
     <div key={title} className={`rounded-2xl border p-4 ${accent ? 'border-brand-600 bg-brand-600 text-white' : 'border-gray-100 bg-white text-slate-900'}`}>
       <p className={`text-xs ${accent ? 'text-brand-50' : 'text-slate-500'}`}>{title}</p>
       <p className="mt-2 text-2xl font-black tabular-nums">{money(value)} ฿</p>
-      <p className={`mt-2 text-[11px] ${accent ? 'text-brand-50' : 'text-slate-500'}`}>{detail}</p>
+      <p className={`mt-2 text-xs ${accent ? 'text-brand-50' : 'text-slate-500'}`}>{detail}</p>
     </div>
   );
   const ranking = new Map<string, { name: string; value: number; count: number }>();
@@ -72,7 +72,7 @@ export default function SalesDashboard({ orders, shopId }: {
         {period === 'custom' && <label className="flex items-center gap-2">ถึง<input aria-label="วันที่สิ้นสุดรายงาน" type="date" value={customEnd} min={selectedDate} onChange={e => setCustomEnd(e.target.value)} className="rounded-lg border border-gray-200 p-2" /></label>}
         <button type="button" onClick={() => { setSelectedDate(dateKey(new Date())); setCustomEnd(dateKey(new Date())); }} className="font-bold text-brand-700">กลับมาวันนี้</button>
       </div>
-      <p className="text-[11px] text-slate-500">ช่วง {start} ถึง {end} • นับยอดขายตามวันส่งสำเร็จ เวลาไทย • สำเร็จ {summary.completed.length} บิล • ยกเลิกตามวันสั่ง {summary.cancelled} บิล</p>
+      <p className="text-xs text-slate-500">ช่วง {start} ถึง {end} • นับยอดขายตามวันส่งสำเร็จ เวลาไทย • สำเร็จ {summary.completed.length} บิล • ยกเลิกตามวันสั่ง {summary.cancelled} บิล</p>
       {invalidRange && <p role="alert" className="text-xs text-red-600">กรุณาเลือกช่วงวันที่ให้ถูกต้อง</p>}
     </div>
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -119,7 +119,7 @@ export default function SalesDashboard({ orders, shopId }: {
                     <span className="font-mono font-bold text-slate-900 block">
                       #{formatOrderCode(o)}
                     </span>
-                    <span className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5 font-medium">
+                    <span className="text-xs text-slate-500 flex items-center gap-1 mt-0.5 font-medium">
                       <Clock className="w-3 h-3 text-brand-500 shrink-0" />
                       <span>{timeDisplay}</span>
                     </span>
@@ -162,7 +162,7 @@ export default function SalesDashboard({ orders, shopId }: {
               <div>
                 <h3 className="font-black text-base text-gray-900 flex items-center gap-1.5">
                   <span>บิล #{formatOrderCode(selectedBillOrder)}</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-100 text-brand-800">
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-100 text-brand-800">
                     ส่งสำเร็จแล้ว
                   </span>
                 </h3>
@@ -247,12 +247,12 @@ export default function SalesDashboard({ orders, shopId }: {
                       <span className="text-brand-600 font-black">{item.quantity}x</span> {item.name}
                     </p>
                     {item.selected_options && item.selected_options.length > 0 && (
-                      <p className="text-[10px] text-gray-500 mt-0.5">
+                      <p className="text-xs text-gray-500 mt-0.5">
                         {item.selected_options.map(o => `+ ${o.name} (${o.price}฿)`).join(', ')}
                       </p>
                     )}
                     {item.note && (
-                      <p className="text-[10px] text-brand-700 italic mt-0.5 flex items-center gap-1">
+                      <p className="text-xs text-brand-700 italic mt-0.5 flex items-center gap-1">
                         <FileEdit className="w-2.5 h-2.5 shrink-0" />
                         <span>{item.note}</span>
                       </p>
@@ -280,7 +280,7 @@ export default function SalesDashboard({ orders, shopId }: {
               <span>ยอดรวมที่รับจากลูกค้า:</span>
               <span className="text-brand-600">{money(selectedBillOrder.total_amount ?? 0)} ฿</span>
             </div>
-            <div className="flex justify-between text-gray-500 text-[11px] pt-1 border-t border-dashed border-brand-200/60">
+            <div className="flex justify-between text-gray-500 text-xs pt-1 border-t border-dashed border-brand-200/60">
               <span>วิธีชำระเงิน:</span>
               <span className="font-bold text-gray-700">
                 {selectedBillOrder.payment_method === 'cash' ? 'เงินสดปลายทาง' : 'สแกน QR ร้านปลายทาง'}

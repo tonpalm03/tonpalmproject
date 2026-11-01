@@ -95,7 +95,7 @@ export default function ReviewModal({
           </div>
           <h3 className="font-black text-lg text-gray-900">ให้คะแนนร้านค้า</h3>
           <p className="text-xs text-brand-600 font-bold mt-0.5">ร้าน {shopName}</p>
-          <p className="text-[11px] text-gray-400 mt-1">
+          <p className="text-xs text-gray-400 mt-1">
             ความพึงพอใจในรสชาติอาหารและการจัดส่ง
           </p>
         </div>
@@ -135,14 +135,14 @@ export default function ReviewModal({
 
           {/* Quick Tags */}
           <div className="space-y-1.5">
-            <span className="text-[11px] text-gray-500 font-medium">กดคำชมด่วน:</span>
+            <span className="text-xs text-gray-500 font-medium">กดคำชมด่วน:</span>
             <div className="flex flex-wrap gap-1.5">
               {quickTags.map((tag) => (
                 <button
                   key={tag}
                   type="button"
                   onClick={() => handleTagClick(tag)}
-                  className="text-[10px] px-2.5 py-1 rounded-xl bg-gray-50 hover:bg-brand-100 hover:text-brand-800 text-gray-700 border border-gray-200 transition font-medium"
+                  className="text-xs px-2.5 py-1 rounded-xl bg-gray-50 hover:bg-brand-100 hover:text-brand-800 text-gray-700 border border-gray-200 transition font-medium"
                 >
                   {tag}
                 </button>

@@ -32,6 +32,7 @@ import SupportersModal from '@/components/SupportersModal';
 import HomeHero, { HomeHeroCompact } from '@/components/HomeHero';
 import WavePattern from '@/components/WavePattern';
 import { formatReviewCount } from '@/lib/reviewCount';
+import { STATUS_MASCOT } from '@/lib/statusMascot';
 import AndroidInstallLink from '@/components/AndroidInstallLink';
 
 export default function HomePage() {
@@ -71,10 +72,12 @@ export default function HomePage() {
   useEffect(() => {
     const el = heroRef.current;
     if (!el) return;
+    // The header covers the top 3.625rem (58px at normal text size), so count the card as
+    // gone once it slides under it.
+    const headerPx = 3.625 * parseFloat(getComputedStyle(document.documentElement).fontSize);
     const observer = new IntersectionObserver(
       ([entry]) => setHeroHidden(!entry.isIntersecting),
-      // The header covers the top 58px, so count the card as gone once it slides under it.
-      { rootMargin: '-58px 0px 0px 0px' }
+      { rootMargin: `-${headerPx}px 0px 0px 0px` }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -553,7 +556,7 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-2.5 pb-3">
             <div className="flex items-center gap-2">
               <img src="/logo.png?v=9" alt="CPRUFood" className="w-9 h-9 object-contain shrink-0 drop-shadow-sm" />
-              <h1 className="flex-1 min-w-0 text-lg font-black tracking-tight text-[#085041] leading-tight">CPRUFood</h1>
+              <h1 className="flex-1 min-w-0 truncate text-lg font-black tracking-tight text-[#085041] leading-tight">CPRUFood</h1>
 
               {(role === 'merchant' || role === 'admin') && (
                 <button
@@ -576,7 +579,7 @@ export default function HomePage() {
               >
                 <ShoppingCart className="w-5 h-5" strokeWidth={2.4} />
                 {itemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-black min-w-4 h-4 px-1 rounded-full flex items-center justify-center ring-2 ring-[#E1F5EE]">
+                  <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-xs font-black min-w-4 h-4 px-1 rounded-full flex items-center justify-center ring-2 ring-[#E1F5EE]">
                     {itemCount}
                   </span>
                 )}
@@ -622,11 +625,11 @@ export default function HomePage() {
                 <h1 className="text-sm sm:text-base md:text-lg font-black tracking-tight text-gray-900 leading-tight whitespace-nowrap">
                   CPRUFood
                 </h1>
-                <span className="hidden lg:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-50 text-brand-600 border border-brand-200/80 shrink-0">
+                <span className="hidden lg:inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-50 text-brand-600 border border-brand-200/80 shrink-0">
                   ส่งรอบ มรภ. ชัยภูมิ
                 </span>
               </div>
-              <p className="hidden xs:flex sm:flex text-[10px] sm:text-xs text-gray-500 font-medium mt-0.5 items-center gap-1 whitespace-nowrap truncate">
+              <p className="hidden xs:flex sm:flex text-xs sm:text-xs text-gray-500 font-medium mt-0.5 items-center gap-1 whitespace-nowrap truncate">
                 <MapPin className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-brand-500 shrink-0" />
                 <span className="truncate max-w-[180px] sm:max-w-none">ชุมชนห้วยชัน - นาฝาย • ส่งถึงหน้าบ้าน & หอพัก</span>
               </p>
@@ -646,7 +649,7 @@ export default function HomePage() {
               >
                 {viewMode === 'merchant' ? <UtensilsCrossed className="w-3.5 h-3.5" /> : <ChefHat className="w-3.5 h-3.5" />}
                 <span className="hidden sm:inline">{viewMode === 'merchant' ? 'หน้าสั่งอาหาร' : 'จัดการร้านค้า'}</span>
-                <span className="sm:hidden text-[11px] font-bold">{viewMode === 'merchant' ? 'สั่งอาหาร' : 'ร้านค้า'}</span>
+                <span className="sm:hidden text-xs font-bold">{viewMode === 'merchant' ? 'สั่งอาหาร' : 'ร้านค้า'}</span>
               </button>
             )}
 
@@ -659,7 +662,7 @@ export default function HomePage() {
               >
                 {viewMode === 'admin' ? <UtensilsCrossed className="w-3.5 h-3.5" /> : <ShieldCheck className="w-3.5 h-3.5" />}
                 <span className="hidden sm:inline">{viewMode === 'admin' ? 'หน้าสั่งอาหาร' : 'จัดการหลังบ้าน'}</span>
-                <span className="sm:hidden text-[11px] font-bold">{viewMode === 'admin' ? 'สั่งอาหาร' : 'แอดมิน'}</span>
+                <span className="sm:hidden text-xs font-bold">{viewMode === 'admin' ? 'สั่งอาหาร' : 'แอดมิน'}</span>
               </button>
             )}
 
@@ -671,7 +674,7 @@ export default function HomePage() {
                 className="px-2.5 py-1.5 sm:px-3 rounded-xl text-xs font-bold bg-brand-500 hover:bg-brand-600 text-white shadow-sm transition active:scale-95 flex items-center gap-1 whitespace-nowrap shrink-0"
               >
                 <UserCheck className="w-3.5 h-3.5 shrink-0" />
-                <span className="text-[11px] sm:text-xs font-black">เข้าสู่ระบบ</span>
+                <span className="text-xs sm:text-xs font-black">เข้าสู่ระบบ</span>
               </button>
             ) : (
               <button
@@ -723,7 +726,7 @@ export default function HomePage() {
             </div>
 
             {/* Search and category chips stay pinned under the header while scrolling */}
-            <div className="sticky top-[58px] z-20 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 -mt-2 pt-2 pb-2 bg-slate-50/95 backdrop-blur-md space-y-3">
+            <div className="sticky top-[3.625rem] z-20 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 -mt-2 pt-2 pb-2 bg-slate-50/95 backdrop-blur-md space-y-3">
             {heroHidden && (
               <HomeHeroCompact
                 supporters={supporters}
@@ -812,8 +815,8 @@ export default function HomePage() {
                         )}
                       </div>
                       <div className="p-2.5">
-                        <h3 className="font-bold text-sm text-gray-900 leading-tight truncate">{shop.name}</h3>
-                        <div className="flex items-center gap-1.5 mt-1 text-[11px] text-gray-500">
+                        <h3 className="font-bold text-base text-gray-900 leading-tight truncate">{shop.name}</h3>
+                        <div className="flex items-center gap-1.5 mt-1 text-xs text-gray-500">
                           {/* Like GrabFood: rating with review count, no sales numbers */}
                           {(shop.review_count ?? 0) > 0 ? (
                             <span className="flex items-center gap-0.5 font-bold text-gray-700 shrink-0">
@@ -865,10 +868,10 @@ export default function HomePage() {
                         )}
                       </button>
                       <div className="p-2.5 flex-1 flex flex-col">
-                        <h4 className="font-bold text-sm text-gray-900 leading-tight line-clamp-2">{item.name}</h4>
-                        <p className="text-[11px] text-gray-400 mt-0.5 truncate">{shop?.name || 'ร้านค้าชุมชน'}</p>
+                        <h4 className="font-bold text-base text-gray-900 leading-tight line-clamp-2">{item.name}</h4>
+                        <p className="text-xs text-gray-400 mt-0.5 truncate">{shop?.name || 'ร้านค้าชุมชน'}</p>
                         <div className="mt-auto pt-1.5 flex items-center justify-between">
-                          <span className="text-sm font-black text-brand-700">{item.price} บ.</span>
+                          <span className="text-base font-black text-brand-700">{item.price} บ.</span>
                           <button
                             type="button"
                             onClick={() => handleAddItemFromFeed(item)}
@@ -935,7 +938,7 @@ export default function HomePage() {
               </button>
               <AndroidInstallLink variant="footer" />
             </div>
-            <p className="text-[11px] text-gray-400">
+            <p className="text-xs text-gray-400">
               CPRUFood • แพลตฟอร์มสั่งอาหารชุมชนบ้านห้วยชัน - นาฝาย และ มหาวิทยาลัยราชภัฏชัยภูมิ
             </p>
           </footer>
@@ -975,6 +978,11 @@ export default function HomePage() {
       {viewMode === 'customer' && trackingOrders.length > 0 && (() => {
         const ongoingOrders = trackingOrders.filter((o) => o.status !== 'completed' && o.status !== 'cancelled');
         const allCompleted = ongoingOrders.length === 0 && trackingOrders.some((o) => o.status === 'completed');
+        // The bar shows the furthest-along order, so น้องพุงเด้ง rides once any order is on its way.
+        const barStatus = allCompleted
+          ? 'completed'
+          : (['delivering', 'cooking', 'pending'] as const).find((st) => ongoingOrders.some((o) => o.status === st));
+        const barMascot = barStatus ? STATUS_MASCOT[barStatus] : undefined;
 
         return (
           <div className={`fixed left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-20 animate-in fade-in slide-in-from-bottom-2 duration-200 ${
@@ -993,13 +1001,21 @@ export default function HomePage() {
                 }`}
               >
                 <div className="flex items-center gap-2.5 text-xs text-left min-w-0 pr-2">
-                  <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-                    {allCompleted ? <CheckCircle2 className="w-4 h-4 text-brand-400" /> : <Bike className="w-4 h-4 text-brand-400" />}
-                  </div>
+                  {barMascot ? (
+                    <img
+                      src={barMascot.src}
+                      alt={barMascot.alt}
+                      className="w-12 h-12 -my-3 -ml-1 object-contain shrink-0 pointer-events-none select-none drop-shadow-md"
+                    />
+                  ) : (
+                    <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+                      {allCompleted ? <CheckCircle2 className="w-4 h-4 text-brand-400" /> : <Bike className="w-4 h-4 text-brand-400" />}
+                    </div>
+                  )}
                   <div className="min-w-0">
                     <p className="font-bold flex items-center gap-1.5 flex-wrap">
                       {hasCustomerUnreadMessage && (
-                        <span className="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                        <span className="bg-rose-500 text-white text-xs px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
                           <MessageSquare className="w-2.5 h-2.5" /> มีข้อความจากร้าน!
                         </span>
                       )}
@@ -1011,7 +1027,7 @@ export default function HomePage() {
                           : `ออเดอร์ #${formatOrderCode(trackingOrders[0])} กำลังดำเนินการ`}
                       </span>
                     </p>
-                    <p className="text-[10px] text-gray-400 truncate">
+                    <p className="text-xs text-gray-400 truncate">
                       {allCompleted ? 'แตะเพื่อรีวิว ให้คะแนน หรือปิดการติดตาม' : 'แตะเพื่อติดตามสถานะ & แชทกับร้าน'}
                     </p>
                   </div>

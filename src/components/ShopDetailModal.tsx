@@ -27,7 +27,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
   const { user } = useAuth();
   const { addItem, confirmSwitchShopAndAdd, itemCount, total, deliveryFee } = useCart();
   const [activeTab, setActiveTab] = useState<'menu' | 'reviews'>('menu');
-  const [selectedCategory, setSelectedCategory] = useState<'all' | 'food' | 'drink_dessert'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<'food' | 'drink_dessert'>('food');
   const [searchQuery, setSearchQuery] = useState('');
   const [reviews, setReviews] = useState<ShopReview[]>([]);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -202,6 +202,66 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
     m.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // A shop with only drinks opens on that tab instead of an empty food tab.
+  const activeCategory = selectedCategory === 'food' && foodItems.length === 0 && drinkItems.length > 0 ? 'drink_dessert' : selectedCategory;
+  // Searching looks through both tabs, so a dish is found whichever tab is open.
+  const isSearching = searchQuery.trim() !== '';
+  const showFood = menuItems.length > 0 && (isSearching ? filteredFoodItems.length > 0 : activeCategory === 'food');
+  const showDrinks = menuItems.length > 0 && (isSearching ? filteredDrinkItems.length > 0 : activeCategory === 'drink_dessert');
+
+  const renderMenuCard = (item: MenuItem, FallbackIcon: typeof UtensilsCrossed) => {
+    const soldOut = !item.is_available;
+    return (
+      <div
+        key={item.id}
+        onClick={() => handleItemClick(item)}
+        className={`bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-xs flex flex-col cursor-pointer hover:shadow-md transition active:scale-[0.99] ${soldOut ? 'opacity-60 grayscale' : ''}`}
+      >
+        <div className="relative aspect-square bg-slate-100">
+          {item.image_url ? (
+            <img key={item.image_url} src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full bg-brand-50 text-brand-500 flex items-center justify-center">
+              <FallbackIcon className="w-9 h-9" />
+            </div>
+          )}
+          {item.options && item.options.length > 0 && (
+            <span className="absolute left-1.5 top-1.5 inline-flex items-center gap-1 text-xs text-brand-700 bg-white/90 px-1.5 py-0.5 rounded-md font-bold shadow-2xs">
+              <Sparkles className="w-3 h-3" /> มีตัวเลือก
+            </span>
+          )}
+          {soldOut && (
+            <span className="absolute inset-0 flex items-center justify-center">
+              <span className="bg-black/70 text-white text-xs font-bold px-2.5 py-1 rounded-full">หมด</span>
+            </span>
+          )}
+        </div>
+        <div className="p-2.5 flex-1 flex flex-col">
+          <h4 className="font-bold text-base text-gray-900 leading-tight line-clamp-2">{item.name}</h4>
+          <div className="mt-auto pt-1.5 flex items-center justify-between gap-1">
+            <span className="text-base font-black text-brand-700 whitespace-nowrap">{item.price} บ.</span>
+            {isOwnShop ? (
+              <span className="text-xs font-bold text-gray-400 whitespace-nowrap">ร้านของคุณ</span>
+            ) : (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleItemClick(item);
+                }}
+                disabled={!isShopOpenAndReady || soldOut}
+                aria-label={`ใส่ ${item.name} ลงตะกร้า`}
+                className="w-8 h-8 shrink-0 rounded-full bg-brand-600 hover:bg-brand-700 disabled:bg-gray-300 text-white flex items-center justify-center shadow-xs active:scale-90 transition"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const displayRating = reviews.length > 0
     ? Math.round((reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length) * 10) / 10
     : 0;
@@ -244,16 +304,16 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
             {/* Shop Title Info Overlay */}
             <div className="absolute bottom-3 left-4 right-4 text-white">
               <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isShopOpenAndReady ? 'bg-brand-500' : 'bg-red-500'}`}>
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${isShopOpenAndReady ? 'bg-brand-500' : 'bg-red-500'}`}>
                   {isShopOpenAndReady ? 'เปิดรับออเดอร์' : 'ปิดร้านชั่วคราว'}
                 </span>
                 
-                <span className="text-[10px] bg-brand-500/90 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="text-xs bg-brand-500/90 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                   <Star className="w-3 h-3 fill-white text-white" />
                   <span>{displayReviewCount > 0 ? `${displayRating.toFixed(1)} (${formatReviewCount(displayReviewCount)})` : 'ยังไม่มีรีวิว'}</span>
                 </span>
 
-                <span className="text-[10px] bg-white/20 backdrop-blur-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="text-xs bg-white/20 backdrop-blur-xs px-2 py-0.5 rounded-full flex items-center gap-1">
                   <Bike className="w-3 h-3" />
                   <span>{(shop.delivery_fee ?? 0) === 0 ? 'ส่งฟรี' : `ค่าส่ง ${shop.delivery_fee} บ.`}</span>
                 </span>
@@ -274,7 +334,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                     href={`https://www.google.com/maps/dir/?api=1&destination=${shop.location.lat},${shop.location.lng}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white font-bold px-2 py-0.5 rounded-full border border-white/30 text-[10px] backdrop-blur-xs transition active:scale-95"
+                    className="inline-flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white font-bold px-2 py-0.5 rounded-full border border-white/30 text-xs backdrop-blur-xs transition active:scale-95"
                   >
                     <Navigation className="w-2.5 h-2.5 text-brand-300" />
                     <span>นำทาง Google Maps</span>
@@ -290,7 +350,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
               <Store className="w-5 h-5 text-brand-600 shrink-0" />
               <div className="text-xs">
                 <p className="font-bold">นี่คือร้านค้าของคุณเอง</p>
-                <p className="text-[11px] text-brand-700 mt-0.5">
+                <p className="text-xs text-brand-700 mt-0.5">
                   ระบบไม่อนุญาตให้สั่งอาหารจากร้านของตนเอง แต่คุณยังสามารถสั่งอาหารจากร้านอื่นได้ตามปกติครับ
                 </p>
               </div>
@@ -349,28 +409,13 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                     </button>
                   </div>
                 )}
-                {/* Category Filter Pills (ทั้งหมด / อาหาร / เครื่องดื่ม & ของหวาน) */}
-                <div className="grid grid-cols-3 gap-1.5 bg-white p-1 rounded-2xl border border-gray-150 shadow-xs">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedCategory('all')}
-                    className={`py-2 px-1 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 ${
-                      selectedCategory === 'all'
-                        ? 'bg-brand-500 text-white shadow-xs'
-                        : 'text-gray-500 hover:text-gray-800'
-                    }`}
-                  >
-                    <span>ทั้งหมด</span>
-                    <span className={`text-[10px] font-semibold ${selectedCategory === 'all' ? 'text-brand-100' : 'text-gray-400'}`}>
-                      ({menuItems.length})
-                    </span>
-                  </button>
-
+                {/* Category Filter Pills (อาหาร / เครื่องดื่ม & ของหวาน) */}
+                <div className="grid grid-cols-2 gap-1.5 bg-white p-1 rounded-2xl border border-gray-150 shadow-xs">
                   <button
                     type="button"
                     onClick={() => setSelectedCategory('food')}
                     className={`py-2 px-1 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 ${
-                      selectedCategory === 'food'
+                      activeCategory === 'food'
                         ? 'bg-brand-500 text-white shadow-xs'
                         : 'text-gray-500 hover:text-gray-800'
                     }`}
@@ -378,7 +423,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                     <span className="flex items-center gap-1">
                       <UtensilsCrossed className="w-3.5 h-3.5" /> อาหาร
                     </span>
-                    <span className={`text-[10px] font-semibold ${selectedCategory === 'food' ? 'text-brand-100' : 'text-gray-400'}`}>
+                    <span className={`text-xs font-semibold ${activeCategory === 'food' ? 'text-brand-100' : 'text-gray-400'}`}>
                       ({foodItems.length})
                     </span>
                   </button>
@@ -387,7 +432,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                     type="button"
                     onClick={() => setSelectedCategory('drink_dessert')}
                     className={`py-2 px-1 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 ${
-                      selectedCategory === 'drink_dessert'
+                      activeCategory === 'drink_dessert'
                         ? 'bg-brand-500 text-white shadow-xs'
                         : 'text-gray-500 hover:text-gray-800'
                     }`}
@@ -395,7 +440,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                     <span className="flex items-center gap-1 text-center truncate">
                       <CupSoda className="w-3.5 h-3.5 shrink-0" /> น้ำ/ของหวาน
                     </span>
-                    <span className={`text-[10px] font-semibold ${selectedCategory === 'drink_dessert' ? 'text-brand-100' : 'text-gray-400'}`}>
+                    <span className={`text-xs font-semibold ${activeCategory === 'drink_dessert' ? 'text-brand-100' : 'text-gray-400'}`}>
                       ({drinkItems.length})
                     </span>
                   </button>
@@ -425,155 +470,53 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                 )}
 
                 {/* Foods Section */}
-                {(selectedCategory === 'all' || selectedCategory === 'food') && (
-                  <>
-                    {filteredFoodItems.length > 0 ? (
-                      <div className="space-y-2">
-                        <h3 className="text-xs font-black text-gray-600 uppercase tracking-wider flex items-center gap-1.5 pt-1">
+                {showFood && (
+                  filteredFoodItems.length > 0 ? (
+                    <div className="space-y-2">
+                      {isSearching && (
+                        <h3 className="text-xs font-black text-gray-600 flex items-center gap-1.5 pt-1">
                           <span className="w-2 h-2 rounded-full bg-brand-500 inline-block" />
-                          <span>เมนูอาหารจานเดียว / ตามสั่ง ({filteredFoodItems.length})</span>
+                          <span>อาหาร ({filteredFoodItems.length})</span>
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                          {filteredFoodItems.map((item) => (
-                            <div
-                              key={item.id}
-                              onClick={() => handleItemClick(item)}
-                              className="bg-white rounded-2xl p-3 border border-gray-100 shadow-xs flex items-center justify-between gap-3 hover:shadow-md transition cursor-pointer active:scale-[0.99]"
-                            >
-                              <div className="flex items-center gap-3">
-                                {item.image_url ? (
-                                  <img
-                                    key={item.image_url}
-                                    src={item.image_url}
-                                    alt={item.name}
-                                    className="w-16 h-16 rounded-xl object-cover border border-gray-100 shrink-0"
-                                  />
-                                ) : (
-                                  <div className="w-16 h-16 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center border border-brand-100 shrink-0">
-                                    <UtensilsCrossed className="w-6 h-6" />
-                                  </div>
-                                )}
-                                <div>
-                                  <h4 className="font-bold text-sm text-gray-800 leading-tight">{item.name}</h4>
-                                  <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                                    <p className="text-xs font-black text-brand-600">{item.price} บาท</p>
-                                  </div>
-                                  {item.options && item.options.length > 0 && (
-                                    <span className="inline-flex items-center gap-1 mt-1 text-[10px] text-brand-700 bg-brand-50 px-1.5 py-0.5 rounded-md font-bold border border-brand-200">
-                                      <Sparkles className="w-2.5 h-2.5" /> ตัวเลือกเสริม ({item.options.length})
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleItemClick(item);
-                                }}
-                                disabled={isOwnShop || !isShopOpenAndReady || !item.is_available}
-                                className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1 shadow-xs transition active:scale-95 shrink-0 ${
-                                  isOwnShop
-                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                    : 'bg-brand-500 hover:bg-brand-600 disabled:opacity-40 text-white'
-                                }`}
-                              >
-                                {isOwnShop ? (
-                                  <span>ร้านของคุณ</span>
-                                ) : (
-                                  <>
-                                    <Plus className="w-3.5 h-3.5" /> {item.options && item.options.length > 0 ? 'เลือก' : 'ใส่ตะกร้า'}
-                                  </>
-                                )}
-                              </button>
-                            </div>
-                          ))}
-                        </div>
+                      )}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                        {filteredFoodItems.map((item) => renderMenuCard(item, UtensilsCrossed))}
                       </div>
-                    ) : selectedCategory === 'food' ? (
-                      <div className="text-center py-8 text-gray-400 text-xs bg-white rounded-2xl border border-gray-100 flex flex-col items-center justify-center gap-1.5">
-                        <UtensilsCrossed className="w-6 h-6 text-gray-300" />
-                        <p>ยังไม่มีเมนูอาหารในหมวดนี้</p>
-                      </div>
-                    ) : null}
-                  </>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-400 text-xs bg-white rounded-2xl border border-gray-100 flex flex-col items-center justify-center gap-1.5">
+                      <UtensilsCrossed className="w-6 h-6 text-gray-300" />
+                      <p>ยังไม่มีเมนูอาหารในหมวดนี้</p>
+                    </div>
+                  )
                 )}
 
                 {/* Drinks & Desserts Section */}
-                {(selectedCategory === 'all' || selectedCategory === 'drink_dessert') && (
-                  <>
-                    {filteredDrinkItems.length > 0 ? (
-                      <div className="space-y-2">
-                        <h3 className="text-xs font-black text-gray-600 uppercase tracking-wider flex items-center gap-1.5 pt-1">
+                {showDrinks && (
+                  filteredDrinkItems.length > 0 ? (
+                    <div className="space-y-2">
+                      {isSearching && (
+                        <h3 className="text-xs font-black text-gray-600 flex items-center gap-1.5 pt-1">
                           <span className="w-2 h-2 rounded-full bg-brand-500 inline-block" />
-                          <span>เครื่องดื่ม & ของหวาน ({filteredDrinkItems.length})</span>
+                          <span>น้ำ/ของหวาน ({filteredDrinkItems.length})</span>
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                          {filteredDrinkItems.map((item) => (
-                            <div
-                              key={item.id}
-                              onClick={() => handleItemClick(item)}
-                              className="bg-white rounded-2xl p-3 border border-gray-100 shadow-xs flex items-center justify-between gap-3 hover:shadow-sm transition cursor-pointer active:scale-[0.99]"
-                            >
-                              <div className="flex items-center gap-3">
-                                {item.image_url ? (
-                                  <img
-                                    key={item.image_url}
-                                    src={item.image_url}
-                                    alt={item.name}
-                                    className="w-16 h-16 rounded-xl object-cover border border-gray-100 shrink-0"
-                                  />
-                                ) : (
-                                  <div className="w-16 h-16 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center border border-brand-100 shrink-0">
-                                    <CupSoda className="w-6 h-6" />
-                                  </div>
-                                )}
-                                <div>
-                                  <h4 className="font-bold text-sm text-gray-800 leading-tight">{item.name}</h4>
-                                  <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                                    <p className="text-xs font-black text-brand-600">{item.price} บาท</p>
-                                  </div>
-                                  {item.options && item.options.length > 0 && (
-                                    <span className="inline-flex items-center gap-1 mt-1 text-[10px] text-brand-700 bg-brand-50 px-1.5 py-0.5 rounded-md font-bold border border-brand-200">
-                                      <Sparkles className="w-2.5 h-2.5" /> ตัวเลือกเสริม ({item.options.length})
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
+                      )}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                        {filteredDrinkItems.map((item) => renderMenuCard(item, CupSoda))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-400 text-xs bg-white rounded-2xl border border-gray-100 flex flex-col items-center justify-center gap-1.5">
+                      <CupSoda className="w-6 h-6 text-gray-300" />
+                      <p>ยังไม่มีเครื่องดื่มหรือของหวานในหมวดนี้</p>
+                    </div>
+                  )
+                )}
 
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleItemClick(item);
-                                }}
-                                disabled={isOwnShop || !isShopOpenAndReady || !item.is_available}
-                                className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1 shadow-xs transition active:scale-95 shrink-0 ${
-                                  isOwnShop
-                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                    : 'bg-brand-500 hover:bg-brand-600 disabled:opacity-40 text-white'
-                                }`}
-                              >
-                                {isOwnShop ? (
-                                  <span>ร้านของคุณ</span>
-                                ) : (
-                                  <>
-                                    <Plus className="w-3.5 h-3.5" /> {item.options && item.options.length > 0 ? 'เลือก' : 'ใส่ตะกร้า'}
-                                  </>
-                                )}
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ) : selectedCategory === 'drink_dessert' ? (
-                      <div className="text-center py-8 text-gray-400 text-xs bg-white rounded-2xl border border-gray-100 flex flex-col items-center justify-center gap-1.5">
-                        <CupSoda className="w-6 h-6 text-gray-300" />
-                        <p>ยังไม่มีเครื่องดื่มหรือของหวานในหมวดนี้</p>
-                      </div>
-                    ) : null}
-                  </>
+                {isSearching && !showFood && !showDrinks && (
+                  <div className="text-center py-8 text-gray-400 text-xs bg-white rounded-2xl border border-gray-100">
+                    ไม่พบเมนู &quot;{searchQuery}&quot; ในร้านนี้
+                  </div>
                 )}
 
                 {menuItems.length === 0 && (
@@ -605,7 +548,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                             />
                           ))}
                         </div>
-                        <span className="text-[11px] text-brand-800 font-bold">
+                        <span className="text-xs text-brand-800 font-bold">
                           {displayReviewCount} รีวิวจากลูกค้า
                         </span>
                       </div>
@@ -633,7 +576,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                   <div className="bg-white rounded-2xl p-6 text-center border border-gray-100 space-y-2">
                     <Star className="w-8 h-8 text-amber-300 fill-amber-300 mx-auto" />
                     <h4 className="text-xs font-bold text-gray-700">ยังไม่มีรีวิวสำหรับร้านนี้</h4>
-                    <p className="text-[11px] text-gray-400">สั่งอาหารและเป็นคนแรกที่รีวิวร้านนี้กันเถอะ!</p>
+                    <p className="text-xs text-gray-400">สั่งอาหารและเป็นคนแรกที่รีวิวร้านนี้กันเถอะ!</p>
                     <button
                       type="button"
                       onClick={() => {
@@ -697,17 +640,20 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
 
           {/* Floating Bottom Cart Bar if items exist */}
           {itemCount > 0 && (
-            <div className="p-3 bg-white border-t border-gray-100 flex items-center justify-between shadow-lg">
-              <div>
+            <div className="p-3 bg-white border-t border-gray-100 flex items-center justify-between gap-2 shadow-lg">
+              <div className="min-w-0">
                 <span className="text-xs text-gray-500">ในตะกร้า {itemCount} ชิ้น</span>
-                <p className="text-sm font-black text-gray-800">{total} ฿ (รวมส่ง {deliveryFee} บ.)</p>
+                <p className="text-sm font-black text-gray-800">
+                  <span className="whitespace-nowrap">{total} ฿</span>{' '}
+                  <span className="whitespace-nowrap text-xs font-bold text-gray-500">(รวมส่ง {deliveryFee} บ.)</span>
+                </p>
               </div>
               <button
                 onClick={() => {
                   onClose();
                   onOpenCart();
                 }}
-                className="px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-500 hover:from-brand-600 text-white font-bold text-xs rounded-xl shadow-md transition active:scale-95 flex items-center gap-1"
+                className="px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-500 hover:from-brand-600 text-white font-bold text-xs rounded-xl shadow-md transition active:scale-95 flex items-center gap-1 shrink-0 whitespace-nowrap"
               >
                 <span>ดูตะกร้า & สั่งซื้อ</span>
                 <ArrowRight className="w-4 h-4" aria-hidden="true" />
@@ -792,7 +738,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                             <span>{group.title}</span>
                           </span>
                           <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                               group.required
                                 ? 'bg-brand-100 text-brand-800 border border-brand-200'
                                 : 'bg-gray-100 text-gray-600'
@@ -870,7 +816,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                       <span className="flex items-center gap-1">
                         <Sparkles className="w-3.5 h-3.5 text-brand-600" /> เลือกท็อปปิ้ง / ตัวเลือกเสริม:
                       </span>
-                      <span className="text-[10px] text-gray-400 font-normal">เลือกได้หลายอย่าง</span>
+                      <span className="text-xs text-gray-400 font-normal">เลือกได้หลายอย่าง</span>
                     </label>
                     <div className="space-y-1.5">
                       {customizingItem.options.map((opt, idx) => {
@@ -908,7 +854,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
 
               {/* Special Note input */}
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-gray-700 flex items-center gap-1">
+                <label className="text-xs font-bold text-gray-700 flex items-center gap-1">
                   <FileEdit className="w-3 h-3 text-gray-500" />
                   <span>รายละเอียดเพิ่มเติมถึงร้าน (ไม่บังคับ):</span>
                 </label>

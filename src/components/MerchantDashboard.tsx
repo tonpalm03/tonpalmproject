@@ -1169,11 +1169,11 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/15 pointer-events-none" />
 
         {/* Top Action Buttons on Banner */}
-        <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
+        <div className="absolute top-3 left-3 right-3 flex flex-wrap items-center justify-between gap-1.5">
           <button
             type="button"
             onClick={handleToggleOpen}
-            className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-md transition active:scale-95 cursor-pointer ${
+            className={`px-3 py-1.5 rounded-xl font-bold text-xs whitespace-nowrap flex items-center gap-1.5 shadow-md transition active:scale-95 cursor-pointer ${
               isOpen
                 ? 'bg-brand-500 hover:bg-brand-600 text-white'
                 : 'bg-red-500 hover:bg-red-600 text-white'
@@ -1182,7 +1182,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
             <Power className="w-3.5 h-3.5" />
             <span>
               {isOpen
-                ? 'เปิดร้านรับออเดอร์'
+                ? 'เปิดรับออเดอร์'
                 : 'ปิดร้านชั่วคราว (แตะเพื่อเปิด)'}
             </span>
           </button>
@@ -1191,7 +1191,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
             <button
               type="button"
               onClick={toggleWakeLock}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold backdrop-blur-xs flex items-center gap-1 shadow-md active:scale-95 transition cursor-pointer border ${
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap backdrop-blur-xs flex items-center gap-1 shadow-md active:scale-95 transition cursor-pointer border ${
                 isWakeLockActive
                   ? 'bg-brand-600/90 hover:bg-brand-700 text-white border-brand-400/50'
                   : 'bg-black/60 hover:bg-black/80 text-white border-white/15'
@@ -1209,11 +1209,12 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
             <button
               type="button"
               onClick={() => setActiveTab('shop_info')}
-              className="px-3 py-1.5 bg-black/60 hover:bg-black/80 text-white font-bold text-xs rounded-xl backdrop-blur-xs flex items-center gap-1.5 shadow-md active:scale-95 transition cursor-pointer border border-white/15"
+              className="px-2.5 py-1.5 bg-black/60 hover:bg-black/80 text-white font-bold text-xs whitespace-nowrap rounded-xl backdrop-blur-xs flex items-center gap-1.5 shadow-md active:scale-95 transition cursor-pointer border border-white/15"
               title="ไปที่การตั้งค่าข้อมูลร้านและรูปภาพปก"
+              aria-label="ตั้งค่าข้อมูลร้าน"
             >
               <Store className="w-3.5 h-3.5 text-brand-400" />
-              <span>ตั้งค่าข้อมูลร้าน</span>
+              <span className="hidden sm:inline">ตั้งค่าข้อมูลร้าน</span>
             </button>
           </div>
         </div>
@@ -1225,17 +1226,17 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
               const count = shopReviews.length;
               const avg = count > 0 ? (Math.round((shopReviews.reduce((sum, r) => sum + r.rating, 0) / count) * 10) / 10).toFixed(1) : (shopData?.rating ? shopData.rating.toFixed(1) : '0.0');
               return (
-                <span className="text-[10px] bg-brand-500 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="text-xs bg-brand-500 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                   <Star className="w-3 h-3 fill-white text-white" /> {avg} ({count} รีวิว)
                 </span>
               );
             })()}
             {(shopData?.sales_count ?? 0) > 0 && (
-              <span className="text-[10px] bg-brand-600 font-black px-2 py-0.5 rounded-full">
+              <span className="text-xs bg-brand-600 font-black px-2 py-0.5 rounded-full">
                 ขายแล้ว {shopData?.sales_count} ออเดอร์
               </span>
             )}
-            <span className="text-[10px] bg-white/20 backdrop-blur-xs px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-white/20 backdrop-blur-xs px-2 py-0.5 rounded-full">
               รูปนี้แสดงบนฟีดหน้าแรก
             </span>
           </div>
@@ -1259,7 +1260,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
               <h4 className="font-black text-sm sm:text-base flex items-center gap-1.5">
                 มีออเดอร์ใหม่รอดำเนินการ ({pendingOrders.length} ออเดอร์)!
               </h4>
-              <p className="text-[11px] text-red-100 font-medium">
+              <p className="text-xs text-red-100 font-medium">
                 {isAlarmMuted
                   ? 'พักเสียงเตือนชั่วคราวแล้ว (กดปุ่มเปิดเสียงต่อได้)'
                   : 'เสียงกระดิ่งเตือนวนซ้ำต่อเนื่อง (จะดังจนกว่าจะกดรับออเดอร์)'}
@@ -1290,10 +1291,10 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
       )}
 
       {/* Navigation Sub-tabs */}
-      <div className="flex bg-gray-100 p-1 rounded-2xl gap-1 overflow-x-auto">
+      <div className="grid grid-cols-2 sm:flex bg-gray-100 p-1 rounded-2xl gap-1">
         <button
           onClick={() => setActiveTab('orders')}
-          className={`flex-1 min-w-[75px] py-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1 transition ${
+          className={`flex-auto shrink-0 px-2.5 py-2 rounded-xl font-bold text-xs whitespace-nowrap flex items-center justify-center gap-1 transition ${
             activeTab === 'orders'
               ? 'bg-white text-gray-800 shadow-sm'
               : 'text-gray-500 hover:text-gray-700'
@@ -1304,7 +1305,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
         </button>
         <button
           onClick={() => setActiveTab('menu')}
-          className={`flex-1 min-w-[75px] py-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1 transition ${
+          className={`flex-auto shrink-0 px-2.5 py-2 rounded-xl font-bold text-xs whitespace-nowrap flex items-center justify-center gap-1 transition ${
             activeTab === 'menu'
               ? 'bg-white text-gray-800 shadow-sm'
               : 'text-gray-500 hover:text-gray-700'
@@ -1315,7 +1316,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
         </button>
         <button
           onClick={() => setActiveTab('sales')}
-          className={`flex-1 min-w-[75px] py-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1 transition ${
+          className={`flex-auto shrink-0 px-2.5 py-2 rounded-xl font-bold text-xs whitespace-nowrap flex items-center justify-center gap-1 transition ${
             activeTab === 'sales'
               ? 'bg-white text-gray-800 shadow-sm'
               : 'text-gray-500 hover:text-gray-700'
@@ -1326,7 +1327,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
         </button>
         <button
           onClick={() => setActiveTab('shop_info')}
-          className={`flex-1 min-w-[75px] py-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1 transition ${
+          className={`flex-auto shrink-0 px-2.5 py-2 rounded-xl font-bold text-xs whitespace-nowrap flex items-center justify-center gap-1 transition ${
             activeTab === 'shop_info'
               ? 'bg-white text-gray-800 shadow-sm'
               : 'text-gray-500 hover:text-gray-700'
@@ -1352,7 +1353,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                       มีข้อความใหม่จากลูกค้า! ({unreadOrders.length} ออเดอร์)
                     </p>
                     {completedUnreadCount > 0 && (
-                      <span className="bg-brand-900/90 text-brand-200 text-[10px] px-2 py-0.5 rounded-full font-bold border border-brand-400/40">
+                      <span className="bg-brand-900/90 text-brand-200 text-xs px-2 py-0.5 rounded-full font-bold border border-brand-400/40">
                         ประวัติส่งสำเร็จ {completedUnreadCount} ข้อความ
                       </span>
                     )}
@@ -1418,7 +1419,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
               <Check className="w-3.5 h-3.5 text-brand-600" />
               <span>ส่งสำเร็จ ({completedOrders.length})</span>
               {completedUnreadCount > 0 && (
-                <span className="bg-rose-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-black animate-bounce flex items-center gap-1">
+                <span className="bg-rose-500 text-white text-xs px-1.5 py-0.5 rounded-full font-black animate-bounce flex items-center gap-1">
                   <MessageSquare className="w-2.5 h-2.5" />
                   <span>{completedUnreadCount}</span>
                 </span>
@@ -1442,7 +1443,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
 
           {/* Controls Bar for Orders */}
           {displayedOrders.length > 0 && (
-            <div className="flex items-center justify-between px-1 text-xs text-gray-500 mb-1">
+            <div className="flex flex-wrap items-center justify-between gap-1.5 px-1 text-xs text-gray-500 mb-1">
               <span className="font-bold text-gray-700">
                 รายการออเดอร์ ({displayedOrders.length} บิล)
               </span>
@@ -1450,7 +1451,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                 <button
                   type="button"
                   onClick={() => toggleAllOrders(true, displayedOrders)}
-                  className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold text-[11px] transition active:scale-95 flex items-center gap-1 cursor-pointer shadow-2xs"
+                  className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold text-xs whitespace-nowrap transition active:scale-95 flex items-center gap-1 cursor-pointer shadow-2xs"
                   title="ย่อแถบออเดอร์ทั้งหมดเพื่อดูภาพรวม"
                 >
                   <ChevronsUp className="w-3.5 h-3.5 text-gray-500" />
@@ -1459,7 +1460,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                 <button
                   type="button"
                   onClick={() => toggleAllOrders(false, displayedOrders)}
-                  className="px-2.5 py-1 bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200/80 rounded-xl font-bold text-[11px] transition active:scale-95 flex items-center gap-1 cursor-pointer shadow-2xs"
+                  className="px-2.5 py-1 bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200/80 rounded-xl font-bold text-xs whitespace-nowrap transition active:scale-95 flex items-center gap-1 cursor-pointer shadow-2xs"
                   title="ขยายรายละเอียดอาหารทุกออเดอร์"
                 >
                   <ChevronsDown className="w-3.5 h-3.5 text-brand-600" />
@@ -1479,7 +1480,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                       <span className="font-black text-xs sm:text-sm flex items-center gap-1.5">
                         มีลูกค้าทักแชทเข้ามา {completedUnreadCount} ข้อความ ในแท็บส่งสำเร็จ!
                       </span>
-                      <span className="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold animate-ping">
+                      <span className="bg-rose-500 text-white text-xs px-2 py-0.5 rounded-full font-bold animate-ping">
                         ใหม่!
                       </span>
                     </div>
@@ -1553,17 +1554,17 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                   }`}
                 >
                   {/* Order Card Header */}
-                  <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-2.5">
                     <div
                       onClick={() => toggleOrderCollapse(order.id, order.status)}
-                      className="cursor-pointer group flex-1"
+                      className="cursor-pointer group flex-1 min-w-[10rem]"
                     >
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="font-black text-base text-gray-900 group-hover:text-brand-600 transition">
                           #{formatOrderCode(order)}
                         </span>
                         <span
-                          className={`text-[10px] sm:text-[11px] font-extrabold px-2 py-0.5 rounded-full ${
+                          className={`text-xs font-extrabold whitespace-nowrap px-2 py-0.5 rounded-full ${
                             order.has_unread_message
                               ? 'bg-rose-500 text-white animate-bounce shadow-xs'
                               : order.status === 'pending'
@@ -1654,7 +1655,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                     <div className={`rounded-xl px-3 py-1.5 text-xs flex items-center justify-between gap-1.5 animate-in fade-in ${
                       order.has_unread_message
                         ? 'bg-brand-500 text-white border border-brand-600 font-bold shadow-sm'
-                        : 'bg-brand-50/90 text-brand-900 border border-brand-200 text-[11px]'
+                        : 'bg-brand-50/90 text-brand-900 border border-brand-200 text-xs'
                     }`}>
                       <span className="truncate">
                         <strong>{order.has_unread_message ? 'ลูกค้าส่งข้อความ' : order.last_message_sender === 'merchant' ? 'ร้านค้า' : 'ลูกค้า'}:</strong> {order.last_message}
@@ -1667,7 +1668,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                             updateDoc(doc(db, 'orders', order.id), { has_unread_message: false }).catch(() => {});
                           }
                         }}
-                        className={`text-[10px] font-black underline shrink-0 ${
+                        className={`text-xs font-black underline shrink-0 ${
                           order.has_unread_message ? 'text-white hover:text-brand-100 bg-black/20 px-2 py-0.5 rounded-md' : 'text-brand-700 hover:text-brand-900'
                         }`}
                       >
@@ -1691,14 +1692,14 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                             {order.items?.map(it => `${it.quantity}x ${it.name}`).join(', ')}
                           </span>
                         </div>
-                        <div className="text-[11px] text-gray-600 truncate mt-1 flex items-center gap-1">
+                        <div className="text-xs text-gray-600 truncate mt-1 flex items-center gap-1">
                           <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
                           <span>ส่ง: {order.delivery_address || 'ไม่ระบุที่อยู่'}</span>
                         </div>
                       </div>
                       <div className="text-right shrink-0 pl-2 border-l border-brand-200/70">
                         <span className="font-black text-brand-600 text-sm sm:text-base block">{order.total_amount} ฿</span>
-                        <span className="text-[10px] text-brand-700 font-bold group-hover:underline flex items-center justify-end gap-0.5 mt-0.5">
+                        <span className="text-xs text-brand-700 font-bold group-hover:underline flex items-center justify-end gap-0.5 mt-0.5">
                           <span>แตะขยาย</span>
                           <ChevronDown className="w-3 h-3" />
                         </span>
@@ -1728,7 +1729,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                                         <span className="text-brand-500 font-black">•</span>
                                         <span>{opt.name}</span>
                                         {opt.price > 0 && (
-                                          <span className="text-brand-700 text-[11px] font-extrabold bg-brand-100/70 px-1.5 py-0.2 rounded">
+                                          <span className="text-brand-700 text-xs font-extrabold bg-brand-100/70 px-1.5 py-0.2 rounded">
                                             +{opt.price} ฿
                                           </span>
                                         )}
@@ -1739,7 +1740,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
 
                                 {item.note && (
                                   <div className="mt-1.5 bg-rose-50 border border-rose-200 text-rose-800 px-2.5 py-1 rounded-xl text-xs font-bold inline-flex items-center gap-1.5">
-                                    <span className="bg-rose-500 text-white text-[10px] px-1.5 py-0.2 rounded-md font-black">
+                                    <span className="bg-rose-500 text-white text-xs px-1.5 py-0.2 rounded-md font-black">
                                       หมายเหตุ
                                     </span>
                                     <span>{item.note}</span>
@@ -1756,7 +1757,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
 
                         <div className="pt-2 mt-1 border-t-2 border-brand-200/80 flex justify-between items-center font-bold text-gray-700">
                           <span className="text-xs sm:text-sm">ยอดรวมอาหาร (รวมค่าส่ง {(order.delivery_fee ?? 0) === 0 ? 'ส่งฟรี' : `${order.delivery_fee} บ.`})</span>
-                          <span className="text-brand-600 text-base sm:text-lg font-black">{order.total_amount} ฿</span>
+                          <span className="text-brand-600 text-base sm:text-lg font-black whitespace-nowrap">{order.total_amount} ฿</span>
                         </div>
                       </div>
 
@@ -1785,14 +1786,14 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                               href={`https://www.google.com/maps/dir/?api=1&destination=${order.location.lat},${order.location.lng}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-[11px] font-semibold text-gray-500 underline underline-offset-2"
+                              className="text-xs font-semibold text-gray-500 underline underline-offset-2"
                             >
                               เปิดใน Google Maps
                             </a>
                           </div>
                         )}
 
-                        <div className="text-gray-500 text-[11px] pt-1">
+                        <div className="text-gray-500 text-xs pt-1">
                           วิธีจ่าย: <span className="font-bold text-gray-700">
                             {order.payment_method === 'transfer_chat'
                               ? 'โอนเงินผ่านแชทก่อนทำ'
@@ -1806,7 +1807,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
 
                       {/* Pending Order Notice for Merchant */}
                       {order.status === 'pending' && (
-                        <div className="bg-brand-50 rounded-xl p-2 border border-brand-200 text-[11px] text-brand-900 flex items-center justify-between gap-1.5">
+                        <div className="bg-brand-50 rounded-xl p-2 border border-brand-200 text-xs text-brand-900 flex items-center justify-between gap-1.5">
                           <span className="flex items-center gap-1 font-semibold">
                             <CreditCard className="w-3.5 h-3.5 text-brand-600 shrink-0" />
                             <span>รอตรวจสลิปโอนเงินในแชท</span>
@@ -2014,7 +2015,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                     <button
                       type="button"
                       onClick={() => setNewMenuImage('')}
-                      className="text-[11px] text-red-500 font-semibold hover:underline"
+                      className="text-xs text-red-500 font-semibold hover:underline"
                     >
                       ลบรูปภาพ
                     </button>
@@ -2057,7 +2058,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                         <Camera className="w-5 h-5 text-brand-700" />
                       </div>
                       <span className="text-sm font-bold">ถ่ายรูป / เลือกรูปจากมือถือ</span>
-                      <span className="text-[11px] text-brand-700/80 font-normal">
+                      <span className="text-xs text-brand-700/80 font-normal">
                         สามารถตัดขอบ ปรับขนาด ซูม และหมุนรูปภาพได้อิสระ
                       </span>
                     </button>
@@ -2073,7 +2074,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                       <Sparkles className="w-3.5 h-3.5 text-brand-600" />
                       <span>กลุ่มตัวเลือกเมนู (ก๋วยเตี๋ยว, ลูกชิ้น, ชานม, อาหารตามสั่ง)</span>
                     </label>
-                    <p className="text-[11px] text-gray-400">
+                    <p className="text-xs text-gray-400">
                       สร้างกลุ่มตัวเลือกแบบบังคับเลือก (เช่น เส้น/น้ำซุป) หรือท็อปปิ้งเสริม
                     </p>
                   </div>
@@ -2105,7 +2106,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                 {/* Quick 1-Click Preset Templates */}
                 <div className="space-y-1.5 bg-brand-50/50 p-2.5 rounded-xl border border-brand-100">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-brand-900 flex items-center gap-1">
+                    <span className="text-xs font-bold text-brand-900 flex items-center gap-1">
                       <Sparkles className="w-3 h-3 text-brand-600" />
                       <span>เทมเพลตด่วน (กด 1 คลิกเพื่อโหลดตัวเลือกสำเร็จรูป):</span>
                     </span>
@@ -2143,7 +2144,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-200/70 pb-2">
                           <div className="flex-1 flex items-center gap-2">
-                            <span className="w-5 h-5 rounded-full bg-brand-500 text-white text-[10px] font-black flex items-center justify-center shrink-0">
+                            <span className="w-5 h-5 rounded-full bg-brand-500 text-white text-xs font-black flex items-center justify-center shrink-0">
                               {gIdx + 1}
                             </span>
                             <input
@@ -2168,7 +2169,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                                 next[gIdx].required = !next[gIdx].required;
                                 setNewMenuOptionGroups(next);
                               }}
-                              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition ${
+                              className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition ${
                                 group.required
                                   ? 'bg-rose-50 text-rose-700 border-rose-200'
                                   : 'bg-white text-gray-600 border-gray-200'
@@ -2185,7 +2186,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                                 next[gIdx].type = next[gIdx].type === 'single' ? 'multiple' : 'single';
                                 setNewMenuOptionGroups(next);
                               }}
-                              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition ${
+                              className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition ${
                                 group.type === 'single'
                                   ? 'bg-brand-50 text-brand-800 border-brand-200'
                                   : 'bg-blue-50 text-blue-800 border-blue-200'
@@ -2235,7 +2236,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                                   }}
                                   className="w-full px-2 py-1.5 text-xs bg-white border border-gray-200 rounded-xl text-right font-bold text-brand-600 focus:ring-1 focus:ring-brand-500"
                                 />
-                                <span className="text-[11px] text-gray-400">฿</span>
+                                <span className="text-xs text-gray-400">฿</span>
                               </div>
                               <button
                                 type="button"
@@ -2263,7 +2264,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                               });
                               setNewMenuOptionGroups(next);
                             }}
-                            className="text-[11px] font-bold text-brand-600 hover:text-brand-700 inline-flex items-center gap-1 pt-1"
+                            className="text-xs font-bold text-brand-600 hover:text-brand-700 inline-flex items-center gap-1 pt-1"
                           >
                             <Plus className="w-3 h-3" />
                             <span>+ เพิ่มตัวเลือกในกลุ่ม &quot;{group.title || `กลุ่มที่ ${gIdx + 1}`}&quot;</span>
@@ -2275,7 +2276,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                 )}
 
                 {newMenuOptionGroups.length === 0 && (
-                  <p className="text-[11px] text-gray-400 italic">
+                  <p className="text-xs text-gray-400 italic">
                     กดเลือกเทมเพลตสำเร็จรูปด้านบน หรือกดปุ่ม &quot;+ เพิ่มกลุ่มตัวเลือกเอง&quot; เพื่อตั้งค่าตัวเลือกสำหรับก๋วยเตี๋ยว ลูกชิ้น หรือชานมได้ทันที
                   </p>
                 )}
@@ -2374,7 +2375,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                       {/* Menu Image Edit & Crop Section */}
                       <div className="space-y-1">
                         <div className="flex items-center justify-between">
-                          <label className="text-[10px] font-bold text-gray-700 flex items-center gap-1">
+                          <label className="text-xs font-bold text-gray-700 flex items-center gap-1">
                             <Camera className="w-3.5 h-3.5 text-brand-600" />
                             <span>รูปภาพอาหาร</span>
                           </label>
@@ -2382,7 +2383,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                             <button
                               type="button"
                               onClick={() => setEditItemImage('')}
-                              className="text-[10px] text-rose-500 font-bold hover:underline cursor-pointer"
+                              className="text-xs text-rose-500 font-bold hover:underline cursor-pointer"
                             >
                               ลบรูปภาพ (ไม่ใส่รูป)
                             </button>
@@ -2447,7 +2448,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                               <Camera className="w-4 h-4 text-brand-600" />
                             </div>
                             <span className="text-xs font-bold">แตะเพื่อเลือกรูปภาพ / ถ่ายรูปอาหาร</span>
-                            <span className="text-[10px] text-brand-700/80 font-normal">
+                            <span className="text-xs text-brand-700/80 font-normal">
                               ตัดขอบ ซูม และหมุนรูปภาพได้อิสระ
                             </span>
                           </button>
@@ -2456,7 +2457,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
 
                       <div className="grid grid-cols-2 gap-2">
                         <div>
-                          <label className="text-[10px] font-bold text-gray-600 block mb-0.5">ชื่อเมนู</label>
+                          <label className="text-xs font-bold text-gray-600 block mb-0.5">ชื่อเมนู</label>
                           <input
                             type="text"
                             value={editItemName}
@@ -2465,7 +2466,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                           />
                         </div>
                         <div>
-                          <label className="text-[10px] font-bold text-gray-600 block mb-0.5">ราคา (บาท)</label>
+                          <label className="text-xs font-bold text-gray-600 block mb-0.5">ราคา (บาท)</label>
                           <input
                             type="number"
                             value={editItemPrice}
@@ -2476,7 +2477,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                       </div>
 
                       <div>
-                        <label className="text-[10px] font-bold text-gray-600 block mb-0.5">หมวดหมู่</label>
+                        <label className="text-xs font-bold text-gray-600 block mb-0.5">หมวดหมู่</label>
                         <select
                           value={editItemCategory}
                           onChange={(e) => setEditItemCategory(e.target.value as any)}
@@ -2491,11 +2492,11 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                       <div className="bg-brand-50/50 p-2.5 rounded-xl border border-brand-200/80 space-y-2.5">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-brand-200/60 pb-1.5">
                           <div>
-                            <span className="text-[11px] font-black text-brand-900 flex items-center gap-1">
+                            <span className="text-xs font-black text-brand-900 flex items-center gap-1">
                               <Sparkles className="w-3 h-3 text-brand-600" />
                               <span>กลุ่มตัวเลือกเมนู (ก๋วยเตี๋ยว, ลูกชิ้น, ชานม)</span>
                             </span>
-                            <p className="text-[9px] text-gray-500">
+                            <p className="text-xs text-gray-500">
                               ตั้งค่ากลุ่มตัวเลือกแบบบังคับเลือก (Radio) หรือเลือกได้หลายอย่าง (Checkbox)
                             </p>
                           </div>
@@ -2517,7 +2518,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                                 },
                               ]);
                             }}
-                            className="text-[10px] font-bold text-brand-800 bg-white hover:bg-brand-100 px-2 py-0.5 rounded-lg border border-brand-300 transition active:scale-95 flex items-center gap-1 shrink-0 self-start sm:self-auto"
+                            className="text-xs font-bold text-brand-800 bg-white hover:bg-brand-100 px-2 py-0.5 rounded-lg border border-brand-300 transition active:scale-95 flex items-center gap-1 shrink-0 self-start sm:self-auto"
                           >
                             <Plus className="w-3 h-3" />
                             <span>+ เพิ่มกลุ่มตัวเลือก</span>
@@ -2539,7 +2540,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                                 }
                                 setEditItemOptionGroups(preset.groups());
                               }}
-                              className="p-1.5 rounded-lg bg-white hover:bg-brand-50 text-gray-800 border border-brand-200/80 text-[10px] font-bold flex items-center justify-center gap-1 shadow-2xs transition active:scale-95"
+                              className="p-1.5 rounded-lg bg-white hover:bg-brand-50 text-gray-800 border border-brand-200/80 text-xs font-bold flex items-center justify-center gap-1 shadow-2xs transition active:scale-95"
                             >
                               <preset.icon className="w-3.5 h-3.5 text-brand-600 shrink-0" aria-hidden="true" />
                               <span className="truncate">{preset.label}</span>
@@ -2557,7 +2558,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                               >
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-gray-100 pb-1.5">
                                   <div className="flex-1 flex items-center gap-1.5">
-                                    <span className="w-4 h-4 rounded-full bg-brand-500 text-white text-[9px] font-black flex items-center justify-center shrink-0">
+                                    <span className="w-4 h-4 rounded-full bg-brand-500 text-white text-xs font-black flex items-center justify-center shrink-0">
                                       {gIdx + 1}
                                     </span>
                                     <input
@@ -2581,7 +2582,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                                         next[gIdx].required = !next[gIdx].required;
                                         setEditItemOptionGroups(next);
                                       }}
-                                      className={`px-2 py-0.5 rounded text-[9px] font-bold border transition ${
+                                      className={`px-2 py-0.5 rounded text-xs font-bold border transition ${
                                         group.required
                                           ? 'bg-rose-50 text-rose-700 border-rose-200'
                                           : 'bg-gray-50 text-gray-600 border-gray-200'
@@ -2597,7 +2598,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                                         next[gIdx].type = next[gIdx].type === 'single' ? 'multiple' : 'single';
                                         setEditItemOptionGroups(next);
                                       }}
-                                      className={`px-2 py-0.5 rounded text-[9px] font-bold border transition ${
+                                      className={`px-2 py-0.5 rounded text-xs font-bold border transition ${
                                         group.type === 'single'
                                           ? 'bg-brand-50 text-brand-800 border-brand-200'
                                           : 'bg-blue-50 text-blue-800 border-blue-200'
@@ -2646,7 +2647,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                                           }}
                                           className="w-full px-1.5 py-1 text-xs bg-gray-50 border border-gray-200 rounded-lg text-right font-bold text-brand-600"
                                         />
-                                        <span className="text-[10px] text-gray-400">฿</span>
+                                        <span className="text-xs text-gray-400">฿</span>
                                       </div>
                                       <button
                                         type="button"
@@ -2674,7 +2675,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                                       });
                                       setEditItemOptionGroups(next);
                                     }}
-                                    className="text-[10px] font-bold text-brand-700 hover:text-brand-800 inline-flex items-center gap-1 pt-0.5"
+                                    className="text-xs font-bold text-brand-700 hover:text-brand-800 inline-flex items-center gap-1 pt-0.5"
                                   >
                                     <Plus className="w-2.5 h-2.5" />
                                     <span>+ เพิ่มตัวเลือกในกลุ่ม &quot;{group.title || `กลุ่มที่ ${gIdx + 1}`}&quot;</span>
@@ -2686,7 +2687,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                         )}
 
                         {editItemOptionGroups.length === 0 && (
-                          <p className="text-[10px] text-gray-400 italic">
+                          <p className="text-xs text-gray-400 italic">
                             ยังไม่มีกลุ่มตัวเลือก กดเลือกเทมเพลตด้านบนหรือกด &quot;+ เพิ่มกลุ่มตัวเลือก&quot; ได้เลย
                           </p>
                         )}
@@ -2715,8 +2716,8 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                     </div>
                   ) : (
                     /* Normal View Mode */
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                      <div className="flex items-center gap-3 min-w-0 flex-1 basis-[13rem]">
                         <div className="relative group/img shrink-0">
                           {item.image_url ? (
                             <img
@@ -2736,7 +2737,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                               setEditingItemForImage(item);
                               editFileInputRef.current?.click();
                             }}
-                            className="absolute inset-0 bg-black/60 text-white rounded-2xl opacity-0 hover:opacity-100 transition flex flex-col items-center justify-center text-[10px] font-bold"
+                            className="absolute inset-0 bg-black/60 text-white rounded-2xl opacity-0 hover:opacity-100 transition flex flex-col items-center justify-center text-xs font-bold"
                             title="คลิกเพื่อเปลี่ยนรูปอาหาร"
                           >
                             <Camera className="w-3.5 h-3.5 mb-0.5" />
@@ -2745,13 +2746,13 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                         </div>
 
                         <div className="min-w-0">
-                          <h4 className="font-bold text-sm text-gray-800 leading-tight truncate">{item.name}</h4>
+                          <h4 className="font-bold text-sm text-gray-800 leading-tight line-clamp-2">{item.name}</h4>
                           <p className="text-xs text-brand-600 font-black mt-0.5">{item.price} บาท</p>
                           <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                            <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-md">
+                            <span className="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-md">
                               {item.category === 'food' ? 'อาหาร' : 'ของหวาน/น้ำ'}
                             </span>
-                            <span className="text-[10px] bg-brand-50 text-brand-600 font-bold px-1.5 py-0.5 rounded-md border border-brand-200">
+                            <span className="text-xs bg-brand-50 text-brand-600 font-bold px-1.5 py-0.5 rounded-md border border-brand-200">
                               ขายแล้ว {item.sales_count || 0} {item.category === 'food' ? 'จาน' : 'แก้ว'}
                             </span>
                             {!item.image_url ? (
@@ -2761,7 +2762,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                                   setEditingItemForImage(item);
                                   editFileInputRef.current?.click();
                                 }}
-                                className="text-[10px] text-brand-600 hover:underline font-semibold cursor-pointer"
+                                className="text-xs text-brand-600 hover:underline font-semibold cursor-pointer"
                               >
                                 + ใส่รูป
                               </button>
@@ -2773,7 +2774,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                                     await handleUpdateItemImage(item.id, '');
                                   }
                                 }}
-                                className="text-[10px] text-rose-500 hover:underline font-semibold flex items-center gap-0.5 cursor-pointer"
+                                className="text-xs text-rose-500 hover:underline font-semibold flex items-center gap-0.5 cursor-pointer"
                                 title="ลบรูปภาพเมนูนี้"
                               >
                                 <Trash2 className="w-2.5 h-2.5" /> ลบรูป
@@ -2781,19 +2782,19 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                             )}
                           </div>
                           {item.option_groups && item.option_groups.length > 0 ? (
-                            <div className="text-[10px] text-brand-800 bg-brand-50/80 px-2 py-0.5 rounded-lg border border-brand-200/70 mt-1 max-w-xs truncate flex items-center gap-1">
+                            <div className="text-xs text-brand-800 bg-brand-50/80 px-2 py-0.5 rounded-lg border border-brand-200/70 mt-1 max-w-xs truncate flex items-center gap-1">
                               <Sparkles className="w-3 h-3 text-brand-600 shrink-0" />
                               <span>กลุ่มตัวเลือก: {item.option_groups.map((g) => g.title).join(' • ')}</span>
                             </div>
                           ) : item.options && item.options.length > 0 ? (
-                            <div className="text-[10px] text-brand-800 bg-brand-50/80 px-2 py-0.5 rounded-lg border border-brand-200/70 mt-1 max-w-xs truncate">
+                            <div className="text-xs text-brand-800 bg-brand-50/80 px-2 py-0.5 rounded-lg border border-brand-200/70 mt-1 max-w-xs truncate">
                               ท็อปปิ้ง: {item.options.map((o) => `${o.name} (+${o.price}฿)`).join(', ')}
                             </div>
                           ) : null}
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="flex items-center gap-1.5 shrink-0 ml-auto">
                         {/* Edit Button */}
                         <button
                           type="button"
@@ -2866,7 +2867,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-gray-700 block">รูปภาพหน้าร้าน (Cover Banner หน้าแรก)</label>
-              <span className="text-[11px] text-brand-600 font-bold bg-brand-50 px-2 py-0.5 rounded-md border border-brand-200">
+              <span className="text-xs text-brand-600 font-bold bg-brand-50 px-2 py-0.5 rounded-md border border-brand-200">
                 สัดส่วนแนวนอน 16:9
               </span>
             </div>
@@ -2912,7 +2913,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                 )}
               </div>
             </div>
-            <p className="text-[11px] text-gray-400">รูปภาพหน้าร้านนี้จะแสดงบนฟีดหน้าแรก ให้ลูกค้าเห็นความน่ากินและป้ายร้าน</p>
+            <p className="text-xs text-gray-400">รูปภาพหน้าร้านนี้จะแสดงบนฟีดหน้าแรก ให้ลูกค้าเห็นความน่ากินและป้ายร้าน</p>
           </div>
 
           {/* Shop Name */}
@@ -2970,7 +2971,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                 <span>ค่าจัดส่งของร้าน (บาท)</span>
               </label>
             </div>
-            <p className="text-[11px] text-brand-800/80">
+            <p className="text-xs text-brand-800/80">
               กำหนดค่าส่งเหมาของร้านคุณสำหรับออเดอร์นี้ (หากไม่กรอกหรือใส่ 0 ระบบจะขึ้นว่า "ส่งฟรี")
             </p>
 
@@ -3015,11 +3016,11 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                 <Navigation className="w-3.5 h-3.5 text-brand-600" />
                 <span>รัศมีขอบเขตจัดส่งอาหาร (กิโลเมตร)</span>
               </label>
-              <span className="text-[11px] font-bold text-brand-700 bg-brand-100/80 px-2 py-0.5 rounded-full">
+              <span className="text-xs font-bold text-brand-700 bg-brand-100/80 px-2 py-0.5 rounded-full">
                 ค่าเริ่มต้น 1.0 กม.
               </span>
             </div>
-            <p className="text-[11px] text-brand-800/80">
+            <p className="text-xs text-brand-800/80">
               กำหนดระยะทางสูงสุดที่ร้านของคุณรับจัดส่ง ลูกค้าที่ปักหมุดเกินระยะนี้จะไม่สามารถสั่งอาหารได้ (วงกลมบนแผนที่จะปรับขนาดตามทันที)
             </p>
 
@@ -3073,10 +3074,10 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                 <CreditCard className="w-4 h-4 text-brand-700 shrink-0" />
                 <div>
                   <h4 className="text-xs font-black text-brand-950">ข้อมูลการรับเงินของร้านค้า</h4>
-                  <p className="text-[11px] text-brand-800/80">ระบบจะนำข้อมูลนี้ไปสร้างปุ่มส่งให้ลูกค้าสแกนจ่าย/โอนเงินในห้องแชทสดทันที</p>
+                  <p className="text-xs text-brand-800/80">ระบบจะนำข้อมูลนี้ไปสร้างปุ่มส่งให้ลูกค้าสแกนจ่าย/โอนเงินในห้องแชทสดทันที</p>
                 </div>
               </div>
-              <span className="text-[10px] font-bold text-brand-700 bg-brand-100 px-2 py-0.5 rounded-full">
+              <span className="text-xs font-bold text-brand-700 bg-brand-100 px-2 py-0.5 rounded-full">
                 โอนก่อนทำอาหาร
               </span>
             </div>
@@ -3097,19 +3098,19 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                   </div>
                   <div className="flex-1 space-y-1.5">
                     <p className="text-xs font-bold text-brand-900">มีรูปภาพ QR Code แล้ว</p>
-                    <p className="text-[11px] text-gray-500 leading-snug">ลูกค้าสามารถสแกนจ่ายผ่านแชทสดได้สะดวกรวดเร็ว</p>
+                    <p className="text-xs text-gray-500 leading-snug">ลูกค้าสามารถสแกนจ่ายผ่านแชทสดได้สะดวกรวดเร็ว</p>
                     <div className="flex gap-2">
                       <button
                         type="button"
                         onClick={() => shopQrInputRef.current?.click()}
-                        className="px-2.5 py-1 text-[11px] font-bold bg-brand-100 hover:bg-brand-200 text-brand-800 rounded-lg transition"
+                        className="px-2.5 py-1 text-xs font-bold bg-brand-100 hover:bg-brand-200 text-brand-800 rounded-lg transition"
                       >
                         เปลี่ยนรูป QR
                       </button>
                       <button
                         type="button"
                         onClick={handleRemoveShopQr}
-                        className="px-2.5 py-1 text-[11px] font-bold bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition"
+                        className="px-2.5 py-1 text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition"
                       >
                         ลบรูป
                       </button>
@@ -3211,13 +3212,13 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                   href={`https://www.google.com/maps/dir/?api=1&destination=${shopLocation.lat},${shopLocation.lng}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[11px] text-blue-600 hover:underline flex items-center gap-1 font-semibold"
+                  className="text-xs text-blue-600 hover:underline flex items-center gap-1 font-semibold"
                 >
                   <Navigation className="w-3 h-3 text-blue-500" /> ดูบน Google Maps
                 </a>
               )}
             </div>
-            <p className="text-[11px] text-gray-400">
+            <p className="text-xs text-gray-400">
               แตะบนแผนที่ หรือลากหมุดสีแดงเพื่อระบุพิกัดหน้าร้านของคุณ ให้ลูกค้าและไรเดอร์นำทางมาได้แม่นยำ
             </p>
             <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-2xs">

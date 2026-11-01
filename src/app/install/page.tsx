@@ -69,7 +69,7 @@ export default function InstallPage() {
                 <Download className="w-5 h-5" /> ดาวน์โหลดแอป
               </a>
               {device === 'other' && (
-                <p className="text-[11px] text-gray-400 text-center flex items-center justify-center gap-1">
+                <p className="text-xs text-gray-400 text-center flex items-center justify-center gap-1">
                   <Smartphone className="w-3.5 h-3.5" /> เปิดหน้านี้จากมือถือ Android เพื่อติดตั้ง
                 </p>
               )}
@@ -83,7 +83,7 @@ export default function InstallPage() {
             <ol className="space-y-2.5">
               {STEPS.map((step, i) => (
                 <li key={i} className="flex gap-2.5 text-xs text-gray-600 leading-relaxed">
-                  <span className="w-5 h-5 rounded-full bg-[#E1F5EE] text-[#085041] text-[11px] font-black flex items-center justify-center shrink-0">{i + 1}</span>
+                  <span className="w-5 h-5 rounded-full bg-[#E1F5EE] text-[#085041] text-xs font-black flex items-center justify-center shrink-0">{i + 1}</span>
                   <span>{step}</span>
                 </li>
               ))}

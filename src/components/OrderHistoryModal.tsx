@@ -184,42 +184,42 @@ export default function OrderHistoryModal({
     switch (status) {
       case 'completed':
         return (
-          <span className="inline-flex items-center gap-1 bg-brand-100 text-brand-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-brand-200">
+          <span className="inline-flex items-center gap-1 bg-brand-100 text-brand-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-brand-200">
             <CheckCircle2 className="w-3 h-3 text-brand-600" />
             <span>จัดส่งสำเร็จแล้ว</span>
           </span>
         );
       case 'pending':
         return (
-          <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-amber-200 animate-pulse">
+          <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-amber-200 animate-pulse">
             <Clock className="w-3 h-3 text-amber-600" />
             <span>รอยืนยัน</span>
           </span>
         );
       case 'cooking':
         return (
-          <span className="inline-flex items-center gap-1 bg-violet-100 text-violet-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-violet-200">
+          <span className="inline-flex items-center gap-1 bg-violet-100 text-violet-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-violet-200">
             <Utensils className="w-3 h-3 text-violet-600" />
             <span>ร้านกำลังทำอาหาร</span>
           </span>
         );
       case 'delivering':
         return (
-          <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-blue-200">
+          <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-blue-200">
             <Bike className="w-3 h-3 text-blue-600" />
             <span>กำลังจัดส่ง</span>
           </span>
         );
       case 'cancelled':
         return (
-          <span className="inline-flex items-center gap-1 bg-rose-100 text-rose-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-rose-200">
+          <span className="inline-flex items-center gap-1 bg-rose-100 text-rose-800 text-xs font-bold px-2.5 py-0.5 rounded-full border border-rose-200">
             <Ban className="w-3 h-3 text-rose-600" />
             <span>ยกเลิกออเดอร์</span>
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
+          <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-800 text-xs font-bold px-2.5 py-0.5 rounded-full">
             {status}
           </span>
         );
@@ -246,15 +246,15 @@ export default function OrderHistoryModal({
         <MascotWatermark page="history" />
         
         {/* Modal Header */}
-        <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] border-b border-[#9FE1CB] px-5 py-4 text-[#04342C] flex items-center justify-between shadow-xs relative overflow-hidden isolate">
+        <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] border-b border-[#9FE1CB] px-5 py-4 text-[#04342C] flex items-center justify-between gap-2 shrink-0 shadow-xs relative overflow-hidden isolate">
           <WavePattern className="text-white/90 -z-10" />
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-white border border-[#9FE1CB] flex items-center justify-center text-xl shadow-inner">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-10 h-10 shrink-0 rounded-2xl bg-white border border-[#9FE1CB] flex items-center justify-center text-xl shadow-inner">
               <FileText className="w-5 h-5 text-[#1D9E75]" />
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-black tracking-tight">ประวัติการสั่งซื้อของคุณ</h2>
-              <p className="text-[11px] sm:text-xs text-[#0F6E56]">
+              <p className="text-xs sm:text-xs text-[#0F6E56]">
                 รายการออเดอร์ทั้งหมด {orders.length} รายการ
               </p>
             </div>
@@ -357,12 +357,17 @@ export default function OrderHistoryModal({
                   className="bg-white rounded-2xl p-4 border border-gray-200/90 shadow-2xs hover:shadow-xs transition space-y-3"
                 >
                   {/* Card Header: Shop & Status */}
-                  <div className="flex items-start justify-between gap-2 border-b border-gray-100 pb-2.5">
+                  <div className="border-b border-gray-100 pb-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-xs font-black text-brand-700 bg-brand-50 px-2 py-0.5 rounded-lg border border-brand-200">
+                        {formatOrderCode(order)}
+                      </span>
+                      <div className="shrink-0 text-right">
+                        {renderStatusBadge(order.status)}
+                      </div>
+                    </div>
                     <div>
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-mono text-xs font-black text-brand-700 bg-brand-50 px-2 py-0.5 rounded-lg border border-brand-200">
-                          {formatOrderCode(order)}
-                        </span>
+                      <div className="flex items-center gap-1.5 flex-wrap mt-1.5">
                         <h3 className="font-black text-sm text-gray-900 flex items-center gap-1.5">
                           {shopInfo?.image_url ? (
                             <img
@@ -378,30 +383,26 @@ export default function OrderHistoryModal({
                         {/* Live Shop Open/Closed Status Badge */}
                         {shopInfo ? (
                           isShopOpen ? (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-brand-700 bg-brand-50 border border-brand-200 px-2 py-0.5 rounded-md">
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-brand-700 bg-brand-50 border border-brand-200 px-2 py-0.5 rounded-md">
                               <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
                               ร้านเปิดอยู่
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md">
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md">
                               <span className="w-2 h-2 rounded-full bg-rose-500"></span>
                               ร้านปิดอยู่
                             </span>
                           )
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-500 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-md">
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-500 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-md">
                             ไม่มีร้านนี้ในระบบ
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                      <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         <span>{formatDate(order.created_at)}</span>
                       </p>
-                    </div>
-
-                    <div className="shrink-0 text-right">
-                      {renderStatusBadge(order.status)}
                     </div>
                   </div>
 
@@ -437,12 +438,12 @@ export default function OrderHistoryModal({
                                 {item.name}
                               </p>
                               {item.selected_options && item.selected_options.length > 0 && (
-                                <p className="text-[10.5px] text-gray-500 mt-0.5">
+                                <p className="text-xs text-gray-500 mt-0.5">
                                   + {item.selected_options.map((o) => `${o.name} (${o.price}฿)`).join(', ')}
                                 </p>
                               )}
                               {item.note && (
-                                <p className="text-[10px] text-brand-600 italic mt-0.5 flex items-center gap-1">
+                                <p className="text-xs text-brand-600 italic mt-0.5 flex items-center gap-1">
                                   <FileEdit className="w-2.5 h-2.5 shrink-0" />
                                   <span>&ldquo;{item.note}&rdquo;</span>
                                 </p>
@@ -459,9 +460,9 @@ export default function OrderHistoryModal({
                   </div>
 
                   {/* Pricing & Delivery Info Bar */}
-                  <div className="bg-slate-50 rounded-xl p-2.5 flex items-center justify-between text-xs border border-gray-150">
-                    <div className="space-y-0.5 text-[11px]">
-                      <div className="text-gray-500 flex items-center gap-1">
+                  <div className="bg-slate-50 rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-2 text-xs border border-gray-150">
+                    <div className="space-y-0.5 text-xs">
+                      <div className="text-gray-500 flex items-center gap-1 whitespace-nowrap">
                         <Bike className="w-3 h-3" />
                         <span>ค่าจัดส่ง:</span>
                         <strong className="text-gray-700">
@@ -472,7 +473,7 @@ export default function OrderHistoryModal({
                           )}
                         </strong>
                       </div>
-                      <div className="text-gray-500 flex items-center gap-1">
+                      <div className="text-gray-500 flex items-center gap-1 whitespace-nowrap">
                         <CreditCard className="w-3 h-3" />
                         <span>ชำระโดย:</span>
                         <span className="font-semibold text-gray-700">
@@ -481,8 +482,8 @@ export default function OrderHistoryModal({
                       </div>
                     </div>
 
-                    <div className="text-right">
-                      <span className="text-[10px] text-gray-400 block">ยอดรวมทั้งสิ้น</span>
+                    <div className="text-right ml-auto whitespace-nowrap">
+                      <span className="text-xs text-gray-400 block">ยอดรวมทั้งสิ้น</span>
                       <span className="text-base font-black text-brand-600">
                         ฿{order.total_amount}
                       </span>
@@ -492,7 +493,7 @@ export default function OrderHistoryModal({
                   {/* Card Actions: Re-order & Track Order */}
                   <div className="pt-1 flex items-center justify-between gap-2 flex-wrap border-t border-gray-100/80 pt-2">
                     {/* Shop Open / Closed hint on the left */}
-                    <div className="text-[11px] font-semibold flex items-center gap-1.5">
+                    <div className="text-xs font-semibold flex items-center gap-1.5">
                       {shopInfo ? (
                         isShopOpen ? (
                           <span className="text-brand-600 flex items-center gap-1 bg-brand-50/80 px-2 py-0.5 rounded-lg border border-brand-100">
@@ -521,7 +522,7 @@ export default function OrderHistoryModal({
                             onClose();
                             onTrackOrder?.(order);
                           }}
-                          className="py-1.5 px-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold text-xs flex items-center gap-1 shadow-xs transition active:scale-95 cursor-pointer"
+                          className="whitespace-nowrap py-1.5 px-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold text-xs flex items-center gap-1 shadow-xs transition active:scale-95 cursor-pointer"
                         >
                           <Bike className="w-3.5 h-3.5" />
                           <span>ติดตามสถานะ</span>
@@ -535,7 +536,7 @@ export default function OrderHistoryModal({
                             type="button"
                             disabled={isReordering}
                             onClick={() => handleReorder(order)}
-                            className="py-1.5 px-3.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
+                            className="whitespace-nowrap py-1.5 px-3.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
                             title="นำเมนูเข้าตะกร้าเพื่อสั่งอีกครั้ง"
                           >
                             <RotateCw className={`w-3.5 h-3.5 ${isReordering ? 'animate-spin' : ''}`} />
@@ -546,7 +547,7 @@ export default function OrderHistoryModal({
                             type="button"
                             disabled={isReordering}
                             onClick={() => handleReorder(order)}
-                            className="py-1.5 px-3.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl font-bold text-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
+                            className="whitespace-nowrap py-1.5 px-3.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl font-bold text-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
                             title="ร้านค้านี้ปิดให้บริการอยู่ในขณะนี้"
                           >
                             <Ban className="w-3.5 h-3.5 text-rose-500" />
@@ -557,7 +558,7 @@ export default function OrderHistoryModal({
                         <button
                           type="button"
                           disabled
-                          className="py-1.5 px-3.5 bg-gray-100 text-gray-400 border border-gray-200 rounded-xl font-medium text-xs flex items-center gap-1.5 cursor-not-allowed"
+                          className="whitespace-nowrap py-1.5 px-3.5 bg-gray-100 text-gray-400 border border-gray-200 rounded-xl font-medium text-xs flex items-center gap-1.5 cursor-not-allowed"
                         >
                           <span>ไม่มีร้านในระบบ</span>
                         </button>

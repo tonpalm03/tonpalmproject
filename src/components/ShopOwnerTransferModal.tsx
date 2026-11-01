@@ -75,7 +75,7 @@ export default function ShopOwnerTransferModal({ shop, users, currentUser, onClo
           </p>
         </div>
 
-        <div className="text-[11px] text-brand-900 bg-brand-50 border border-brand-200 rounded-xl p-2.5 flex gap-1.5 leading-relaxed">
+        <div className="text-xs text-brand-900 bg-brand-50 border border-brand-200 rounded-xl p-2.5 flex gap-1.5 leading-relaxed">
           <AlertTriangle className="w-4 h-4 text-brand-600 shrink-0" />
           <span>
             ให้เจ้าของร้านเข้าสู่ระบบด้วยบัญชี LINE หรือ Google ใหม่ก่อน 1 ครั้ง แล้วค้นหาบัญชีนั้นด้านล่าง ควรยืนยันตัวตนเจ้าของร้าน (เช่น โทรกลับเบอร์ร้าน) ก่อนย้ายสิทธิ์
@@ -96,7 +96,7 @@ export default function ShopOwnerTransferModal({ shop, users, currentUser, onClo
               />
             </div>
             {q && candidates.length === 0 && (
-              <p className="text-[11px] text-gray-400 text-center py-2">ไม่พบบัญชีลูกค้าที่ตรงกัน</p>
+              <p className="text-xs text-gray-400 text-center py-2">ไม่พบบัญชีลูกค้าที่ตรงกัน</p>
             )}
             {candidates.map((u) => (
               <button
@@ -127,7 +127,7 @@ export default function ShopOwnerTransferModal({ shop, users, currentUser, onClo
                 <p className="font-bold text-gray-800 truncate">{target.display_name}</p>
                 <p className="text-gray-500">#{getUserCode(target)} • {target.phone || 'ไม่ระบุเบอร์'}</p>
               </div>
-              <button type="button" onClick={() => setTarget(null)} className="text-[11px] text-purple-700 font-bold px-2">
+              <button type="button" onClick={() => setTarget(null)} className="text-xs text-purple-700 font-bold px-2">
                 เปลี่ยน
               </button>
             </div>

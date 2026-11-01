@@ -116,7 +116,7 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
         <p>
           ร้าน <strong>{application.shop_name}</strong> • โทร {application.phone}
         </p>
-        <p className="text-[11px] text-brand-700 leading-relaxed">
+        <p className="text-xs text-brand-700 leading-relaxed">
           เมื่อแอดมินอนุมัติ หน้านี้จะเปลี่ยนเป็นระบบจัดการร้านค้าให้อัตโนมัติ ระหว่างนี้ยังสั่งอาหารในฐานะลูกค้าได้ตามปกติ
         </p>
         <div className="flex gap-2 pt-1">
@@ -154,11 +154,11 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
             คำขอก่อนหน้าไม่ผ่านการอนุมัติ
           </p>
           {application.reject_reason && <p>เหตุผล: {application.reject_reason}</p>}
-          <p className="text-[11px]">แก้ไขข้อมูลแล้วส่งคำขอใหม่ได้</p>
+          <p className="text-xs">แก้ไขข้อมูลแล้วส่งคำขอใหม่ได้</p>
         </div>
       )}
 
-      <p className="text-[11px] text-gray-500 leading-relaxed">
+      <p className="text-xs text-gray-500 leading-relaxed">
         กรอกข้อมูลร้านเบื้องต้น แอดมินจะตรวจสอบและติดต่อกลับ เมื่ออนุมัติแล้วจะใช้บัญชีนี้ ({user.display_name}) เข้าจัดการร้านได้ทันที
       </p>
 
@@ -235,7 +235,7 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
           showRadiusCircle={false}
           autoLocate={!pinned}
         />
-        {!pinned && <p className="text-[11px] text-gray-400 mt-1">แตะบนแผนที่หรือกดใช้ตำแหน่งปัจจุบันเพื่อปักหมุด</p>}
+        {!pinned && <p className="text-xs text-gray-400 mt-1">แตะบนแผนที่หรือกดใช้ตำแหน่งปัจจุบันเพื่อปักหมุด</p>}
       </div>
 
       <div>

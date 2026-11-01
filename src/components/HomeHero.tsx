@@ -6,6 +6,7 @@ import { Order } from '@/types';
 import { Supporter, formatBaht } from '@/lib/donations';
 import { formatOrderCode } from '@/lib/orderNumber';
 import UserAvatar from './UserAvatar';
+import { STATUS_MASCOT } from '@/lib/statusMascot';
 import WavePattern from './WavePattern';
 
 interface HomeHeroProps {
@@ -92,9 +93,9 @@ function SupporterTicker({ supporters, compact = false }: { supporters: Supporte
       <span className={`${avatar} rounded-full overflow-hidden ring-2 ring-white bg-white shrink-0`}>
         <UserAvatar src={current.avatar_url} alt={current.display_name} />
       </span>
-      <span className={`${compact ? 'text-[11px]' : 'text-xs'} font-black truncate`}>{current.display_name}</span>
+      <span className={`${compact ? 'text-xs' : 'text-xs'} font-black truncate`}>{current.display_name}</span>
       {current.total > 0 && (
-        <span className={`${compact ? 'text-[10px]' : 'text-[11px]'} font-bold text-[#1D9E75] shrink-0`}>{formatBaht(current.total)}</span>
+        <span className={`${compact ? 'text-xs' : 'text-xs'} font-bold text-[#1D9E75] shrink-0`}>{formatBaht(current.total)}</span>
       )}
     </span>
   );
@@ -126,14 +127,14 @@ export function HomeHeroCompact({
         <button
           type="button"
           onClick={onOpenTracking}
-          className="relative h-7 rounded-full bg-white text-[#0F6E56] px-2 flex items-center gap-1 text-[11px] font-bold shrink-0 active:scale-95 transition"
+          className="relative h-7 rounded-full bg-white text-[#0F6E56] px-2 flex items-center gap-1 text-xs font-bold shrink-0 active:scale-95 transition"
         >
           {activeOrder.has_customer_unread_message && <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-rose-500" />}
           <status.icon className="w-3.5 h-3.5" />
           <span className="max-w-[72px] truncate">{status.label}</span>
         </button>
       ) : (
-        <span className="h-7 rounded-full bg-white text-[#0F6E56] px-2 flex items-center gap-1 text-[11px] font-bold shrink-0">
+        <span className="h-7 rounded-full bg-white text-[#0F6E56] px-2 flex items-center gap-1 text-xs font-bold shrink-0">
           <Store className="w-3.5 h-3.5" /> {openShopCount} ร้านเปิด
         </span>
       )}
@@ -151,18 +152,18 @@ export default function HomeHero({
 
   return (
     <section className="grid grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-2.5">
-      {/* Greeting */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#C3EBDC] to-[#9FE1CB] p-3.5 min-h-[128px] shadow-[0_6px_16px_-6px_rgba(15,110,86,0.35)]">
+      {/* Greeting. When large text leaves the card too narrow, the mascot steps aside for the words. */}
+      <div className="relative overflow-hidden @container rounded-2xl bg-gradient-to-br from-[#C3EBDC] to-[#9FE1CB] p-3.5 min-h-[128px] shadow-[0_6px_16px_-6px_rgba(15,110,86,0.35)]">
         <WavePattern />
-        <p className="relative z-10 text-xs font-bold text-[#085041] truncate pr-16">สวัสดี{firstName ? ` ${firstName}` : ''}</p>
-        <h2 className="relative z-10 text-sm font-black text-[#04342C] mt-1 leading-snug pr-[64px] sm:pr-24">
+        <p className="relative z-10 text-xs font-bold text-[#085041] truncate pr-16 @max-[10rem]:pr-0">สวัสดี{firstName ? ` ${firstName}` : ''}</p>
+        <h2 className="relative z-10 text-sm font-black text-[#04342C] mt-1 leading-snug pr-[64px] sm:pr-24 @max-[10rem]:pr-0">
           {/* Break between phrases only, never mid-word */}
           <span className="whitespace-nowrap">สั่งอาหาร</span><wbr /><span className="whitespace-nowrap">กับน้องพุงเด้ง</span>
         </h2>
-        <p className="relative z-10 text-xs font-bold text-[#085041] leading-snug pr-[64px] sm:pr-24">
+        <p className="relative z-10 text-xs font-bold text-[#085041] leading-snug pr-[64px] sm:pr-24 @max-[10rem]:pr-0">
           <span className="whitespace-nowrap">จัดส่งถึง</span><wbr /><span className="whitespace-nowrap">หน้าบ้าน/หอพัก</span>
         </p>
-        <p className="relative z-10 mt-1.5 pr-[72px] sm:pr-24 text-[11px] font-medium text-[#0F6E56] leading-snug flex gap-1">
+        <p className="relative z-10 mt-1.5 pr-[72px] sm:pr-24 @max-[10rem]:pr-0 text-xs font-medium text-[#0F6E56] leading-snug flex gap-1">
           <MapPin className="w-3 h-3 shrink-0 mt-0.5" />
           <span>
             <span className="whitespace-nowrap">ชุมชนห้วยชัน - นาฝาย</span>{' '}
@@ -174,10 +175,10 @@ export default function HomeHero({
             key={pose.src}
             src={pose.src}
             alt={pose.alt}
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 w-[68px] sm:w-24 pointer-events-none select-none drop-shadow-sm animate-in fade-in zoom-in-95 duration-500 motion-reduce:animate-none"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 w-[68px] sm:w-24 @max-[10rem]:hidden pointer-events-none select-none drop-shadow-sm animate-in fade-in zoom-in-95 duration-500 motion-reduce:animate-none"
           />
         )}
-        <Sparkles className="absolute right-[72px] sm:right-24 top-4 w-3.5 h-3.5 text-white pointer-events-none" />
+        <Sparkles className="absolute right-[72px] sm:right-24 top-4 w-3.5 h-3.5 text-white pointer-events-none @max-[10rem]:hidden" />
         <Sparkles className="absolute right-2 top-3 w-3 h-3 text-white/90 pointer-events-none" />
         <Sparkles className="absolute right-3 bottom-3 w-2.5 h-2.5 text-white/80 pointer-events-none" />
       </div>
@@ -200,17 +201,25 @@ export default function HomeHero({
             className="flex-1 bg-white border border-[#E1F5EE] shadow-[0_6px_16px_-6px_rgba(15,110,86,0.3)] rounded-2xl p-2 flex flex-col items-center justify-center text-center active:scale-95 transition relative"
           >
             {activeOrder.has_customer_unread_message && <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500" />}
-            <status.icon className="w-5 h-5 text-[#1D9E75]" />
-            <span className="text-sm font-black text-gray-900 mt-1 leading-tight">{status.label}</span>
-            <span className="text-[11px] text-gray-500 truncate max-w-full">
-              ออเดอร์ #{formatOrderCode(activeOrder)}{trackingOrders.length > 1 ? ` +${trackingOrders.length - 1}` : ''}
+            {STATUS_MASCOT[activeOrder.status] ? (
+              <img
+                src={STATUS_MASCOT[activeOrder.status].src}
+                alt={STATUS_MASCOT[activeOrder.status].alt}
+                className="w-14 h-14 object-contain pointer-events-none select-none drop-shadow-sm"
+              />
+            ) : (
+              <status.icon className="w-5 h-5 text-[#1D9E75]" />
+            )}
+            <span className="text-sm font-black text-gray-900 mt-0.5 leading-tight">{status.label}</span>
+            <span className="text-xs text-gray-500 leading-tight">
+              ออเดอร์ <span className="whitespace-nowrap">#{formatOrderCode(activeOrder)}{trackingOrders.length > 1 ? ` +${trackingOrders.length - 1}` : ''}</span>
             </span>
           </button>
         ) : (
           <div className="flex-1 bg-white border border-[#E1F5EE] shadow-[0_6px_16px_-6px_rgba(15,110,86,0.3)] rounded-2xl p-2 flex flex-col items-center justify-center text-center">
             <Store className="w-4 h-4 text-[#1D9E75] mb-0.5" />
             <span className="text-2xl font-black text-[#1D9E75] leading-tight">{openShopCount}</span>
-            <span className="text-[11px] text-gray-500">ร้านเปิดอยู่</span>
+            <span className="text-xs text-gray-500">ร้านเปิดอยู่</span>
           </div>
         )}
       </div>

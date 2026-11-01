@@ -54,7 +54,7 @@ export default function AppUpdateNotice() {
         </span>
         <div className="min-w-0">
           <p className="text-sm font-black text-gray-900">มีแอปเวอร์ชันใหม่ {latest.versionName}</p>
-          <p className="text-[11px] text-gray-500 leading-relaxed mt-0.5">
+          <p className="text-xs text-gray-500 leading-relaxed mt-0.5">
             เปิดลิงก์นี้ใน Chrome เพื่อโหลดแอปใหม่ ติดตั้งทับได้เลย ข้อมูลเดิมไม่หาย
           </p>
           <button

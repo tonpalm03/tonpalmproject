@@ -188,11 +188,11 @@ export default function PWAProvider() {
               <div className="text-left">
                 <p className="font-bold text-xs leading-tight text-white flex items-center gap-1">
                   ติดตั้งแอปลงมือถือ
-                  <span className="bg-brand-500 text-[9px] font-black px-1.5 py-0.5 rounded-full text-slate-900">
+                  <span className="bg-brand-500 text-xs font-black px-1.5 py-0.5 rounded-full text-slate-900">
                     แนะนำ
                   </span>
                 </p>
-                <p className="text-[10px] text-gray-300 mt-0.5">
+                <p className="text-xs text-gray-300 mt-0.5">
                   เปิดไว จอเต็มตา สั่งอาหารสะดวกเหมือนแอปจริง
                 </p>
               </div>
@@ -242,7 +242,7 @@ export default function PWAProvider() {
 
             <div className="bg-gray-50 p-3.5 rounded-2xl border border-gray-200 text-left space-y-2.5 text-xs">
               <div className="flex items-start gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-brand-500 text-white font-black flex items-center justify-center text-[10px] shrink-0 mt-0.5">
+                <span className="w-5 h-5 rounded-full bg-brand-500 text-white font-black flex items-center justify-center text-xs shrink-0 mt-0.5">
                   1
                 </span>
                 <p className="text-gray-700">
@@ -250,7 +250,7 @@ export default function PWAProvider() {
                 </p>
               </div>
               <div className="flex items-start gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-brand-500 text-white font-black flex items-center justify-center text-[10px] shrink-0 mt-0.5">
+                <span className="w-5 h-5 rounded-full bg-brand-500 text-white font-black flex items-center justify-center text-xs shrink-0 mt-0.5">
                   2
                 </span>
                 <p className="text-gray-700">

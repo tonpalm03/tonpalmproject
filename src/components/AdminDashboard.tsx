@@ -968,7 +968,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
             <ShieldCheck className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-[10px] bg-[#1D9E75] text-white px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+            <span className="text-[0.625rem] bg-[#1D9E75] text-white px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
               Super Admin Panel
             </span>
             <h1 className="text-xl font-black mt-0.5">CPRUFood • หลังบ้าน</h1>
@@ -1038,7 +1038,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
               <TrendingUp className="w-4 h-4 text-rose-500 shrink-0" />
               <span className="font-bold">รายงานยอดขายและสถิติภาพรวม</span>
               {orphanedOrdersCount > 0 && (
-                <span className="text-rose-600 font-bold bg-rose-50 px-2.5 py-0.5 rounded-lg border border-rose-200 text-[11px] flex items-center gap-1">
+                <span className="text-rose-600 font-bold bg-rose-50 px-2.5 py-0.5 rounded-lg border border-rose-200 text-[0.6875rem] flex items-center gap-1">
                   มีออเดอร์ตกค้างจากร้านที่ลบแล้ว ({orphanedOrdersCount} บิล)
                 </span>
               )}
@@ -1115,7 +1115,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                 key={f.id}
                 type="button"
                 onClick={() => setUserRoleFilter(f.id as any)}
-                className={`px-3 py-1.5 rounded-xl font-bold transition whitespace-nowrap text-[11px] ${
+                className={`px-3 py-1.5 rounded-xl font-bold transition whitespace-nowrap text-[0.6875rem] ${
                   userRoleFilter === f.id
                     ? 'bg-brand-500 text-white shadow-xs'
                     : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-100'
@@ -1151,11 +1151,11 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <h4 className="font-bold text-sm text-gray-800 truncate">{u.display_name}</h4>
-                        <span className="text-[10px] font-mono font-bold text-gray-400">
+                        <span className="text-[0.625rem] font-mono font-bold text-gray-400">
                           #{getUserCode(u)}
                         </span>
                         <span
-                          className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                          className={`text-[0.625rem] px-2 py-0.5 rounded-full font-semibold ${
                             u.role === 'admin'
                               ? 'bg-rose-100 text-rose-800'
                               : u.role === 'merchant'
@@ -1350,11 +1350,11 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-bold text-sm text-gray-800 truncate">{shop.name}</p>
-                    <p className="text-[11px] text-gray-400 truncate">
+                    <p className="text-[0.6875rem] text-gray-400 truncate">
                       เมนู {allMenuItems.filter(m => m.shop_id === shop.id).length} · {shop.address_detail || 'รอบ มรภ. ชัยภูมิ'}
                     </p>
                   </div>
-                  <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full ${open ? 'bg-brand-50 text-brand-700' : 'bg-red-50 text-red-600'}`}>
+                  <span className={`shrink-0 text-[0.625rem] font-bold px-2 py-0.5 rounded-full ${open ? 'bg-brand-50 text-brand-700' : 'bg-red-50 text-red-600'}`}>
                     {open ? 'เปิด' : 'ปิด'}
                   </span>
                   <ChevronDown className={`w-4 h-4 text-gray-400 shrink-0 transition-transform ${expanded ? 'rotate-180' : ''}`} />
@@ -1385,7 +1385,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                     <button
                       type="button"
                       onClick={() => handleToggleShopOpen(shop)}
-                      className={`px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1 shadow-md transition active:scale-95 cursor-pointer ${
+                      className={`px-2.5 py-1 rounded-xl text-[0.6875rem] font-bold flex items-center gap-1 shadow-md transition active:scale-95 cursor-pointer ${
                         (shop.is_open ?? true)
                           ? 'bg-brand-500 text-white'
                           : 'bg-red-500 text-white'
@@ -1434,7 +1434,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                           <button
                             type="button"
                             onClick={() => setSelectedShopForReviews(shop)}
-                            className="text-[10px] bg-brand-500 hover:bg-brand-600 font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs transition active:scale-95 cursor-pointer"
+                            className="text-[0.625rem] bg-brand-500 hover:bg-brand-600 font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs transition active:scale-95 cursor-pointer"
                             title="คลิกเพื่อดูและจัดการรีวิว"
                           >
                             <Star className="w-3 h-3 fill-white" /> {avg} ({count} รีวิว)
@@ -1442,13 +1442,13 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                         );
                       })()}
                       {(shop.sales_count ?? 0) > 0 && (
-                        <span className="text-[10px] bg-brand-600 font-black px-2 py-0.5 rounded-full">
+                        <span className="text-[0.625rem] bg-brand-600 font-black px-2 py-0.5 rounded-full">
                           ขายแล้ว {shop.sales_count} ออเดอร์
                         </span>
                       )}
                     </div>
                     <h4 className="font-black text-base drop-shadow-md leading-tight">{shop.name}</h4>
-                    <div className="flex items-center justify-between text-[11px] text-brand-200 mt-0.5">
+                    <div className="flex items-center justify-between text-[0.6875rem] text-brand-200 mt-0.5">
                       <p className="flex items-center gap-1 truncate">
                         <MapPin className="w-3 h-3 shrink-0" /> {shop.address_detail || 'รอบ มรภ. ชัยภูมิ'}
                       </p>
@@ -1457,7 +1457,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                           href={`https://www.google.com/maps/dir/?api=1&destination=${shop.location.lat},${shop.location.lng}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="shrink-0 text-[10px] bg-white/20 hover:bg-white/30 text-white font-bold px-2 py-0.5 rounded-full border border-white/30 flex items-center gap-0.5 backdrop-blur-xs ml-1 transition"
+                          className="shrink-0 text-[0.625rem] bg-white/20 hover:bg-white/30 text-white font-bold px-2 py-0.5 rounded-full border border-white/30 flex items-center gap-0.5 backdrop-blur-xs ml-1 transition"
                         >
                           <Navigation className="w-2.5 h-2.5 text-brand-300" />
                           <span>แผนที่</span>
@@ -1522,7 +1522,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                       <Phone className="w-3.5 h-3.5 text-gray-400" /> {shop.phone || 'ไม่มีเบอร์โทร'}
                     </p>
                     {shop.promptpay_number && (
-                      <p className="text-[11px] text-gray-400">
+                      <p className="text-[0.6875rem] text-gray-400">
                         พร้อมเพย์: {shop.promptpay_number}
                       </p>
                     )}
@@ -1630,7 +1630,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                     setOrderDatePreset('all');
                     setOrderCustomDate('');
                   }}
-                  className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition ${
+                  className={`px-2.5 py-1 text-[0.6875rem] font-bold rounded-lg transition ${
                     orderDatePreset === 'all'
                       ? 'bg-[#FF8500] text-white shadow-2xs'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -1644,7 +1644,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                     setOrderDatePreset('today');
                     setOrderCustomDate('');
                   }}
-                  className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition ${
+                  className={`px-2.5 py-1 text-[0.6875rem] font-bold rounded-lg transition ${
                     orderDatePreset === 'today'
                       ? 'bg-[#FF8500] text-white shadow-2xs'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -1658,7 +1658,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                     setOrderDatePreset('yesterday');
                     setOrderCustomDate('');
                   }}
-                  className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition ${
+                  className={`px-2.5 py-1 text-[0.6875rem] font-bold rounded-lg transition ${
                     orderDatePreset === 'yesterday'
                       ? 'bg-[#FF8500] text-white shadow-2xs'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -1672,7 +1672,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                     setOrderDatePreset('7days');
                     setOrderCustomDate('');
                   }}
-                  className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition ${
+                  className={`px-2.5 py-1 text-[0.6875rem] font-bold rounded-lg transition ${
                     orderDatePreset === '7days'
                       ? 'bg-[#FF8500] text-white shadow-2xs'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -1687,7 +1687,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
             <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-gray-100">
               {/* Direct Date Picker */}
               <div className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1.5 rounded-xl border border-gray-200 text-xs">
-                <span className="text-[11px] text-gray-500 font-medium">ระบุวัน:</span>
+                <span className="text-[0.6875rem] text-gray-500 font-medium">ระบุวัน:</span>
                 <input
                   type="date"
                   value={orderCustomDate}
@@ -1773,7 +1773,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
           </div>
 
           {/* 3. Filter Summary Ribbon */}
-          <div className="bg-[#F8F9FB] border border-[#E9E9EF] rounded-xl px-3 py-2 text-[11px] flex items-center justify-between text-zinc-600 font-medium">
+          <div className="bg-[#F8F9FB] border border-[#E9E9EF] rounded-xl px-3 py-2 text-[0.6875rem] flex items-center justify-between text-zinc-600 font-medium">
             <span>
               พบทั้งหมด <strong className="text-zinc-900 font-bold">{filteredAdminOrders.length}</strong> ออเดอร์
             </span>
@@ -1789,7 +1789,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                 <Search className="w-5 h-5" />
               </div>
               <h4 className="font-bold text-zinc-700 text-xs">ไม่พบรายการออเดอร์ตามเงื่อนไขที่เลือก</h4>
-              <p className="text-[11px] text-zinc-400">ลองเปลี่ยนช่วงวันที่ หรือคำค้นหาใหม่อีกครั้ง</p>
+              <p className="text-[0.6875rem] text-zinc-400">ลองเปลี่ยนช่วงวันที่ หรือคำค้นหาใหม่อีกครั้ง</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -1824,7 +1824,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="font-black text-xs text-gray-800">#{formatOrderCode(o)}</span>
                         <span
-                          className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                          className={`text-[0.625rem] px-2 py-0.5 rounded-full font-bold ${
                             o.status === 'pending'
                               ? 'bg-amber-100 text-amber-800 animate-pulse'
                               : o.status === 'cooking'
@@ -1842,7 +1842,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                           {o.status === 'completed' && 'ส่งสำเร็จแล้ว'}
                           {o.status === 'cancelled' && 'ยกเลิก'}
                         </span>
-                        <span className="text-[10px] text-zinc-400 font-medium flex items-center gap-1"><Clock className="w-2.5 h-2.5 text-zinc-400" /> {dateText}</span>
+                        <span className="text-[0.625rem] text-zinc-400 font-medium flex items-center gap-1"><Clock className="w-2.5 h-2.5 text-zinc-400" /> {dateText}</span>
                       </div>
 
                       <div className="flex items-center gap-1.5">
@@ -1887,14 +1887,14 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                         <ArrowRight className="w-3 h-3 text-zinc-300" />
                         <span className="flex items-center gap-1"><User className="w-3 h-3 text-zinc-400" /> {o.customer_name}</span>
                       </p>
-                      <p className="text-[11px] text-gray-500 flex items-center gap-1 truncate">
+                      <p className="text-[0.6875rem] text-gray-500 flex items-center gap-1 truncate">
                         <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
                         <span>{o.delivery_address}</span>
                       </p>
                     </div>
 
                     {/* Items List */}
-                    <div className="bg-gray-50 rounded-xl p-2 text-[11px] space-y-1">
+                    <div className="bg-gray-50 rounded-xl p-2 text-[0.6875rem] space-y-1">
                       {o.items?.map((it, idx) => (
                         <div key={idx} className="flex justify-between items-start text-gray-700">
                           <div>
@@ -1903,7 +1903,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                               {it.note && <span className="text-brand-700 ml-1">({it.note})</span>}
                             </span>
                             {it.selected_options && it.selected_options.length > 0 && (
-                              <div className="text-[10px] text-brand-700 pl-4 space-y-0.5 mt-0.5">
+                              <div className="text-[0.625rem] text-brand-700 pl-4 space-y-0.5 mt-0.5">
                                 {it.selected_options.map((opt, optIdx) => (
                                   <div key={optIdx}>↳ + {opt.name} {opt.price > 0 ? `(+${opt.price} ฿)` : '(ฟรี)'}</div>
                                 ))}
@@ -1960,7 +1960,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                 </div>
                 <div>
                   <h3 className="font-black text-gray-900 text-base">จัดการพื้นที่ & รีเซ็ตข้อมูล</h3>
-                  <p className="text-[11px] text-gray-500">ล้างข้อความแชท, ออเดอร์ตกค้าง หรือรีเซ็ตระบบทดสอบ</p>
+                  <p className="text-[0.6875rem] text-gray-500">ล้างข้อความแชท, ออเดอร์ตกค้าง หรือรีเซ็ตระบบทดสอบ</p>
                 </div>
               </div>
               <button
@@ -1980,7 +1980,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                   <Trash2 className="w-3.5 h-3.5 text-zinc-400 inline mr-1" />
                   <span>จัดการข้อมูลทดสอบ & ยอดขาย</span>
                 </span>
-                <span className="text-[10px] bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded-full">
+                <span className="text-[0.625rem] bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded-full">
                   Admin เท่านั้น
                 </span>
               </div>
@@ -2002,12 +2002,12 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                       ล้างออเดอร์ของร้านค้าที่ถูกลบ
                     </span>
                     {orphanedOrdersCount > 0 && (
-                      <span className="text-[10px] bg-rose-600 text-white px-2 py-0.5 rounded-full font-bold animate-pulse">
+                      <span className="text-[0.625rem] bg-rose-600 text-white px-2 py-0.5 rounded-full font-bold animate-pulse">
                         {orphanedOrdersCount} บิลตกค้าง
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-gray-500 mt-0.5">
+                  <p className="text-[0.6875rem] text-gray-500 mt-0.5">
                     ลบออเดอร์และยอดขายที่ค้างจากร้านค้าที่เคยถูกลบออกจากระบบ เพื่อให้ยอดสรุปเป็น 0
                   </p>
                 </div>
@@ -2028,17 +2028,17 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                     <span className="text-xs font-bold text-red-900 group-hover:text-red-800">
                       ล้างออเดอร์ & รีเซ็ตยอดขายทั้งหมด
                     </span>
-                    <span className="text-[10px] bg-red-200 text-red-800 px-2 py-0.5 rounded-full font-bold">
+                    <span className="text-[0.625rem] bg-red-200 text-red-800 px-2 py-0.5 rounded-full font-bold">
                       ล้างหมด
                     </span>
                   </div>
-                  <p className="text-[11px] text-red-700/80 mt-0.5">
+                  <p className="text-[0.6875rem] text-red-700/80 mt-0.5">
                     ลบข้อมูลออเดอร์ บิล และรีวิวทดสอบทั้งหมด พร้อมรีเซ็ตเลขออเดอร์เริ่มต้น
                   </p>
                 </div>
                 <div className="text-right shrink-0">
                   <span className="text-xs font-extrabold text-red-800">{orders.length}</span>
-                  <span className="text-[10px] text-red-500 block">บิล</span>
+                  <span className="text-[0.625rem] text-red-500 block">บิล</span>
                 </div>
               </button>
 
@@ -2062,7 +2062,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                 >
                   <div>
                     <span className="text-xs font-bold text-gray-800">เก่ากว่า 30 วัน</span>
-                    <p className="text-[10px] text-gray-400">ล้างแชทออเดอร์ที่เสร็จสิ้นก่อน 1 เดือนที่แล้ว</p>
+                    <p className="text-[0.625rem] text-gray-400">ล้างแชทออเดอร์ที่เสร็จสิ้นก่อน 1 เดือนที่แล้ว</p>
                   </div>
                   <div className="text-right shrink-0">
                     <span className="text-xs font-bold text-gray-600">{getOrdersForCleanup(30).length} ออเดอร์</span>
@@ -2078,7 +2078,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                 >
                   <div>
                     <span className="text-xs font-bold text-gray-800">แชทที่จบแล้วทั้งหมด</span>
-                    <p className="text-[10px] text-gray-400">ล้างแชททุกออเดอร์ที่ส่งสำเร็จหรือยกเลิกแล้ว</p>
+                    <p className="text-[0.625rem] text-gray-400">ล้างแชททุกออเดอร์ที่ส่งสำเร็จหรือยกเลิกแล้ว</p>
                   </div>
                   <div className="text-right shrink-0">
                     <span className="text-xs font-bold text-gray-600">{getOrdersForCleanup('all').length} ออเดอร์</span>
@@ -2124,7 +2124,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                 </div>
                 <div>
                   <h3 className="font-black text-gray-900 text-base">จัดการรีวิว • {selectedShopForReviews.name}</h3>
-                  <p className="text-[11px] text-gray-500">ตรวจสอบและลบรีวิวที่ไม่เป็นธรรมหรือกลั่นแกล้งร้านค้า</p>
+                  <p className="text-[0.6875rem] text-gray-500">ตรวจสอบและลบรีวิวที่ไม่เป็นธรรมหรือกลั่นแกล้งร้านค้า</p>
                 </div>
               </div>
               <button
@@ -2147,7 +2147,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                   จากทั้งหมด {allShopReviews.filter((r) => r.shop_id === selectedShopForReviews.id).length} รีวิว
                 </span>
               </div>
-              <span className="text-[10px] bg-white border border-[#E9E9EF] text-zinc-700 font-bold px-2.5 py-1 rounded-full">
+              <span className="text-[0.625rem] bg-white border border-[#E9E9EF] text-zinc-700 font-bold px-2.5 py-1 rounded-full">
                 คำนวณดาวใหม่อัตโนมัติเมื่อลบ
               </span>
             </div>
@@ -2194,7 +2194,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                                   }`}
                                 />
                               ))}
-                              <span className="text-[10px] text-gray-500 ml-1 font-bold">
+                              <span className="text-[0.625rem] text-gray-500 ml-1 font-bold">
                                 {rev.rating} ดาว
                               </span>
                             </div>
@@ -2211,7 +2211,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                               rev.customer_name || 'ลูกค้า'
                             )
                           }
-                          className="px-2.5 py-1 text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl text-[11px] font-bold flex items-center gap-1 transition active:scale-95 cursor-pointer"
+                          className="px-2.5 py-1 text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl text-[0.6875rem] font-bold flex items-center gap-1 transition active:scale-95 cursor-pointer"
                           title="ลบรีวิวที่ไม่เป็นธรรมนี้"
                         >
                           <Trash2 className="w-3 h-3 text-red-500" />
@@ -2253,7 +2253,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                 </div>
                 <div>
                   <h3 className="font-black text-gray-900 text-base">แก้ไขข้อมูลร้าน • {selectedShopForEdit.name}</h3>
-                  <p className="text-[11px] text-gray-500">ปรับเปลี่ยนชื่อ เบอร์โทร หรือพิกัดร้านค้า</p>
+                  <p className="text-[0.6875rem] text-gray-500">ปรับเปลี่ยนชื่อ เบอร์โทร หรือพิกัดร้านค้า</p>
                 </div>
               </div>
               <button
@@ -2267,7 +2267,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
 
             <form onSubmit={handleSaveShopDetails} className="space-y-3">
               <div>
-                <label className="text-[11px] font-bold text-gray-700 block mb-1">ชื่อร้านค้า:</label>
+                <label className="text-[0.6875rem] font-bold text-gray-700 block mb-1">ชื่อร้านค้า:</label>
                 <input
                   type="text"
                   required
@@ -2279,7 +2279,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-[11px] font-bold text-gray-700 block mb-1">เบอร์โทรศัพท์ร้าน:</label>
+                  <label className="text-[0.6875rem] font-bold text-gray-700 block mb-1">เบอร์โทรศัพท์ร้าน:</label>
                   <input
                     type="tel"
                     value={editShopPhone}
@@ -2289,7 +2289,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-bold text-gray-700 block mb-1">เลขพร้อมเพย์ร้าน:</label>
+                  <label className="text-[0.6875rem] font-bold text-gray-700 block mb-1">เลขพร้อมเพย์ร้าน:</label>
                   <input
                     type="text"
                     value={editShopPromptpay}
@@ -2301,7 +2301,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-gray-700 block mb-1">ที่อยู่ / จุดสังเกตร้าน:</label>
+                <label className="text-[0.6875rem] font-bold text-gray-700 block mb-1">ที่อยู่ / จุดสังเกตร้าน:</label>
                 <input
                   type="text"
                   value={editShopAddress}
@@ -2312,7 +2312,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-gray-700 block mb-1">หมวดหมู่หลัก:</label>
+                <label className="text-[0.6875rem] font-bold text-gray-700 block mb-1">หมวดหมู่หลัก:</label>
                 <select
                   value={editShopCategory}
                   onChange={(e) => setEditShopCategory(e.target.value as any)}
@@ -2325,7 +2325,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-gray-700 block mb-1">
+                <label className="text-[0.6875rem] font-bold text-gray-700 block mb-1">
                   ค่าจัดส่งของร้าน (บาท):
                 </label>
                 <div className="flex gap-1.5 mb-1.5">
@@ -2334,7 +2334,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                       key={preset}
                       type="button"
                       onClick={() => setEditShopDeliveryFee(String(preset))}
-                      className={`flex-1 py-1 text-[10px] font-bold rounded-lg border transition ${
+                      className={`flex-1 py-1 text-[0.625rem] font-bold rounded-lg border transition ${
                         editShopDeliveryFee === String(preset)
                           ? 'bg-brand-500 text-white border-brand-600 shadow-2xs'
                           : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
@@ -2352,7 +2352,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                   className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-brand-500 font-medium"
                   placeholder="0 (ส่งฟรี)"
                 />
-                <span className="text-[10px] text-gray-400 mt-0.5 block">
+                <span className="text-[0.625rem] text-gray-400 mt-0.5 block">
                   * กำหนด 0 บาทหากร้านส่งฟรี หรือใส่ตามระยะทางจริง
                 </span>
               </div>
@@ -2389,7 +2389,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                 <div className="w-10 h-10 rounded-2xl bg-[#FFF5E8] text-[#FF8500] border border-brand-100 flex items-center justify-center shrink-0 shadow-xs"><ChefHat className="w-5 h-5" /></div>
                 <div>
                   <h3 className="font-black text-gray-900 text-base">จัดการเมนูอาหาร • {selectedShopForMenus.name}</h3>
-                  <p className="text-[11px] text-gray-500">เพิ่ม ลบ หรือแก้ไขสถานะของหมดแทนร้านค้าได้</p>
+                  <p className="text-[0.6875rem] text-gray-500">เพิ่ม ลบ หรือแก้ไขสถานะของหมดแทนร้านค้าได้</p>
                 </div>
               </div>
               <button
@@ -2442,14 +2442,14 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                 {/* Image Picker Section */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <label className="text-[11px] font-bold text-gray-700 flex items-center gap-1">
+                    <label className="text-[0.6875rem] font-bold text-gray-700 flex items-center gap-1">
                       <Camera className="w-3.5 h-3.5 text-brand-600" /> รูปภาพเมนูอาหาร
                     </label>
                     {newMenuImage && (
                       <button
                         type="button"
                         onClick={() => setNewMenuImage('')}
-                        className="text-[11px] text-red-500 font-semibold hover:underline"
+                        className="text-[0.6875rem] text-red-500 font-semibold hover:underline"
                       >
                         ลบรูปภาพ
                       </button>
@@ -2489,14 +2489,14 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                         
                       </div>
                       <span className="font-bold text-xs text-brand-950">เลือกรูป / ถ่ายรูปอาหาร (สี่เหลี่ยม 1:1)</span>
-                      <span className="text-[10px] text-gray-400">รองรับการซูมและตัดขอบภาพให้พอดีสวยงาม</span>
+                      <span className="text-[0.625rem] text-gray-400">รองรับการซูมและตัดขอบภาพให้พอดีสวยงาม</span>
                     </button>
                   )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-bold text-gray-600 block mb-1">ชื่อเมนู</label>
+                    <label className="text-[0.625rem] font-bold text-gray-600 block mb-1">ชื่อเมนู</label>
                     <input
                       type="text"
                       required
@@ -2507,7 +2507,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-bold text-gray-600 block mb-1">ราคา (บาท)</label>
+                    <label className="text-[0.625rem] font-bold text-gray-600 block mb-1">ราคา (บาท)</label>
                     <input
                       type="number"
                       required
@@ -2520,7 +2520,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold text-gray-600 block mb-1">หมวดหมู่อาหาร</label>
+                  <label className="text-[0.625rem] font-bold text-gray-600 block mb-1">หมวดหมู่อาหาร</label>
                   <select
                     value={newMenuCategory}
                     onChange={(e) => setNewMenuCategory(e.target.value as any)}
@@ -2534,13 +2534,13 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                 {/* Add Toppings / Options */}
                 <div className="bg-white/90 p-2.5 rounded-xl border border-brand-200 space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-brand-950 flex items-center gap-1">
+                    <span className="text-[0.6875rem] font-bold text-brand-950 flex items-center gap-1">
                       ตัวเลือกเสริม / ท็อปปิ้ง (ไม่บังคับ)
                     </span>
                     <button
                       type="button"
                       onClick={() => setNewMenuOptions([...newMenuOptions, { name: '', price: 10 }])}
-                      className="text-[10px] font-bold text-brand-700 bg-brand-100 hover:bg-brand-200 px-2 py-0.5 rounded-lg transition active:scale-95 flex items-center gap-0.5"
+                      className="text-[0.625rem] font-bold text-brand-700 bg-brand-100 hover:bg-brand-200 px-2 py-0.5 rounded-lg transition active:scale-95 flex items-center gap-0.5"
                     >
                       <Plus className="w-3 h-3" />
                       <span>เพิ่มท็อปปิ้ง</span>
@@ -2548,7 +2548,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                   </div>
 
                   {newMenuOptions.length === 0 ? (
-                    <p className="text-[10px] text-gray-400 italic">
+                    <p className="text-[0.625rem] text-gray-400 italic">
                       ยังไม่มีตัวเลือกเสริม (เช่น เพิ่มไข่ดาว, พิเศษ, เพิ่มไข่มุก) กดปุ่ม "+ เพิ่มท็อปปิ้ง"
                     </p>
                   ) : (
@@ -2578,7 +2578,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                               }}
                               className="w-full px-1.5 py-1 text-xs bg-white border border-gray-200 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-brand-500 text-right font-bold text-brand-600"
                             />
-                            <span className="text-[10px] text-gray-400">฿</span>
+                            <span className="text-[0.625rem] text-gray-400">฿</span>
                           </div>
                           <button
                             type="button"
@@ -2641,7 +2641,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                         <div className="space-y-2 animate-in fade-in">
                           <div className="grid grid-cols-2 gap-2">
                             <div>
-                              <label className="text-[10px] font-bold text-gray-600 block mb-0.5">ชื่อเมนู</label>
+                              <label className="text-[0.625rem] font-bold text-gray-600 block mb-0.5">ชื่อเมนู</label>
                               <input
                                 type="text"
                                 value={editMenuItemName}
@@ -2650,7 +2650,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                               />
                             </div>
                             <div>
-                              <label className="text-[10px] font-bold text-gray-600 block mb-0.5">ราคา (บาท)</label>
+                              <label className="text-[0.625rem] font-bold text-gray-600 block mb-0.5">ราคา (บาท)</label>
                               <input
                                 type="number"
                                 value={editMenuItemPrice}
@@ -2660,7 +2660,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                             </div>
                           </div>
                           <div>
-                            <label className="text-[10px] font-bold text-gray-600 block mb-0.5">หมวดหมู่</label>
+                            <label className="text-[0.625rem] font-bold text-gray-600 block mb-0.5">หมวดหมู่</label>
                             <select
                               value={editMenuItemCategory}
                               onChange={(e) => setEditMenuItemCategory(e.target.value as any)}
@@ -2674,17 +2674,17 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                           {/* Edit Toppings */}
                           <div className="bg-brand-50/70 p-2.5 rounded-xl border border-brand-200 space-y-1.5">
                             <div className="flex items-center justify-between">
-                              <span className="text-[11px] font-bold text-zinc-900 flex items-center gap-1.5"><Sparkles className="w-3 h-3 text-[#FF8500]" /> ท็อปปิ้ง / ตัวเลือกเสริม</span>
+                              <span className="text-[0.6875rem] font-bold text-zinc-900 flex items-center gap-1.5"><Sparkles className="w-3 h-3 text-[#FF8500]" /> ท็อปปิ้ง / ตัวเลือกเสริม</span>
                               <button
                                 type="button"
                                 onClick={() => setEditMenuItemOptions([...editMenuItemOptions, { name: '', price: 10 }])}
-                                className="text-[10px] font-bold text-brand-700 bg-white px-2 py-0.5 rounded-lg border border-brand-200 hover:bg-brand-100 transition active:scale-95"
+                                className="text-[0.625rem] font-bold text-brand-700 bg-white px-2 py-0.5 rounded-lg border border-brand-200 hover:bg-brand-100 transition active:scale-95"
                               >
                                 + เพิ่มท็อปปิ้ง
                               </button>
                             </div>
                             {editMenuItemOptions.length === 0 ? (
-                              <p className="text-[10px] text-gray-400 italic">ยังไม่มีท็อปปิ้ง</p>
+                              <p className="text-[0.625rem] text-gray-400 italic">ยังไม่มีท็อปปิ้ง</p>
                             ) : (
                               <div className="space-y-1">
                                 {editMenuItemOptions.map((opt, oIdx) => (
@@ -2711,7 +2711,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                                       }}
                                       className="w-16 px-1.5 py-1 text-xs bg-white border border-gray-200 rounded-lg text-right font-bold text-brand-600"
                                     />
-                                    <span className="text-[10px] text-gray-400">฿</span>
+                                    <span className="text-[0.625rem] text-gray-400">฿</span>
                                     <button
                                       type="button"
                                       onClick={() => setEditMenuItemOptions(editMenuItemOptions.filter((_, i) => i !== oIdx))}
@@ -2769,7 +2769,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                                   setCropTarget('edit_menu');
                                   adminMenuEditImageInputRef.current?.click();
                                 }}
-                                className="absolute inset-0 bg-black/60 text-white rounded-xl opacity-0 group-hover/img:opacity-100 transition flex flex-col items-center justify-center text-[9px] font-bold"
+                                className="absolute inset-0 bg-black/60 text-white rounded-xl opacity-0 group-hover/img:opacity-100 transition flex flex-col items-center justify-center text-[0.5625rem] font-bold"
                                 title="คลิกเพื่อเปลี่ยนรูปอาหาร"
                               >
                                 <Camera className="w-3.5 h-3.5 mb-0.5" />
@@ -2782,7 +2782,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                               <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                                 <span className="text-xs font-extrabold text-brand-600">{item.price} บาท</span>
                                 <span
-                                  className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                                  className={`text-[0.625rem] font-bold px-1.5 py-0.5 rounded-full ${
                                     item.is_available ?? true
                                       ? 'bg-brand-100 text-brand-800'
                                       : 'bg-red-100 text-red-800'
@@ -2799,7 +2799,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                                       setCropTarget('edit_menu');
                                       adminMenuEditImageInputRef.current?.click();
                                     }}
-                                    className="text-[10px] text-brand-600 hover:underline font-semibold flex items-center gap-0.5 cursor-pointer"
+                                    className="text-[0.625rem] text-brand-600 hover:underline font-semibold flex items-center gap-0.5 cursor-pointer"
                                   >
                                     <Camera className="w-2.5 h-2.5" /> + ใส่รูป
                                   </button>
@@ -2807,7 +2807,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                                   <button
                                     type="button"
                                     onClick={() => handleAdminRemoveMenuImage(item)}
-                                    className="text-[10px] text-rose-500 hover:underline font-semibold flex items-center gap-0.5 cursor-pointer"
+                                    className="text-[0.625rem] text-rose-500 hover:underline font-semibold flex items-center gap-0.5 cursor-pointer"
                                     title="ลบรูปภาพเมนูนี้"
                                   >
                                     <Trash2 className="w-2.5 h-2.5" /> ลบรูป
@@ -2815,7 +2815,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                                 )}
                               </div>
                               {item.options && item.options.length > 0 && (
-                                <div className="text-[10px] text-brand-700 bg-brand-100/60 px-2 py-0.5 rounded-md mt-1 border border-brand-200/60 inline-flex items-center gap-1 max-w-full">
+                                <div className="text-[0.625rem] text-brand-700 bg-brand-100/60 px-2 py-0.5 rounded-md mt-1 border border-brand-200/60 inline-flex items-center gap-1 max-w-full">
                                   <span className="font-semibold shrink-0 flex items-center gap-1"><Sparkles className="w-3 h-3 text-[#FF8500]" /> ท็อปปิ้ง ({item.options.length}):</span>
                                   <span className="truncate">{item.options.map((o) => `${o.name} (+${o.price}฿)`).join(', ')}</span>
                                 </div>
@@ -2857,7 +2857,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                                   console.error(e);
                                 }
                               }}
-                              className={`px-2 py-1 text-[11px] font-bold rounded-xl border transition ${
+                              className={`px-2 py-1 text-[0.6875rem] font-bold rounded-xl border transition ${
                                 item.is_available ?? true
                                   ? 'bg-brand-50 text-brand-700 border-brand-200 hover:bg-brand-100'
                                   : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'

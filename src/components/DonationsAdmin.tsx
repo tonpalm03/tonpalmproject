@@ -120,11 +120,11 @@ export default function DonationsAdmin({ users }: DonationsAdminProps) {
             <div className="flex-1 min-w-0 space-y-1 text-xs">
               <p className="font-bold text-sm text-gray-900 truncate">
                 {r.display_name}
-                {r.is_anonymous && <span className="ml-1 text-[10px] text-gray-500 font-medium">(ไม่ระบุชื่อ)</span>}
-                {r.hide_amount && <span className="ml-1 text-[10px] text-gray-500 font-medium">(ซ่อนยอด)</span>}
+                {r.is_anonymous && <span className="ml-1 text-[0.625rem] text-gray-500 font-medium">(ไม่ระบุชื่อ)</span>}
+                {r.hide_amount && <span className="ml-1 text-[0.625rem] text-gray-500 font-medium">(ซ่อนยอด)</span>}
               </p>
               {r.message && <p className="text-gray-600 line-clamp-2">&ldquo;{r.message}&rdquo;</p>}
-              <p className="text-[10px] text-gray-400">{r.created_at ? formatThaiDateWithTime(new Date(toMillis(r.created_at))) : ''}</p>
+              <p className="text-[0.625rem] text-gray-400">{r.created_at ? formatThaiDateWithTime(new Date(toMillis(r.created_at))) : ''}</p>
               <div className="flex items-center gap-1.5 pt-1">
                 <span className="text-gray-500">฿</span>
                 <input
@@ -169,7 +169,7 @@ export default function DonationsAdmin({ users }: DonationsAdminProps) {
                 {d.message && (
                   <p className={`line-clamp-2 ${d.message_hidden ? 'text-gray-300 line-through' : 'text-gray-600'}`}>{d.message}</p>
                 )}
-                <p className="text-[10px] text-gray-400">
+                <p className="text-[0.625rem] text-gray-400">
                   {d.created_at ? formatThaiDateWithTime(new Date(toMillis(d.created_at))) : ''} · {d.source === 'admin' ? 'แอดมินเพิ่ม' : 'จากสลิป'}
                 </p>
               </div>
@@ -201,7 +201,7 @@ export default function DonationsAdmin({ users }: DonationsAdminProps) {
 function Stat({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className={`rounded-xl p-2.5 border ${highlight ? 'bg-pink-50 border-pink-200' : 'bg-white border-gray-200'}`}>
-      <p className="text-[10px] text-gray-500 font-bold">{label}</p>
+      <p className="text-[0.625rem] text-gray-500 font-bold">{label}</p>
       <p className="text-sm font-black text-gray-900 truncate">{value}</p>
     </div>
   );
@@ -257,7 +257,7 @@ function PromptPaySettings() {
     <section className="bg-white border border-gray-200 rounded-2xl p-3">
       <button onClick={() => setOpen(o => !o)} className="w-full flex items-center justify-between text-sm font-black text-gray-900">
         <span className="flex items-center gap-1.5"><QrCode className="w-4 h-4 text-brand-600" /> พร้อมเพย์รับ donate</span>
-        <span className={`text-[11px] font-bold ${configured ? 'text-brand-600' : 'text-brand-500'}`}>
+        <span className={`text-[0.6875rem] font-bold ${configured ? 'text-brand-600' : 'text-brand-500'}`}>
           {configured ? 'ตั้งค่าแล้ว' : 'ยังไม่ได้อัปโหลด QR'}
         </span>
       </button>
@@ -369,7 +369,7 @@ function DonationEditor({ users, donation, onClose }: { users: UserProfile[]; do
                   <span className="text-sm truncate">{u.display_name}</span>
                 </button>
               ))}
-              <p className="text-[11px] text-gray-400 text-center">หรือพิมพ์ชื่อเอง (จะใช้รูปน้องพุงเด้งแทนรูปโปรไฟล์)</p>
+              <p className="text-[0.6875rem] text-gray-400 text-center">หรือพิมพ์ชื่อเอง (จะใช้รูปน้องพุงเด้งแทนรูปโปรไฟล์)</p>
               <input value={name} onChange={e => setName(e.target.value)} maxLength={40} placeholder="ชื่อที่จะแสดง" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm" />
             </div>
           )

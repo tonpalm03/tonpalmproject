@@ -155,7 +155,7 @@ export default function DeliveryNavigator({
     <div className="fixed inset-0 z-[300] bg-white flex flex-col">
       <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] px-4 pt-3 pb-3 flex items-start gap-3 shadow-sm z-10">
         <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-bold text-[#0F6E56]">ไปส่งที่</p>
+          <p className="text-xs font-bold text-[#0F6E56]">ไปส่งที่</p>
           <p className="text-base font-black text-[#04342C] truncate">{customerName}</p>
           {address && <p className="text-xs text-[#085041] line-clamp-2">{address}</p>}
         </div>
@@ -172,7 +172,7 @@ export default function DeliveryNavigator({
           </p>
         )}
         {route && !route.onRoads && (
-          <p className="absolute bottom-2 left-2 right-2 z-[500] rounded-xl bg-white/95 p-2 text-[11px] text-gray-600 shadow">
+          <p className="absolute bottom-2 left-2 right-2 z-[500] rounded-xl bg-white/95 p-2 text-xs text-gray-600 shadow">
             โหลดเส้นทางถนนไม่ได้ เส้นประคือทิศทางเป็นเส้นตรงไปหาลูกค้า
           </p>
         )}

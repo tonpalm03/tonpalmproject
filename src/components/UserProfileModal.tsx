@@ -9,6 +9,7 @@ import ImageCropModal from './ImageCropModal';
 import MapPicker from './MapPicker';
 import { DEFAULT_CAMPUS_LOCATION } from '@/lib/geolocation';
 import AndroidInstallLink from './AndroidInstallLink';
+import FontSizeControl from './FontSizeControl';
 import TermsModal from './TermsModal';
 import ContactModal from './ContactModal';
 import UserAvatar, { getUserCode, isCustomAvatar } from './UserAvatar';
@@ -237,12 +238,12 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
             {(role === 'admin' || role === 'merchant') && (
               <div className="mt-1.5 flex items-center justify-center gap-1.5">
                 {role === 'admin' ? (
-                  <span className="inline-flex items-center gap-1 bg-white text-[#0F6E56] border border-[#9FE1CB] text-[11px] font-bold px-3 py-0.5 rounded-full shadow-2xs">
+                  <span className="inline-flex items-center gap-1 bg-white text-[#0F6E56] border border-[#9FE1CB] text-xs font-bold px-3 py-0.5 rounded-full shadow-2xs">
                     <ShieldCheck className="w-3.5 h-3.5" />
                     <span>ผู้ดูแลระบบ (Super Admin)</span>
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 bg-white text-[#0F6E56] border border-[#9FE1CB] text-[11px] font-bold px-3 py-0.5 rounded-full shadow-2xs">
+                  <span className="inline-flex items-center gap-1 bg-white text-[#0F6E56] border border-[#9FE1CB] text-xs font-bold px-3 py-0.5 rounded-full shadow-2xs">
                     <Store className="w-3.5 h-3.5" />
                     <span>ร้านค้าชุมชน (Merchant)</span>
                   </span>
@@ -282,7 +283,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
               {!isEditingInfo ? (
                 <>
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                       ข้อมูลโปรไฟล์
                     </span>
                     <button
@@ -323,7 +324,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
               ) : (
                 <form onSubmit={handleSaveInfo} className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-gray-700">แก้ไขข้อมูล</span>
+                    <span className="text-xs font-bold text-gray-700">แก้ไขข้อมูล</span>
                     <button
                       type="button"
                       onClick={() => {
@@ -338,7 +339,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold text-gray-600 block mb-1">
+                    <label className="text-xs font-bold text-gray-600 block mb-1">
                       ชื่อแสดงในแอพ:
                     </label>
                     <input
@@ -352,7 +353,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold text-gray-600 block mb-1">
+                    <label className="text-xs font-bold text-gray-600 block mb-1">
                       เบอร์โทรศัพท์ (สำหรับคนส่งโทรหา):
                     </label>
                     <input
@@ -381,7 +382,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
               {!isEditingAddress ? (
                 <>
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-brand-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-brand-900 uppercase tracking-wider flex items-center gap-1.5">
                       <MapPin className="w-3.5 h-3.5 text-brand-600" />
                       ที่อยู่จัดส่งและหมุดเริ่มต้น
                     </span>
@@ -400,19 +401,19 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                       <p className="font-semibold text-gray-800 bg-white p-2.5 rounded-xl border border-brand-100 leading-relaxed shadow-2xs">
                         {user.default_address}
                       </p>
-                      <div className="flex items-center justify-between text-[11px] text-gray-500 pt-0.5">
-                        <span className="flex items-center gap-1 text-[10px]">
+                      <div className="flex items-center justify-between gap-2 text-xs text-gray-500 pt-0.5">
+                        <span className="flex items-center gap-1 text-xs">
                           <Navigation className="w-3 h-3 text-brand-600" />
                           พิกัด: {user.default_location?.lat?.toFixed(4) || defaultLocation.lat.toFixed(4)}, {user.default_location?.lng?.toFixed(4) || defaultLocation.lng.toFixed(4)}
                         </span>
-                        <span className="text-[10px] text-brand-700 bg-brand-100/80 px-2 py-0.5 rounded-full font-bold">
+                        <span className="shrink-0 whitespace-nowrap text-xs text-brand-700 bg-brand-100/80 px-2 py-0.5 rounded-full font-bold">
                           พร้อมใช้สั่งอาหาร
                         </span>
                       </div>
                     </div>
                   ) : (
                     <div className="text-center py-2 text-xs text-brand-800">
-                      <p className="text-[11px] text-gray-500 mb-2">ยังไม่ได้บันทึกที่อยู่จัดส่งเริ่มต้น (บันทึกไว้เพื่อความสะดวกรวดเร็วในการสั่งอาหาร)</p>
+                      <p className="text-xs text-gray-500 mb-2">ยังไม่ได้บันทึกที่อยู่จัดส่งเริ่มต้น (บันทึกไว้เพื่อความสะดวกรวดเร็วในการสั่งอาหาร)</p>
                       <button
                         type="button"
                         onClick={() => setIsEditingAddress(true)}
@@ -446,7 +447,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
 
                   {/* Interactive Map Picker */}
                   <div>
-                    <label className="text-[11px] font-bold text-gray-700 block mb-1">
+                    <label className="text-xs font-bold text-gray-700 block mb-1">
                       ปักหมุดตำแหน่ง (ลากหมุดหรือกด "ตำแหน่งของฉัน"):
                     </label>
                     <MapPicker
@@ -460,7 +461,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
 
                   {/* Textarea for detailed address */}
                   <div>
-                    <label className="text-[11px] font-bold text-gray-700 block mb-1">
+                    <label className="text-xs font-bold text-gray-700 block mb-1">
                       รายละเอียดที่อยู่ (หอพัก / บ้าน / จุดส่ง):
                     </label>
                     <textarea
@@ -495,11 +496,11 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                 }}
                 className="w-full py-2.5 px-4 rounded-2xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs flex items-center justify-between transition active:scale-98 shadow-xs"
               >
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-white" />
+                <div className="flex items-center gap-2 min-w-0 text-left">
+                  <FileText className="w-4 h-4 shrink-0 text-white" />
                   <span>ประวัติการสั่งซื้อของฉัน (สั่งซ้ำได้)</span>
                 </div>
-                <span className="text-[11px] bg-white/20 px-2 py-0.5 rounded-full font-bold">ดูรายการ</span>
+                <span className="shrink-0 whitespace-nowrap ml-2 text-xs bg-white/20 px-2 py-0.5 rounded-full font-bold">ดูรายการ</span>
               </button>
             )}
 
@@ -509,11 +510,11 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
               onClick={() => setShowContact(true)}
               className="w-full py-2.5 px-4 rounded-2xl border border-brand-200 bg-brand-50/70 hover:bg-brand-100 text-brand-900 font-bold text-xs flex items-center justify-between transition active:scale-98"
             >
-              <div className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-brand-700" />
+              <div className="flex items-center gap-2 min-w-0 text-left">
+                <MessageSquare className="w-4 h-4 shrink-0 text-brand-700" />
                 <span>ติดต่อเรา / ฝ่ายบริการ (LINE Official)</span>
               </div>
-              <span className="text-[11px] text-brand-700 font-bold bg-brand-100 px-2 py-0.5 rounded-full">@887nrlyw</span>
+              <span className="shrink-0 whitespace-nowrap ml-2 text-xs text-brand-700 font-bold bg-brand-100 px-2 py-0.5 rounded-full">@887nrlyw</span>
             </button>
 
             {/* Terms of Service Button */}
@@ -522,11 +523,11 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
               onClick={() => setShowTerms(true)}
               className="w-full py-2.5 px-4 rounded-2xl border border-gray-200 text-gray-700 hover:bg-gray-50 font-bold text-xs flex items-center justify-between transition active:scale-98"
             >
-              <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-gray-500" />
+              <div className="flex items-center gap-2 min-w-0 text-left">
+                <FileText className="w-4 h-4 shrink-0 text-gray-500" />
                 <span>ข้อกำหนดและนโยบายการให้บริการ</span>
               </div>
-              <span className="text-[11px] text-brand-600 font-semibold">แตะเพื่อดู</span>
+              <span className="shrink-0 whitespace-nowrap ml-2 text-xs text-brand-600 font-semibold">แตะเพื่อดู</span>
             </button>
 
             {/* Customers can apply to open a shop later */}
@@ -535,13 +536,15 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                 href="/merchant"
                 className="w-full py-2.5 px-4 rounded-2xl border border-brand-200 bg-brand-50/70 hover:bg-brand-100 text-brand-900 font-bold text-xs flex items-center justify-between transition active:scale-98"
               >
-                <div className="flex items-center gap-2">
-                  <Store className="w-3.5 h-3.5 text-brand-500" />
+                <div className="flex items-center gap-2 min-w-0 text-left">
+                  <Store className="w-3.5 h-3.5 shrink-0 text-brand-500" />
                   <span>สมัครเปิดร้านค้ากับ CPRUFood</span>
                 </div>
-                <span className="text-[10px] bg-brand-200 text-brand-900 px-2 py-0.5 rounded-full font-bold">สมัคร</span>
+                <span className="shrink-0 whitespace-nowrap ml-2 text-xs bg-brand-200 text-brand-900 px-2 py-0.5 rounded-full font-bold">สมัคร</span>
               </a>
             )}
+
+            <FontSizeControl />
 
             <AndroidInstallLink variant="row" />
 

@@ -97,7 +97,7 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
                     พื้นที่กลางเพื่อชุมชน ส่งตรงถึงหน้าบ้านและหอพัก
                   </h3>
                 </div>
-                <p className="text-[11px] text-brand-900 leading-relaxed">
+                <p className="text-xs text-brand-900 leading-relaxed">
                   CPRUFood จัดทำขึ้นเพื่อสนับสนุนร้านค้าในชุมชนห้วยชัน-นาฝาย ให้ส่งต่ออาหารอร่อยถึงมือเพื่อนบ้านและนักศึกษา มรภ.ชัยภูมิ อย่างสะดวกและรวดเร็ว
                 </p>
               </div>
@@ -180,7 +180,7 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
                     เราเคารพและปกป้องข้อมูลส่วนบุคคลของคุณ
                   </h3>
                 </div>
-                <p className="text-[11px] text-brand-900 leading-relaxed">
+                <p className="text-xs text-brand-900 leading-relaxed">
                   CPRUFood จัดเก็บเฉพาะข้อมูลที่จำเป็นเพื่อการจัดส่งอาหารในชุมชนเท่านั้น และไม่มีนโยบายจำหน่ายหรือส่งต่อข้อมูลให้บุคคลภายนอก
                 </p>
               </div>
@@ -231,7 +231,7 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
 
           {/* Clean Contact Redirect Hint */}
           <div className="p-3 bg-white border border-gray-200/80 rounded-2xl flex items-center justify-between gap-2 shadow-2xs">
-            <div className="text-[11px] text-gray-500">
+            <div className="text-xs text-gray-500">
               <span>มีข้อสงสัยเพิ่มเติมหรือต้องการแจ้งปัญหา?</span>
             </div>
             {onOpenContact && (
@@ -253,7 +253,7 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
 
         {/* Modal Footer */}
         <div className="p-3.5 sm:p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between gap-3 shrink-0">
-          <p className="text-[11px] text-gray-500 hidden sm:flex items-center gap-1">
+          <p className="text-xs text-gray-500 hidden sm:flex items-center gap-1">
             <Sparkles className="w-3.5 h-3.5 text-brand-500" />
             <span>CPRUFood ส่งตรงถึงหน้าบ้านและหอพัก</span>
           </p>

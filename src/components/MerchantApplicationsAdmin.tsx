@@ -84,7 +84,7 @@ export default function MerchantApplicationsAdmin({ users, currentUser }: Mercha
                 </p>
               </div>
               {app.created_at?.toDate && (
-                <span className="text-[10px] text-gray-400 shrink-0">{formatThaiDateWithTime(app.created_at.toDate())}</span>
+                <span className="text-xs text-gray-400 shrink-0">{formatThaiDateWithTime(app.created_at.toDate())}</span>
               )}
             </div>
             <p className="flex items-center gap-1 text-brand-700 font-semibold">

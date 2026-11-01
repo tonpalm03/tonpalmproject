@@ -167,7 +167,7 @@ export default function ImageCropModal({
             <Crop className="w-5 h-5 text-brand-500" />
             <div>
               <h3 className="font-bold text-sm leading-tight">{title}</h3>
-              <p className="text-[10px] text-gray-400">ลากเพื่อย้าย • เลื่อนเพื่อซูม</p>
+              <p className="text-xs text-gray-400">ลากเพื่อย้าย • เลื่อนเพื่อซูม</p>
             </div>
           </div>
           <button
@@ -265,7 +265,7 @@ export default function ImageCropModal({
               <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-brand-400"></div>
 
               <div className="absolute bottom-2 left-0 right-0 text-center pointer-events-none">
-                <span className="text-[10px] bg-black/60 px-2 py-0.5 rounded-full text-white/80 font-medium">
+                <span className="text-xs bg-black/60 px-2 py-0.5 rounded-full text-white/80 font-medium">
                   ลากจัดตำแหน่งในกรอบ
                 </span>
               </div>

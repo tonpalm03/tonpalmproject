@@ -321,7 +321,7 @@ export default function MapPicker({
         <div className="absolute top-2 left-2 right-2 z-20 flex items-center justify-between pointer-events-none gap-1">
           {/* Distance / Radius Status Badge */}
           {showRadiusCircle && (
-            <div className={`px-2.5 py-1 rounded-xl text-[10px] font-bold shadow-md flex items-center gap-1 backdrop-blur-xs pointer-events-auto border transition ${
+            <div className={`px-2.5 py-1 rounded-xl text-xs font-bold shadow-md flex items-center gap-1 backdrop-blur-xs pointer-events-auto border transition ${
               isWithinRadius
                 ? 'bg-brand-600/90 text-white border-brand-400/50'
                 : 'bg-rose-600/95 text-white border-rose-300 animate-pulse'
@@ -342,7 +342,7 @@ export default function MapPicker({
 
           {/* Floating Quick Hint Badge */}
           {!readOnly && (
-            <div className="bg-white/95 backdrop-blur-xs px-2.5 py-1 rounded-xl text-[10px] font-bold text-gray-700 shadow-md border border-gray-200 flex items-center gap-1 pointer-events-none ml-auto">
+            <div className="bg-white/95 backdrop-blur-xs px-2.5 py-1 rounded-xl text-xs font-bold text-gray-700 shadow-md border border-gray-200 flex items-center gap-1 pointer-events-none ml-auto">
               <span>แตะแผนที่เพื่อย้ายหมุด</span>
             </div>
           )}
@@ -352,14 +352,14 @@ export default function MapPicker({
         <button
           type="button"
           onClick={() => setIsFullScreen(true)}
-          className="absolute bottom-2 right-2 z-20 bg-slate-900/90 hover:bg-slate-900 text-white px-2.5 py-1 rounded-xl text-[10px] font-bold shadow-md flex items-center gap-1 backdrop-blur-xs transition active:scale-95"
+          className="absolute bottom-2 right-2 z-20 bg-slate-900/90 hover:bg-slate-900 text-white px-2.5 py-1 rounded-xl text-xs font-bold shadow-md flex items-center gap-1 backdrop-blur-xs transition active:scale-95"
         >
           <ZoomIn className="w-3 h-3 text-brand-400" />
           <span>ซูมปักหมุดแบบขยายใหญ่</span>
         </button>
 
         {/* Coordinates Display */}
-        <div className="absolute bottom-2 left-2 z-20 bg-white/90 backdrop-blur-xs px-2 py-0.5 rounded-md text-[10px] text-gray-600 font-mono shadow-xs border border-gray-200 flex items-center gap-1">
+        <div className="absolute bottom-2 left-2 z-20 bg-white/90 backdrop-blur-xs px-2 py-0.5 rounded-md text-xs text-gray-600 font-mono shadow-xs border border-gray-200 flex items-center gap-1">
           <MapPin className="w-3 h-3 text-rose-500" />
           <span>{currentLat.toFixed(5)}, {currentLng.toFixed(5)}</span>
         </div>
@@ -378,7 +378,7 @@ export default function MapPicker({
                 <div className="flex items-center gap-2">
                   <h3 className="font-bold text-sm">ปักหมุดพิกัดอย่างละเอียด (ซูมได้ลึก)</h3>
                   {showRadiusCircle && (
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${
                       isWithinRadius
                         ? 'bg-brand-950 text-brand-300 border-brand-700'
                         : 'bg-rose-950 text-rose-300 border-rose-700 animate-pulse'
@@ -387,7 +387,7 @@ export default function MapPicker({
                     </span>
                   )}
                 </div>
-                <p className="text-[10px] text-gray-400">แตะจุดที่ต้องการ หรือลากหมุดไปยังหน้าตึก/หอพักของคุณ{showRadiusCircle ? ` (วงกลมสีส้มคือรัศมี ${maxRadiusKm} กม.)` : ''}</p>
+                <p className="text-xs text-gray-400">แตะจุดที่ต้องการ หรือลากหมุดไปยังหน้าตึก/หอพักของคุณ{showRadiusCircle ? ` (วงกลมสีส้มคือรัศมี ${maxRadiusKm} กม.)` : ''}</p>
               </div>
             </div>
 
@@ -422,7 +422,7 @@ export default function MapPicker({
               <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-2xl shadow-lg border border-gray-200 text-xs font-mono font-bold text-gray-800 pointer-events-auto flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-rose-500" />
                 <span>{currentLat.toFixed(6)}, {currentLng.toFixed(6)}</span>
-                <span className="text-[10px] text-gray-400 font-sans font-normal">({formatDistance(distanceKm)})</span>
+                <span className="text-xs text-gray-400 font-sans font-normal">({formatDistance(distanceKm)})</span>
               </div>
 
               <a

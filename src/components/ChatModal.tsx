@@ -515,7 +515,7 @@ export default function ChatModal({
                   {currentUser.role === 'merchant' ? customerName : shopName}
                 </h3>
                 {currentUser.role === 'admin' && (
-                  <span className="bg-rose-500 text-[10px] font-bold px-1.5 py-0.5 rounded text-white flex items-center gap-0.5">
+                  <span className="bg-rose-500 text-xs font-bold px-1.5 py-0.5 rounded text-white flex items-center gap-0.5">
                     <ShieldCheck className="w-3 h-3" /> แอดมินตรวจสอบ
                   </span>
                 )}
@@ -538,14 +538,14 @@ export default function ChatModal({
         <div className="bg-brand-50 border-b border-brand-200 px-3.5 py-2 flex items-center justify-between text-xs text-brand-950 shrink-0 shadow-2xs">
           <div className="flex items-center gap-2 min-w-0">
             <CreditCard className="w-4 h-4 text-brand-600 shrink-0" />
-            <span className="truncate text-[11px] font-medium">
+            <span className="truncate text-xs font-medium">
               {currentUser.role === 'merchant'
                 ? 'กดปุ่ม "ส่ง QR รับเงิน" ด้านล่าง เพื่อส่งยอดและบัญชีให้ลูกค้าโอนจ่าย'
                 : 'โอนชำระเงินกับร้านค้า & ส่งสลิปในแชทนี้ ร้านจะเริ่มปรุงอาหารเมื่อได้รับยอดครับ'}
             </span>
           </div>
           {liveOrderTotal && (
-            <span className="font-black text-brand-700 bg-white px-2 py-0.5 rounded-md border border-brand-300 text-[11px] shrink-0 ml-2 shadow-2xs">
+            <span className="font-black text-brand-700 bg-white px-2 py-0.5 rounded-md border border-brand-300 text-xs shrink-0 ml-2 shadow-2xs">
               ฿{liveOrderTotal}
             </span>
           )}
@@ -560,7 +560,7 @@ export default function ChatModal({
             if (isAdmin && msg.sender_uid === 'system') {
               return (
                 <div key={msg.id} className="text-center my-2">
-                  <span className="text-[11px] leading-relaxed bg-brand-100/90 text-brand-900 px-3.5 py-1.5 rounded-2xl border border-brand-200 inline-block max-w-[90%] shadow-2xs">
+                  <span className="text-xs leading-relaxed bg-brand-100/90 text-brand-900 px-3.5 py-1.5 rounded-2xl border border-brand-200 inline-block max-w-[90%] shadow-2xs">
                     {msg.text}
                   </span>
                 </div>
@@ -574,7 +574,7 @@ export default function ChatModal({
               >
                 {/* Sender badge */}
                 {!isMe && (
-                  <div className="flex items-center gap-1.5 mb-1 text-[11px] text-gray-500">
+                  <div className="flex items-center gap-1.5 mb-1 text-xs text-gray-500">
                     {msg.sender_avatar ? (
                       <div className="w-4 h-4 rounded-full overflow-hidden border border-gray-300 shrink-0 bg-slate-200">
                         <UserAvatar src={msg.sender_avatar} alt={msg.sender_name} />
@@ -587,7 +587,7 @@ export default function ChatModal({
                       <User className="w-3.5 h-3.5 text-blue-500 shrink-0" />
                     )}
                     <span className="font-semibold text-gray-700">{msg.sender_name}</span>
-                    <span className="text-[10px] px-1 py-0.5 rounded bg-gray-200 text-gray-600">
+                    <span className="text-xs px-1 py-0.5 rounded bg-gray-200 text-gray-600">
                       {msg.sender_role === 'merchant' ? 'ร้านค้า' : msg.sender_role === 'admin' ? 'แอดมิน' : 'ลูกค้า'}
                     </span>
                   </div>
@@ -658,7 +658,7 @@ export default function ChatModal({
                           <button
                             type="button"
                             onClick={() => handleCopyText(accMatch[1].replace(/[^0-9]/g, ''), `acc_${msg.id}`)}
-                            className={`text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-2xs flex items-center gap-1 transition active:scale-95 border ${
+                            className={`text-xs font-bold px-2.5 py-1 rounded-lg shadow-2xs flex items-center gap-1 transition active:scale-95 border ${
                               isMe
                                 ? 'bg-brand-600 hover:bg-brand-700 text-white border-brand-400'
                                 : 'bg-brand-50 hover:bg-brand-100 text-brand-800 border-brand-200'
@@ -672,7 +672,7 @@ export default function ChatModal({
                           <button
                             type="button"
                             onClick={() => handleCopyText(ppMatch[1].replace(/[^0-9]/g, ''), `pp_${msg.id}`)}
-                            className={`text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-2xs flex items-center gap-1 transition active:scale-95 border ${
+                            className={`text-xs font-bold px-2.5 py-1 rounded-lg shadow-2xs flex items-center gap-1 transition active:scale-95 border ${
                               isMe
                                 ? 'bg-brand-600 hover:bg-brand-700 text-white border-brand-400'
                                 : 'bg-brand-50 hover:bg-brand-100 text-brand-800 border-brand-200'
@@ -688,7 +688,7 @@ export default function ChatModal({
                 </div>
 
                 {/* Timestamp & Status */}
-                <div className="text-[10px] text-gray-400 mt-0.5 px-1 flex items-center gap-1.5">
+                <div className="text-xs text-gray-400 mt-0.5 px-1 flex items-center gap-1.5">
                   <span className="flex items-center gap-1">
                     <Clock className="w-2.5 h-2.5" />
                     {msg.created_at}
@@ -717,7 +717,7 @@ export default function ChatModal({
           <div className="flex items-center justify-between gap-1.5 mb-1.5">
             <div className="flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-brand-600" />
-              <span className="text-[11px] font-semibold text-gray-500">
+              <span className="text-xs font-semibold text-gray-500">
                 {currentUser.role === 'merchant' ? 'ส่งด่วนร้านค้า:' : 'ตัวช่วยด่วนลูกค้า:'}
               </span>
             </div>
@@ -768,7 +768,7 @@ export default function ChatModal({
                 <p className="text-xs font-bold text-brand-900 flex items-center gap-1">
                   <ImageIcon className="w-3.5 h-3.5" /> แนบรูปภาพแล้ว
                 </p>
-                <p className="text-[11px] text-brand-700">สามารถพิมพ์ข้อความกำกับ หรือกดส่งรูปได้ทันทีครับ</p>
+                <p className="text-xs text-brand-700">สามารถพิมพ์ข้อความกำกับ หรือกดส่งรูปได้ทันทีครับ</p>
               </div>
             </div>
             <button
@@ -822,7 +822,7 @@ export default function ChatModal({
             }
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            className="flex-1 px-4 py-2.5 bg-gray-100 rounded-2xl text-sm focus:outline-hidden focus:ring-2 focus:ring-brand-500 border border-transparent"
+            className="flex-1 min-w-0 px-4 py-2.5 bg-gray-100 rounded-2xl text-sm focus:outline-hidden focus:ring-2 focus:ring-brand-500 border border-transparent"
           />
 
           <button

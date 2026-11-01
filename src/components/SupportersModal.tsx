@@ -52,13 +52,13 @@ export default function SupportersModal({ supporters, onDonate, onClose }: Suppo
               <div className="px-3 pt-2 divide-y divide-gray-100">
                 {supporters.map((s, idx) => (
                   <button key={s.key} onClick={() => setSelected(s)} className="w-full flex items-center gap-3 py-2.5 text-left">
-                    <span className="w-6 h-6 rounded-full bg-[#E1F5EE] text-[#0F6E56] text-[11px] font-black flex items-center justify-center shrink-0">{idx + 1}</span>
+                    <span className="w-6 h-6 rounded-full bg-[#E1F5EE] text-[#0F6E56] text-xs font-black flex items-center justify-center shrink-0">{idx + 1}</span>
                     <div className="w-10 h-10 rounded-full overflow-hidden bg-brand-50 shrink-0">
                       <UserAvatar src={s.avatar_url} alt={s.display_name} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-gray-900 truncate">{s.display_name}</p>
-                      <p className="text-[11px] text-gray-400">สนับสนุน {s.count} ครั้ง</p>
+                      <p className="text-xs text-gray-400">สนับสนุน {s.count} ครั้ง</p>
                     </div>
                     <span className="text-sm font-black text-brand-700">{amountLabel(s)}</span>
                   </button>

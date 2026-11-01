@@ -89,7 +89,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
         {/* 1. Customer Section (LINE & Google Login) */}
         <div className="mt-4 space-y-2.5">
           <div className="text-center">
-            <span className="inline-block px-2.5 py-0.5 bg-brand-50 text-brand-700 font-bold text-[11px] rounded-full border border-brand-200">
+            <span className="inline-block px-2.5 py-0.5 bg-brand-50 text-brand-700 font-bold text-xs rounded-full border border-brand-200">
               สำหรับลูกค้าสั่งอาหาร
             </span>
             <p className="text-xs text-gray-500 mt-1">เลือกเข้าสู่ระบบด้วย LINE หรือ Google ได้ทันที</p>
@@ -172,7 +172,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
           <div className="bg-brand-50/70 border border-brand-100 rounded-2xl p-2.5 text-left transition-all">
             <div className="flex items-start gap-2 mb-2">
               <Smartphone className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
-              <div className="flex-1 text-[11px] text-gray-600 leading-relaxed">
+              <div className="flex-1 text-xs text-gray-600 leading-relaxed">
                 <p className="font-bold text-brand-800">ทริค: ไม่ต้องจำรหัสผ่าน</p>
                 <p className="mt-0.5">
                   เมื่อหน้า LINE ขึ้นมา ให้เลื่อนลงล่างสุด แล้วกดปุ่ม{' '}
@@ -194,11 +194,11 @@ export default function AuthModal({ onClose }: AuthModalProps) {
                 className="w-full h-auto max-h-56 object-contain rounded-lg group-hover:opacity-95 transition"
               />
               <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition flex items-center justify-center rounded-xl">
-                <span className="bg-black/70 text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                <span className="bg-black/70 text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
                   <ZoomIn className="w-3 h-3" /> แตะเพื่อดูรูปขยาย
                 </span>
               </div>
-              <p className="text-[10px] text-center text-gray-400 mt-1 font-medium">
+              <p className="text-xs text-center text-gray-400 mt-1 font-medium">
                 แตะที่รูปเพื่อดูรูปภาพขนาดเต็ม
               </p>
             </div>
@@ -217,7 +217,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
             </span>
             <ArrowRight className="w-4 h-4 text-brand-500" />
           </a>
-          <p className="text-[11px] text-gray-400 text-center mt-1.5">
+          <p className="text-xs text-gray-400 text-center mt-1.5">
             ร้านค้าและแอดมินเข้าสู่ระบบด้วย LINE หรือ Google ด้านบนได้เลย
           </p>
         </div>
@@ -227,7 +227,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
           <button
             type="button"
             onClick={() => setShowTerms(true)}
-            className="text-[11px] text-brand-600 hover:text-brand-700 underline font-semibold cursor-pointer"
+            className="text-xs text-brand-600 hover:text-brand-700 underline font-semibold cursor-pointer"
           >
             ข้อกำหนดการใช้บริการ
           </button>
@@ -278,7 +278,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
               <p className="text-xs font-bold text-brand-800">
                 เลื่อนลงล่างสุด แล้วกดปุ่มในวงกลมสีแดง
               </p>
-              <p className="text-[11px] text-gray-600 mt-0.5">
+              <p className="text-xs text-gray-600 mt-0.5">
                 "เข้าสู่ระบบด้วยแอป LINE" เพื่อเข้าใช้งานทันที
               </p>
             </div>

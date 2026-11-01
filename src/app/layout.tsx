@@ -3,6 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import AppUpdateNotice from "@/components/AppUpdateNotice";
+import { FONT_SCALE_BOOT_SCRIPT } from "@/lib/fontScale";
 
 export const viewport: Viewport = {
   themeColor: "#E1F5EE",
@@ -39,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th">
+    <html lang="th" suppressHydrationWarning>
       <head>
         <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
         <meta httpEquiv="Pragma" content="no-cache" />
@@ -47,6 +48,7 @@ export default function RootLayout({
         <link rel="icon" type="image/x-icon" href="/favicon.ico?v=9" />
         <link rel="shortcut icon" href="/favicon.ico?v=9" />
         <link rel="apple-touch-icon" href="/apple-icon.png?v=9" />
+        <script dangerouslySetInnerHTML={{ __html: FONT_SCALE_BOOT_SCRIPT }} />
       </head>
       <body className="bg-slate-50 text-gray-800 antialiased font-sans">
         <AuthProvider>

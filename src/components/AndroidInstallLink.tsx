@@ -46,7 +46,7 @@ export default function AndroidInstallLink({ variant }: { variant: Variant }) {
       </span>
       <span className="min-w-0 flex-1 text-left">
         <span className="block text-xs font-black text-[#04342C]">ติดตั้งแอปเพื่อไม่พลาดออเดอร์</span>
-        <span className="block text-[11px] text-[#0F6E56]">มีเสียงแจ้งเตือนแม้ปิดหน้าจอ และนำทางส่งอาหารได้</span>
+        <span className="block text-xs text-[#0F6E56]">มีเสียงแจ้งเตือนแม้ปิดหน้าจอ และนำทางส่งอาหารได้</span>
       </span>
       <Download className="w-4 h-4 text-[#0F6E56] shrink-0" />
     </a>

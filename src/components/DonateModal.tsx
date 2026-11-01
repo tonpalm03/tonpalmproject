@@ -167,7 +167,7 @@ export default function DonateModal({ settings, user, onRequireLogin, onClose }:
 
         {step === 'qr' && (
           <div className="px-4 pt-4 pb-5 space-y-3">
-            <div className="space-y-2 text-[13px] text-gray-600 leading-relaxed">
+            <div className="space-y-2 text-[0.8125rem] text-gray-600 leading-relaxed">
               <p>CPRUFood ตั้งใจทำขึ้นมาเพื่อร้านค้า คนในชุมชน และนักศึกษารอบ มรภ.ชัยภูมิ แอปไม่หักค่าธรรมเนียมใดๆ ทั้งจากร้านและลูกค้า เราเป็นแค่ตัวกลางให้ลูกค้ากับร้านได้เจอกัน</p>
               <p>แต่ถ้าวันหนึ่งมีคนใช้มากขึ้น ค่าดูแลเซิร์ฟเวอร์ก็จะมากขึ้นตามไปด้วย จนเราอาจแบกไว้ไม่ไหว จึงเปิดช่องทางนี้ไว้สำหรับผู้ใจดีที่อยากช่วยให้แอปอยู่ต่อไปได้ ทุกบาทจะใช้ดูแลระบบให้ทุกคนได้ใช้งานต่อไปครับ</p>
             </div>
@@ -206,7 +206,7 @@ export default function DonateModal({ settings, user, onRequireLogin, onClose }:
               </div>
             )}
 
-            <p className="text-[11px] text-gray-500 text-center">โอนแล้วกด &ldquo;แจ้งโอน&rdquo; พร้อมแนบสลิป ชื่อของคุณจะขึ้นในรายชื่อผู้ใจดี</p>
+            <p className="text-xs text-gray-500 text-center">โอนแล้วกด &ldquo;แจ้งโอน&rdquo; พร้อมแนบสลิป ชื่อของคุณจะขึ้นในรายชื่อผู้ใจดี</p>
             <button onClick={goToForm} className="w-full bg-brand-600 text-white rounded-2xl py-3 font-black shadow-[0_6px_16px_-6px_rgba(15,110,86,0.45)] active:scale-95 transition">
               แจ้งโอน
             </button>

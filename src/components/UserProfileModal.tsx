@@ -7,6 +7,7 @@ import {
 import { useAuth } from '@/context/AuthContext';
 import ImageCropModal from './ImageCropModal';
 import MapPicker from './MapPicker';
+import { DEFAULT_CAMPUS_LOCATION } from '@/lib/geolocation';
 import TermsModal from './TermsModal';
 import ContactModal from './ContactModal';
 import UserAvatar, { getUserCode, isCustomAvatar } from './UserAvatar';
@@ -34,10 +35,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
   // Address & Map Pin State
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [defaultAddress, setDefaultAddress] = useState('');
-  const [defaultLocation, setDefaultLocation] = useState<{ lat: number; lng: number }>({
-    lat: 15.8272,
-    lng: 102.0298,
-  });
+  const [defaultLocation, setDefaultLocation] = useState<{ lat: number; lng: number }>(DEFAULT_CAMPUS_LOCATION);
   const [isSavingAddress, setIsSavingAddress] = useState(false);
 
   // Profile Image Cropping state
@@ -455,6 +453,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                       onChange={setDefaultLocation}
                       title="หมุดที่อยู่ประจำของคุณ"
                       showRadiusCircle={false}
+                      autoLocate={!user.default_location}
                     />
                   </div>
 

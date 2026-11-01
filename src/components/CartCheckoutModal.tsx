@@ -69,7 +69,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
       const draft = sessionStorage.getItem('hchk_checkout_draft');
       if (draft && JSON.parse(draft).location) return JSON.parse(draft).location;
     } catch (_) {}
-    return user?.default_location || { lat: 15.8272, lng: 102.0298 };
+    return user?.default_location || DEFAULT_CAMPUS_LOCATION;
   });
   const [addressMode, setAddressMode] = useState<'profile' | 'current' | 'custom'>(() => {
     try {

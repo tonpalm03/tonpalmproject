@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import MerchantDashboard from '@/components/MerchantDashboard';
-import { LogOut, ChefHat, AlertCircle, FileText, Home } from 'lucide-react';
+import { LogOut, AlertCircle, FileText, Home } from 'lucide-react';
+import WavePattern from '@/components/WavePattern';
 import { soundAlert } from '@/lib/soundAlert';
 import TermsModal from '@/components/TermsModal';
 import MerchantApplicationPanel from '@/components/MerchantApplicationPanel';
@@ -34,9 +35,7 @@ export default function MerchantAppPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4 text-white">
-        <div className="w-16 h-16 rounded-3xl bg-brand-500/20 flex items-center justify-center animate-bounce mb-4">
-          <ChefHat className="w-8 h-8 text-brand-500" />
-        </div>
+        <img src="/mascots/bg/merchant.webp" alt="น้องพุงเด้ง" className="w-28 animate-bounce mb-4 select-none" />
         <p className="text-sm font-bold text-gray-300 animate-pulse">กำลังโหลดระบบร้านค้า...</p>
       </div>
     );
@@ -50,11 +49,9 @@ export default function MerchantAppPage() {
           
           {/* Header */}
           <div className="text-center space-y-2">
-            <div
-              style={{ backgroundColor: '#1D9E75' }}
-              className="w-16 h-16 rounded-2xl bg-brand-500 bg-gradient-to-tr from-brand-500 to-brand-500 text-white flex items-center justify-center mx-auto shadow-lg shadow-brand-500/30"
-            >
-              <ChefHat className="w-8 h-8 text-white" />
+            <div className="relative overflow-hidden isolate -mx-6 -mt-6 sm:-mx-8 sm:-mt-8 mb-1 rounded-t-3xl bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] pt-5 pb-1">
+              <WavePattern className="text-white/90 -z-10" />
+              <img src="/mascots/bg/merchant.webp" alt="น้องพุงเด้งในชุดเชฟ" className="w-36 mx-auto select-none drop-shadow-sm" />
             </div>
             <h1 className="text-xl font-black text-gray-900">
               CPRUFood
@@ -170,9 +167,7 @@ export default function MerchantAppPage() {
       <header className="bg-slate-900 text-white sticky top-0 z-30 shadow-md border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-brand-500 flex items-center justify-center shadow-sm">
-              <ChefHat className="w-4 h-4 text-white" />
-            </div>
+            <img src="/logo.png?v=9" alt="CPRUFood" className="w-8 h-8 object-contain" />
             <div>
               <h2 className="text-xs font-black text-white leading-none">CPRUFood</h2>
               <p className="text-[10px] text-brand-400 font-semibold mt-0.5">

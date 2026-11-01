@@ -21,6 +21,8 @@ interface MapPickerProps {
   maxRadiusKm?: number;
   showRadiusCircle?: boolean;
   onRadiusStatusChange?: (isValid: boolean, distanceKm: number) => void;
+  /** Ask for the device's GPS position once when the map opens, for spots that have no pin yet. */
+  autoLocate?: boolean;
 }
 
 export default function MapPicker({
@@ -32,6 +34,7 @@ export default function MapPicker({
   maxRadiusKm = MAX_DELIVERY_RADIUS_KM,
   showRadiusCircle = true,
   onRadiusStatusChange,
+  autoLocate = false,
 }: MapPickerProps) {
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState('');
@@ -155,10 +158,13 @@ export default function MapPicker({
     };
   }, [defaultLat, defaultLng, maxRadiusKm, showRadiusCircle]);
 
-  // Sync Inline marker position when location prop changes
+  // Sync Inline marker position when location prop changes, and follow it if it leaves the view
   useEffect(() => {
     if (inlineMarkerRef.current && inlineMapInstanceRef.current) {
       inlineMarkerRef.current.setLatLng([currentLat, currentLng]);
+      if (!inlineMapInstanceRef.current.getBounds().contains([currentLat, currentLng])) {
+        inlineMapInstanceRef.current.setView([currentLat, currentLng], 17);
+      }
     }
   }, [currentLat, currentLng]);
 
@@ -245,8 +251,8 @@ export default function MapPicker({
     }
   }, [currentLat, currentLng]);
 
-  // High Accuracy GPS Locator
-  const handleGetLocation = async () => {
+  // High Accuracy GPS Locator. `quiet` skips error messages, for the automatic try on open.
+  const handleGetLocation = async (quiet = false) => {
     if (isLocating || readOnly) return;
     setLocationError('');
     setIsLocating(true);
@@ -256,15 +262,25 @@ export default function MapPicker({
       onChange({ lat, lng });
       inlineMapInstanceRef.current?.flyTo([lat, lng], 17, { animate: true });
       fullMapInstanceRef.current?.flyTo([lat, lng], 17, { animate: true });
-      if (showRadiusCircle && dist > maxRadiusKm) {
+      if (!quiet && showRadiusCircle && dist > maxRadiusKm) {
         setLocationError(`ตำแหน่ง GPS ของคุณ (${formatDistance(dist)}) อยู่นอกรัศมีบริการ ${maxRadiusKm} กม. กรุณาเลื่อนหมุดมาอยู่ในเขตบริการ`);
       }
     } catch (error) {
-      setLocationError(locationErrorMessage(error));
+      if (!quiet) setLocationError(locationErrorMessage(error));
     } finally {
       setIsLocating(false);
     }
   };
+
+  // Opening a map with no pin yet starts from where the person actually is.
+  const autoLocatedRef = useRef(false);
+  useEffect(() => {
+    if (!autoLocate || readOnly || autoLocatedRef.current) return;
+    autoLocatedRef.current = true;
+    handleGetLocation(true);
+    // Runs once per mount; handleGetLocation reads the latest props itself.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoLocate, readOnly]);
 
   return (
     <div className="space-y-2">
@@ -277,7 +293,7 @@ export default function MapPicker({
         <div className="flex items-center gap-1.5">
           <button
             type="button"
-            onClick={handleGetLocation}
+            onClick={() => handleGetLocation()}
             disabled={isLocating || readOnly}
             className="text-xs px-2.5 py-1 bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white rounded-xl font-bold flex items-center gap-1 shadow-xs transition active:scale-95"
             title="ดึงพิกัดตำแหน่งปัจจุบันของคุณด้วย GPS"
@@ -378,7 +394,7 @@ export default function MapPicker({
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={handleGetLocation}
+                onClick={() => handleGetLocation()}
                 disabled={isLocating || readOnly}
                 className="px-2.5 py-1.5 bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold rounded-xl flex items-center gap-1 shadow-sm transition active:scale-95"
               >

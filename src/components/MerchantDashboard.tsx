@@ -20,6 +20,8 @@ import SalesDashboard from './SalesDashboard';
 import ImageCropModal from './ImageCropModal';
 import FloatingBubbleControl from './FloatingBubbleControl';
 import MapPicker from './MapPicker';
+import DeliveryNavigator from './DeliveryNavigator';
+import { DEFAULT_CAMPUS_LOCATION } from '@/lib/geolocation';
 import { formatOrderCode } from '@/lib/orderNumber';
 import { orderItemUnitPrice } from '@/lib/orderItemPrice';
 import { soundAlert } from '@/lib/soundAlert';
@@ -238,6 +240,8 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
   const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'sales' | 'shop_info'>('orders');
   const [orderFilterTab, setOrderFilterTab] = useState<'active' | 'completed' | 'cancelled'>('active');
   const [activeChatOrder, setActiveChatOrder] = useState<Order | null>(null);
+  // The order being navigated to in the in-app map, if any.
+  const [navOrderId, setNavOrderId] = useState<string | null>(null);
   const [collapsedOrderMap, setCollapsedOrderMap] = useState<{ [id: string]: boolean }>({});
 
   const isOrderCollapsed = (order: Order) => {
@@ -353,7 +357,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
   const [editShopPromptpay, setEditShopPromptpay] = useState('');
   const [editShopPromptpayQrUrl, setEditShopPromptpayQrUrl] = useState('');
   const [editShopAllowCod, setEditShopAllowCod] = useState(false);
-  const [shopLocation, setShopLocation] = useState<{ lat: number; lng: number }>({ lat: 15.8272, lng: 102.0298 });
+  const [shopLocation, setShopLocation] = useState<{ lat: number; lng: number }>(DEFAULT_CAMPUS_LOCATION);
   const [isSavingShopInfo, setIsSavingShopInfo] = useState(false);
   const [cropTarget, setCropTarget] = useState<'menu' | 'shop_cover' | 'shop_qr'>('menu');
   const [menuCategoryFilter, setMenuCategoryFilter] = useState<'all' | 'food' | 'drink_dessert'>('all');
@@ -1087,6 +1091,25 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
 
   return (
     <div className="space-y-4">
+      {(() => {
+        const navOrder = navOrderId ? orders.find((o) => o.id === navOrderId) : null;
+        if (!navOrder?.location) return null;
+        return (
+          <DeliveryNavigator
+            destination={navOrder.location}
+            fallbackOrigin={shopLocation}
+            customerName={navOrder.customer_name}
+            customerPhone={navOrder.customer_phone}
+            address={navOrder.delivery_address}
+            onDelivered={navOrder.status === 'delivering' ? async () => {
+              if (!confirm('ยืนยันว่าส่งถึงมือลูกค้าและรับเงินเรียบร้อยแล้ว?')) return;
+              await updateOrderStatus(navOrder.id, 'completed');
+              setNavOrderId(null);
+            } : undefined}
+            onClose={() => setNavOrderId(null)}
+          />
+        );
+      })()}
       <MascotWatermark page="merchant" fixed />
       {/* Shop Status Toggle Floating Toast */}
       {statusToast && (
@@ -1747,17 +1770,26 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                           </div>
                         </div>
 
-                        {/* Google Maps 1-Click Navigation */}
+                        {/* In-app navigation, with Google Maps kept as a small fallback */}
                         {order.location && (
-                          <a
-                            href={`https://www.google.com/maps/dir/?api=1&destination=${order.location.lat},${order.location.lng}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold text-xs shadow-xs transition active:scale-95"
-                          >
-                            <Navigation className="w-3.5 h-3.5" />
-                            เปิด Google Maps นำทาง
-                          </a>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <button
+                              type="button"
+                              onClick={() => setNavOrderId(order.id)}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold text-xs shadow-xs transition active:scale-95"
+                            >
+                              <Navigation className="w-3.5 h-3.5" />
+                              นำทางไปหาลูกค้า
+                            </button>
+                            <a
+                              href={`https://www.google.com/maps/dir/?api=1&destination=${order.location.lat},${order.location.lng}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[11px] font-semibold text-gray-500 underline underline-offset-2"
+                            >
+                              เปิดใน Google Maps
+                            </a>
+                          </div>
                         )}
 
                         <div className="text-gray-500 text-[11px] pt-1">

@@ -233,6 +233,7 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
           }}
           title={shopName.trim() || 'ตำแหน่งร้านของคุณ'}
           showRadiusCircle={false}
+          autoLocate={!pinned}
         />
         {!pinned && <p className="text-[11px] text-gray-400 mt-1">แตะบนแผนที่หรือกดใช้ตำแหน่งปัจจุบันเพื่อปักหมุด</p>}
       </div>

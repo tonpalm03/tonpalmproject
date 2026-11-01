@@ -17,7 +17,8 @@ export function locationErrorMessage(error: unknown, native = Capacitor.isNative
   return 'ยังหาตำแหน่งไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อและตำแหน่งของอุปกรณ์ แล้วลองอีกครั้ง' + manual;
 }
 
-// Only called by a user's GPS button: no background location or automatic prompt.
+// Called by the GPS button, or once when a person opens a map that has no pin yet.
+// Never runs in the background.
 export async function getCurrentLocation(): Promise<{ lat: number; lng: number }> {
   if (Capacitor.isNativePlatform()) {
     if (!Capacitor.isPluginAvailable('Geolocation')) throw { code: 'APP_UPDATE_REQUIRED' };
@@ -39,8 +40,54 @@ export async function getCurrentLocation(): Promise<{ lat: number; lng: number }
   ));
 }
 
-// Platform / Campus centroid: มหาวิทยาลัยราชภัฏชัยภูมิ (มรภ.ชัยภูมิ)
-export const DEFAULT_CAMPUS_LOCATION = { lat: 15.8272, lng: 102.0298 };
+/**
+ * Follows the device position while a delivery is being navigated. Only runs while the
+ * navigation screen is open; call the returned function to stop.
+ */
+export function watchLocation(
+  onPosition: (loc: { lat: number; lng: number; heading: number | null }) => void,
+  onError: (error: unknown) => void,
+): () => void {
+  let stopped = false;
+  if (Capacitor.isNativePlatform()) {
+    let id: string | null = null;
+    (async () => {
+      try {
+        if (!Capacitor.isPluginAvailable('Geolocation')) throw { code: 'APP_UPDATE_REQUIRED' };
+        let permissions = await Geolocation.checkPermissions();
+        if (permissions.location !== 'granted' && permissions.coarseLocation !== 'granted') {
+          permissions = await Geolocation.requestPermissions({ permissions: ['location'] });
+        }
+        if (permissions.location !== 'granted' && permissions.coarseLocation !== 'granted') throw { code: 'OS-PLUG-GLOC-0003' };
+        id = await Geolocation.watchPosition({ enableHighAccuracy: true, timeout: 20000, maximumAge: 3000 }, (position, err) => {
+          if (stopped) return;
+          if (err || !position) return onError(err);
+          onPosition({ lat: position.coords.latitude, lng: position.coords.longitude, heading: position.coords.heading ?? null });
+        });
+        if (stopped && id) Geolocation.clearWatch({ id });
+      } catch (error) {
+        if (!stopped) onError(error);
+      }
+    })();
+    return () => {
+      stopped = true;
+      if (id) Geolocation.clearWatch({ id });
+    };
+  }
+  if (!navigator.geolocation) {
+    onError({ code: 'UNAVAILABLE' });
+    return () => {};
+  }
+  const id = navigator.geolocation.watchPosition(
+    position => onPosition({ lat: position.coords.latitude, lng: position.coords.longitude, heading: position.coords.heading }),
+    onError,
+    { enableHighAccuracy: true, timeout: 20000, maximumAge: 3000 },
+  );
+  return () => navigator.geolocation.clearWatch(id);
+}
+
+// Platform / Campus centroid: มหาวิทยาลัยราชภัฏชัยภูมิ (มรภ.ชัยภูมิ), from OpenStreetMap
+export const DEFAULT_CAMPUS_LOCATION = { lat: 15.9303, lng: 102.0156 };
 
 // Default delivery radius set to 1.0 kilometer (shops can customize this in settings)
 export const DEFAULT_DELIVERY_RADIUS_KM = 1.0;

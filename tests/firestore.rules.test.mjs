@@ -143,6 +143,10 @@ test('merchant applications: customers apply for themselves, only admins approve
   await deny(setDoc(doc(db('bob'), 'merchant_applications/alice'), app('alice')));
   await deny(setDoc(doc(db('bob'), 'merchant_applications/bob'), { ...app('bob'), status: 'approved' }));
   await deny(setDoc(doc(db('bob'), 'merchant_applications/bob'), { ...app('bob'), shop_id: 'a' }));
+  await deny(setDoc(doc(db('bob'), 'merchant_applications/bob'), { ...app('bob'), category: 'grocery' }));
+  await deny(setDoc(doc(db('bob'), 'merchant_applications/bob'), { ...app('bob'), location: { lat: 'x', lng: 102 } }));
+  await deny(setDoc(doc(db('bob'), 'merchant_applications/bob'), { ...app('bob'), location: { lat: 15.8, lng: 102, extra: 1 } }));
+  await allow(setDoc(doc(db('bob'), 'merchant_applications/bob'), { ...app('bob'), category: 'both', location: { lat: 15.8272, lng: 102.0298 } }));
   await deny(setDoc(doc(db('merchantA'), 'merchant_applications/merchantA'), app('merchantA')));
   await deny(setDoc(doc(db(), 'merchant_applications/guest'), app('guest')));
   await allow(getDoc(doc(db('alice'), 'merchant_applications/alice')));

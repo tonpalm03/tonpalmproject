@@ -6,7 +6,7 @@ import {
   updateDoc, deleteDoc, setDoc,
 } from 'firebase/firestore';
 import {
-  Heart, Check, X, Plus, Search, Eye, EyeOff, Trash2, Pencil, Bell, BellOff, QrCode, Save, Image as ImageIcon,
+  Heart, Check, X, Plus, Search, Eye, EyeOff, Trash2, Pencil, QrCode, Save, Image as ImageIcon,
 } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { Donation, DonationRequest, SystemSettings, UserProfile } from '@/types';
@@ -27,7 +27,6 @@ export default function DonationsAdmin({ users }: DonationsAdminProps) {
   const [requests, setRequests] = useState<DonationRequest[]>([]);
   const [donations, setDonations] = useState<Donation[]>([]);
   const [amountEdits, setAmountEdits] = useState<Record<string, string>>({});
-  const [notifyOnApprove, setNotifyOnApprove] = useState(true);
   const [slipPreview, setSlipPreview] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
@@ -62,7 +61,7 @@ export default function DonationsAdmin({ users }: DonationsAdminProps) {
         avatar_url: r.is_anonymous ? MASCOT_AVATAR : (r.avatar_url || ''),
         amount: r.hide_amount ? null : amount,
         message: r.message || '',
-        notify: notifyOnApprove,
+        notify: false,
         source: 'request',
         request_id: r.id,
         created_at: serverTimestamp(),
@@ -109,18 +108,9 @@ export default function DonationsAdmin({ users }: DonationsAdminProps) {
 
       {/* Pending slip reviews */}
       <section className="bg-pink-50/70 border border-pink-200 rounded-2xl p-3 space-y-2">
-        <div className="flex items-center justify-between gap-2">
-          <h3 className="font-black text-sm text-pink-900 flex items-center gap-1.5">
-            <Heart className="w-4 h-4 text-pink-500" /> รอตรวจ donate ({requests.length})
-          </h3>
-          <button
-            onClick={() => setNotifyOnApprove(v => !v)}
-            className={`text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 border ${notifyOnApprove ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-500 border-gray-200'}`}
-          >
-            {notifyOnApprove ? <Bell className="w-3 h-3" /> : <BellOff className="w-3 h-3" />}
-            {notifyOnApprove ? 'เด้งแจ้งเตือนเมื่ออนุมัติ' : 'ไม่เด้งแจ้งเตือน'}
-          </button>
-        </div>
+        <h3 className="font-black text-sm text-pink-900 flex items-center gap-1.5">
+          <Heart className="w-4 h-4 text-pink-500" /> รอตรวจ donate ({requests.length})
+        </h3>
         {requests.length === 0 && <p className="text-xs text-gray-500 py-2 text-center">ไม่มีรายการรอตรวจ</p>}
         {requests.map(r => (
           <div key={r.id} className="bg-white rounded-xl p-3 border border-pink-100 flex gap-3">
@@ -309,7 +299,6 @@ function DonationEditor({ users, donation, onClose }: { users: UserProfile[]; do
   const [message, setMessage] = useState(donation?.message ?? '');
   const [anonymous, setAnonymous] = useState(donation?.supporter_key.startsWith('anon:') ?? false);
   const [hideAmount, setHideAmount] = useState(donation ? donation.amount === null : false);
-  const [notify, setNotify] = useState(!isEdit);
   const [saving, setSaving] = useState(false);
 
   const matches = useMemo(() => {
@@ -340,7 +329,7 @@ function DonationEditor({ users, donation, onClose }: { users: UserProfile[]; do
           avatar_url: anonymous || !selectedUser ? MASCOT_AVATAR : (selectedUser.picture_url || ''),
           amount: hideAmount ? null : value,
           message: message.trim(),
-          notify,
+          notify: false,
           source: 'admin',
           created_at: serverTimestamp(),
         });
@@ -395,7 +384,6 @@ function DonationEditor({ users, donation, onClose }: { users: UserProfile[]; do
         <div className="grid grid-cols-1 gap-1.5 text-sm">
           {!isEdit && <Toggle label="ไม่ระบุชื่อ (แสดงเป็น ผู้ใจดี)" value={anonymous} onChange={setAnonymous} />}
           <Toggle label="ซ่อนยอดเงิน" value={hideAmount} onChange={setHideAmount} />
-          {!isEdit && <Toggle label="เด้งแจ้งเตือนบนหน้าแอป" value={notify} onChange={setNotify} />}
         </div>
 
         <button disabled={saving} onClick={save} className="w-full bg-brand-600 text-white rounded-xl py-2.5 font-bold disabled:opacity-50">

@@ -7,7 +7,7 @@ import {
   Camera, MapPin, Star, Power, Edit3, Download, Navigation, FileSpreadsheet, Check, Bike, ChefHat, Plus, Edit2, Scissors,
   Key, Lock, Copy, EyeOff, Settings, ArrowRight, User, RefreshCw, Sparkles, Coffee, Utensils, Percent, Wallet, FileText, Heart
 } from 'lucide-react';
-import { UserProfile, Order, UserRole, Shop, MenuItem, MenuItemOption } from '@/types';
+import { UserProfile, Order, UserRole, Shop, MenuItem, MenuItemOption, ShopCategory } from '@/types';
 import { db, functions } from '@/lib/firebase';
 import {
   collection, onSnapshot, doc, updateDoc, setDoc, deleteDoc, getDocs, serverTimestamp, writeBatch, query, where, orderBy, limit, runTransaction, Transaction
@@ -88,7 +88,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
   const [editShopPhone, setEditShopPhone] = useState('');
   const [editShopPromptpay, setEditShopPromptpay] = useState('');
   const [editShopAddress, setEditShopAddress] = useState('');
-  const [editShopCategory, setEditShopCategory] = useState<'food' | 'drink_dessert'>('food');
+  const [editShopCategory, setEditShopCategory] = useState<ShopCategory>('food');
   const [editShopDeliveryFee, setEditShopDeliveryFee] = useState<string>('0');
   const [isSavingShopDetails, setIsSavingShopDetails] = useState(false);
 
@@ -2262,6 +2262,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                 >
                   <option value="food">อาหารจานเดียว / กับข้าว</option>
                   <option value="drink_dessert">เครื่องดื่ม & ของหวาน</option>
+                  <option value="both">อาหาร + เครื่องดื่ม & ของหวาน</option>
                 </select>
               </div>
 

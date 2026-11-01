@@ -58,14 +58,6 @@ export function aggregateSupporters(donations: Donation[]): Supporter[] {
 
 export const formatBaht = (n: number) => `฿${n.toLocaleString('th-TH', { maximumFractionDigits: 2 })}`;
 
-/** Popup effect level by amount: 0 plain, 1 confetti, 2 big + scooter, 3 gold. */
-export function donationLevel(amount: number | null): 0 | 1 | 2 | 3 {
-  if (amount === null) return 1;
-  if (amount >= 1000) return 3;
-  if (amount >= 500) return 2;
-  if (amount >= 100) return 1;
-  return 0;
-}
 
 /** Compresses a slip photo to a JPEG data URL small enough for a Firestore field. */
 export function compressSlip(file: File, maxDim = 900): Promise<string> {

@@ -2,9 +2,17 @@
 
 import React, { useEffect, useState } from 'react';
 import { doc, onSnapshot, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
-import { Store, Clock, XCircle, Send, AlertCircle } from 'lucide-react';
+import { Store, Clock, XCircle, Send, AlertCircle, Check } from 'lucide-react';
 import { db } from '@/lib/firebase';
-import { MerchantApplication, UserProfile } from '@/types';
+import { MerchantApplication, ShopCategory, UserProfile } from '@/types';
+import { DEFAULT_CAMPUS_LOCATION } from '@/lib/geolocation';
+import MapPicker from './MapPicker';
+
+type MenuKind = 'food' | 'drink_dessert';
+
+function kindsOf(category: ShopCategory): MenuKind[] {
+  return category === 'both' ? ['food', 'drink_dessert'] : [category];
+}
 
 interface MerchantApplicationPanelProps {
   user: UserProfile;
@@ -16,7 +24,9 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
   const [editing, setEditing] = useState(false);
   const [shopName, setShopName] = useState('');
   const [phone, setPhone] = useState(user.phone || '');
-  const [category, setCategory] = useState<'food' | 'drink_dessert'>('food');
+  const [kinds, setKinds] = useState<MenuKind[]>(['food']);
+  const [location, setLocation] = useState(DEFAULT_CAMPUS_LOCATION);
+  const [pinned, setPinned] = useState(false);
   const [address, setAddress] = useState('');
   const [note, setNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -31,7 +41,11 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
         if (data) {
           setShopName(data.shop_name);
           setPhone(data.phone);
-          setCategory(data.category);
+          setKinds(kindsOf(data.category));
+          if (data.location) {
+            setLocation(data.location);
+            setPinned(true);
+          }
           setAddress(data.address_detail || '');
           setNote(data.note || '');
         }
@@ -50,6 +64,9 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
     const cleanPhone = phone.replace(/\D/g, '');
     if (!shopName.trim()) return setError('กรุณากรอกชื่อร้าน');
     if (cleanPhone.length < 9 || cleanPhone.length > 10) return setError('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง');
+    if (kinds.length === 0) return setError('กรุณาเลือกประเภทร้านอย่างน้อย 1 อย่าง');
+    if (!pinned) return setError('กรุณาปักหมุดตำแหน่งร้านบนแผนที่');
+    const category: ShopCategory = kinds.length === 2 ? 'both' : kinds[0];
 
     setSubmitting(true);
     try {
@@ -60,6 +77,7 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
         phone: cleanPhone,
         category,
         address_detail: address.trim().slice(0, 300),
+        location: { lat: location.lat, lng: location.lng },
         note: note.trim().slice(0, 500),
         status: 'pending',
         created_at: application?.created_at ?? serverTimestamp(),
@@ -171,7 +189,7 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
       </div>
 
       <div>
-        <label className="text-xs font-bold text-gray-700 block mb-1">ประเภทร้าน *</label>
+        <label className="text-xs font-bold text-gray-700 block mb-1">ประเภทร้าน * <span className="font-medium text-gray-400">(เลือกได้ทั้งสองอย่าง)</span></label>
         <div className="grid grid-cols-2 gap-2">
           {([
             ['food', 'อาหาร'],
@@ -180,11 +198,13 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
             <button
               key={value}
               type="button"
-              onClick={() => setCategory(value)}
-              className={`py-2 rounded-xl text-xs font-bold border transition ${
-                category === value ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+              aria-pressed={kinds.includes(value)}
+              onClick={() => setKinds((prev) => (prev.includes(value) ? prev.filter((k) => k !== value) : [...prev, value]))}
+              className={`py-2 rounded-xl text-xs font-bold border transition flex items-center justify-center gap-1 ${
+                kinds.includes(value) ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
               }`}
             >
+              {kinds.includes(value) && <Check className="w-3.5 h-3.5" />}
               {label}
             </button>
           ))}
@@ -201,6 +221,20 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
           onChange={(e) => setAddress(e.target.value)}
           className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-hidden focus:ring-2 focus:ring-brand-500"
         />
+      </div>
+
+      <div>
+        <label className="text-xs font-bold text-gray-700 block mb-1">ปักหมุดตำแหน่งร้าน *</label>
+        <MapPicker
+          location={location}
+          onChange={(loc) => {
+            setLocation(loc);
+            setPinned(true);
+          }}
+          title={shopName.trim() || 'ตำแหน่งร้านของคุณ'}
+          showRadiusCircle={false}
+        />
+        {!pinned && <p className="text-[11px] text-gray-400 mt-1">แตะบนแผนที่หรือกดใช้ตำแหน่งปัจจุบันเพื่อปักหมุด</p>}
       </div>
 
       <div>

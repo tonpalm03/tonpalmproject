@@ -80,7 +80,7 @@ export default function MerchantApplicationsAdmin({ users, currentUser }: Mercha
                 <p className="font-bold text-sm text-gray-900 truncate">{app.shop_name}</p>
                 <p className="text-gray-500">
                   ผู้สมัคร: {applicant?.display_name || app.applicant_name}
-                  {app.category === 'drink_dessert' ? ' • เครื่องดื่ม/ของหวาน' : ' • อาหาร'}
+                  {app.category === 'both' ? ' • อาหาร + เครื่องดื่ม/ของหวาน' : app.category === 'drink_dessert' ? ' • เครื่องดื่ม/ของหวาน' : ' • อาหาร'}
                 </p>
               </div>
               {app.created_at?.toDate && (

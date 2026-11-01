@@ -36,13 +36,15 @@ service cloud.firestore {
   match /admins/{id} { allow read, write: if admin(); }
   function validApplication(uid) {
    let d = request.resource.data;
-   return d.keys().hasOnly(['uid','applicant_name','shop_name','phone','category','address_detail','note','status','created_at','updated_at'])
+   return d.keys().hasOnly(['uid','applicant_name','shop_name','phone','category','address_detail','location','note','status','created_at','updated_at'])
     && d.keys().hasAll(['uid','applicant_name','shop_name','phone','category','status','created_at','updated_at'])
     && d.uid == uid && d.status == 'pending' && d.updated_at == request.time
     && d.applicant_name is string && d.applicant_name.size() <= 100
     && d.shop_name is string && d.shop_name.size() > 0 && d.shop_name.size() <= 80
     && d.phone is string && d.phone.size() >= 9 && d.phone.size() <= 15
-    && d.category in ['food', 'drink_dessert']
+    && d.category in ['food', 'drink_dessert', 'both']
+    && (!('location' in d) || (d.location is map && d.location.keys().hasOnly(['lat','lng'])
+      && d.location.lat is number && d.location.lng is number))
     && (!('address_detail' in d) || (d.address_detail is string && d.address_detail.size() <= 300))
     && (!('note' in d) || (d.note is string && d.note.size() <= 500));
   }

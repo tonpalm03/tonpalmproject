@@ -17,13 +17,17 @@ export interface UserProfile {
   created_at?: any;
 }
 
+/** A shop can sell food, drinks/desserts, or both. */
+export type ShopCategory = 'food' | 'drink_dessert' | 'both';
+
 export interface MerchantApplication {
   uid: string;
   applicant_name: string;
   shop_name: string;
   phone: string;
-  category: 'food' | 'drink_dessert';
+  category: ShopCategory;
   address_detail?: string;
+  location?: { lat: number; lng: number };
   note?: string;
   status: 'pending' | 'approved' | 'rejected';
   reject_reason?: string;
@@ -52,7 +56,7 @@ export interface Shop {
     lat: number;
     lng: number;
   };
-  category?: 'food' | 'drink_dessert';
+  category?: ShopCategory;
   rating?: number; // e.g. 4.9
   review_count?: number; // e.g. 18
   sales_count?: number; // total orders sold
@@ -206,7 +210,7 @@ export interface Donation {
   amount: number | null; // null when the donor hid the amount
   message: string;
   message_hidden?: boolean;
-  notify: boolean; // show the stream-style popup
+  notify: boolean; // legacy: the on-screen popup was removed; always false now
   source: 'request' | 'admin';
   request_id?: string;
   created_at?: any;

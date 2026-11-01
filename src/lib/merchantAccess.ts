@@ -1,14 +1,15 @@
 import { doc, collection, writeBatch, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { MerchantApplication, Shop, UserProfile } from '@/types';
+import { MerchantApplication, Shop, ShopCategory, UserProfile } from '@/types';
 
 const DEFAULT_SHOP_IMAGE = 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&auto=format&fit=crop&q=80';
 
 export interface NewShopInput {
   name: string;
   phone?: string;
-  category?: 'food' | 'drink_dessert';
+  category?: ShopCategory;
   address_detail?: string;
+  location?: { lat: number; lng: number };
 }
 
 function buildNewShop(shopId: string, ownerUid: string, input: NewShopInput) {
@@ -17,8 +18,9 @@ function buildNewShop(shopId: string, ownerUid: string, input: NewShopInput) {
     owner_uid: ownerUid,
     name: input.name.trim(),
     phone: (input.phone || '').trim(),
-    category: input.category === 'drink_dessert' ? 'drink_dessert' : 'food',
+    category: input.category === 'drink_dessert' || input.category === 'both' ? input.category : 'food',
     address_detail: (input.address_detail || '').trim() || 'รอบ มรภ. ชัยภูมิ',
+    ...(input.location ? { location: { lat: input.location.lat, lng: input.location.lng } } : {}),
     delivery_fee: 0,
     // New shops start closed so the owner can set up menus and payment first.
     is_open: false,
@@ -52,7 +54,7 @@ export async function grantMerchant(user: UserProfile, input: NewShopInput, appl
 export async function approveApplication(app: MerchantApplication, applicant: UserProfile, adminUid: string) {
   return grantMerchant(
     applicant,
-    { name: app.shop_name, phone: app.phone, category: app.category, address_detail: app.address_detail },
+    { name: app.shop_name, phone: app.phone, category: app.category, address_detail: app.address_detail, location: app.location },
     { reviewedBy: adminUid }
   );
 }

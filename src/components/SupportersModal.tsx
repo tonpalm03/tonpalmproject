@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Heart, ArrowLeft, Crown } from 'lucide-react';
+import { X, Heart, ArrowLeft } from 'lucide-react';
 import { Supporter, formatBaht, toMillis } from '@/lib/donations';
 import { formatThaiDateWithTime } from '@/lib/dateUtils';
 import UserAvatar from './UserAvatar';
@@ -16,19 +16,9 @@ interface SupportersModalProps {
 const amountLabel = (s: Supporter) =>
   s.total > 0 ? formatBaht(s.total) : 'ไม่แสดงยอด';
 
-const PODIUM = [
-  { ring: 'ring-brand-400', badge: 'bg-brand-400', size: 'w-20 h-20' },
-  { ring: 'ring-slate-300', badge: 'bg-slate-400', size: 'w-16 h-16' },
-  { ring: 'ring-brand-300', badge: 'bg-brand-400', size: 'w-16 h-16' },
-];
-
 export default function SupportersModal({ supporters, onDonate, onClose }: SupportersModalProps) {
   const [selected, setSelected] = useState<Supporter | null>(null);
   const grandTotal = supporters.reduce((sum, s) => sum + s.total, 0);
-  const top = supporters.slice(0, 3);
-  const rest = supporters.slice(3);
-  // Display order for the podium: 2nd, 1st, 3rd.
-  const podiumOrder = [1, 0, 2].filter(i => top[i]);
 
   return (
     <div className="fixed inset-0 z-[200] bg-black/50 flex items-end sm:items-center justify-center" onClick={onClose}>
@@ -56,34 +46,9 @@ export default function SupportersModal({ supporters, onDonate, onClose }: Suppo
                 </div>
               )}
 
-              {top.length > 0 && (
-                <div className="flex items-end justify-center gap-3 px-4 pt-5 pb-3">
-                  {podiumOrder.map(i => {
-                    const s = top[i];
-                    const style = PODIUM[i];
-                    return (
-                      <button key={s.key} onClick={() => setSelected(s)} className={`flex flex-col items-center w-24 ${i === 0 ? '' : 'pt-4'}`}>
-                        <div className="relative">
-                          {i === 0 && <Crown className="w-6 h-6 text-amber-400 fill-amber-300 absolute -top-5 left-1/2 -translate-x-1/2" />}
-                          <div className={`${style.size} rounded-full overflow-hidden ring-4 ${style.ring} bg-brand-50`}>
-                            <UserAvatar src={s.avatar_url} alt={s.display_name} />
-                          </div>
-                          <span className={`absolute -bottom-1 left-1/2 -translate-x-1/2 ${style.badge} text-white text-[11px] font-black w-6 h-6 rounded-full flex items-center justify-center border-2 border-white`}>
-                            {i + 1}
-                          </span>
-                        </div>
-                        <p className="mt-2 text-xs font-bold text-gray-900 truncate w-full text-center">{s.display_name}</p>
-                        <p className="text-sm font-black text-brand-700">{amountLabel(s)}</p>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-
-              <div className="px-3 divide-y divide-gray-100">
-                {rest.map((s, idx) => (
+              <div className="px-3 pt-2 divide-y divide-gray-100">
+                {supporters.map(s => (
                   <button key={s.key} onClick={() => setSelected(s)} className="w-full flex items-center gap-3 py-2.5 text-left">
-                    <span className="w-6 text-center text-xs font-black text-gray-400">{idx + 4}</span>
                     <div className="w-10 h-10 rounded-full overflow-hidden bg-brand-50 shrink-0">
                       <UserAvatar src={s.avatar_url} alt={s.display_name} />
                     </div>

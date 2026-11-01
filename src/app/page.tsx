@@ -31,7 +31,6 @@ import DonateModal from '@/components/DonateModal';
 import SupportersModal from '@/components/SupportersModal';
 import HomeHero from '@/components/HomeHero';
 import WavePattern from '@/components/WavePattern';
-import DonationPopup from '@/components/DonationPopup';
 
 export default function HomePage() {
   const { user, role, isLineLoggingIn, logout } = useAuth();
@@ -1118,7 +1117,6 @@ export default function HomePage() {
         />
       )}
 
-      <DonationPopup donations={donations} />
 
       {/* LINE Login Global Loading Overlay */}
       {isLineLoggingIn && (

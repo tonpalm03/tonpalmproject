@@ -910,7 +910,7 @@ export default function HomePage() {
                 className="hover:text-brand-600 underline font-semibold transition text-xs sm:text-sm inline-flex items-center gap-1"
               >
                 <FileText className="w-3.5 h-3.5" />
-                <span>ข้อกำหนดการใช้บริการ</span>
+                <span>Terms of Service</span>
               </button>
               <span className="text-gray-300">•</span>
               <button
@@ -919,7 +919,7 @@ export default function HomePage() {
                 className="hover:text-brand-600 underline font-semibold transition text-xs sm:text-sm inline-flex items-center gap-1"
               >
                 <Lock className="w-3.5 h-3.5" />
-                <span>นโยบายความเป็นส่วนตัว</span>
+                <span>Privacy Policy</span>
               </button>
               <span className="text-gray-300">•</span>
               <button
@@ -928,7 +928,7 @@ export default function HomePage() {
                 className="hover:text-brand-700 font-bold transition inline-flex items-center gap-1.5 bg-brand-50 hover:bg-brand-100 text-brand-800 px-3 py-1.5 rounded-xl border border-brand-200 shadow-2xs active:scale-95 text-xs sm:text-sm"
               >
                 <MessageSquare className="w-3.5 h-3.5" />
-                <span>ติดต่อเรา</span>
+                <span>Contact us</span>
               </button>
             </div>
             <p className="text-[11px] text-gray-400">

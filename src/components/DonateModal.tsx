@@ -141,11 +141,14 @@ export default function DonateModal({ settings, user, onRequireLogin, onClose }:
   return (
     <div className="fixed inset-0 z-[200] bg-black/50 flex items-end sm:items-center justify-center" onClick={onClose}>
       <div className="relative bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
+        {/* Outside the scrolling area, so the close button stays put while reading */}
+        {step === 'qr' && (
+          <button onClick={onClose} aria-label="ปิด" className="absolute right-3 top-3 z-20 w-8 h-8 rounded-full bg-white/90 text-[#0F6E56] shadow-md flex items-center justify-center"><X className="w-4 h-4" /></button>
+        )}
         <div className="overflow-y-auto">
         {step === 'qr' ? (
           <div className="relative overflow-hidden isolate bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] px-4 pt-4 pb-5">
             <WavePattern className="text-white/90 -z-10" />
-            <button onClick={onClose} aria-label="ปิด" className="absolute right-3 top-3 w-8 h-8 rounded-full bg-white/80 text-[#0F6E56] flex items-center justify-center z-10"><X className="w-4 h-4" /></button>
             <p className="text-xs font-bold text-[#0F6E56] flex items-center gap-1"><Heart className="w-3.5 h-3.5 text-pink-500 fill-pink-500" /> สนับสนุนแอป</p>
             <h3 className="mt-1 text-xl font-black text-[#04342C] leading-snug pr-28">ช่วยให้น้องพุงเด้ง<br />ได้ไปต่อ</h3>
             <img src="/mascots/bg/donate.webp" alt="น้องพุงเด้งถือกระปุกออมสิน" className="absolute right-12 -bottom-2 w-24 pointer-events-none select-none drop-shadow-sm" />

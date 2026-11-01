@@ -6,6 +6,7 @@ import { Supporter, formatBaht, toMillis } from '@/lib/donations';
 import { formatThaiDateWithTime } from '@/lib/dateUtils';
 import UserAvatar from './UserAvatar';
 import MascotWatermark from './MascotWatermark';
+import WavePattern from './WavePattern';
 
 interface SupportersModalProps {
   supporters: Supporter[];
@@ -28,12 +29,14 @@ export default function SupportersModal({ supporters, onDonate, onClose }: Suppo
           <SupporterHistory supporter={selected} onBack={() => setSelected(null)} onClose={onClose} />
         ) : (
           <>
-            <div className="bg-brand-600 text-white px-4 pt-4 pb-5 relative">
-              <button onClick={onClose} className="absolute right-3 top-3 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"><X className="w-4 h-4" /></button>
-              <p className="text-sm font-bold opacity-90 flex items-center gap-1.5"><Heart className="w-4 h-4 fill-white" /> ขอบคุณผู้สนับสนุนน้องพุงเด้ง</p>
-              <p className="text-3xl font-black mt-1">{formatBaht(grandTotal)}</p>
-              <p className="text-xs opacity-80">จากผู้สนับสนุน {supporters.length} คน</p>
-              <button onClick={onDonate} className="mt-3 bg-white text-brand-700 font-black text-sm rounded-full px-4 py-2 flex items-center gap-1.5">
+            <div className="relative overflow-hidden isolate bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] px-4 pt-4 pb-5">
+              <WavePattern className="text-white/90 -z-10" />
+              <button onClick={onClose} aria-label="ปิด" className="absolute right-3 top-3 z-10 w-8 h-8 rounded-full bg-white/80 text-[#0F6E56] flex items-center justify-center"><X className="w-4 h-4" /></button>
+              <img src="/mascots/pung-deng-thanks.webp" alt="" aria-hidden="true" className="absolute right-12 -bottom-1 w-24 pointer-events-none select-none drop-shadow-sm" />
+              <p className="text-xs font-bold text-[#0F6E56] flex items-center gap-1.5 pr-10"><Heart className="w-4 h-4 text-pink-500 fill-pink-500" /> ขอบคุณผู้สนับสนุนน้องพุงเด้ง</p>
+              <p className="text-3xl font-black mt-1 text-[#04342C]">{formatBaht(grandTotal)}</p>
+              <p className="text-xs font-semibold text-[#085041]">จากผู้สนับสนุน {supporters.length} คน</p>
+              <button onClick={onDonate} className="relative mt-3 bg-white text-brand-700 font-black text-sm rounded-full px-4 py-2 flex items-center gap-1.5 shadow-[0_4px_12px_-4px_rgba(15,110,86,0.35)] active:scale-95 transition">
                 <Heart className="w-4 h-4 fill-pink-500 text-pink-500" /> สนับสนุนแอป
               </button>
             </div>

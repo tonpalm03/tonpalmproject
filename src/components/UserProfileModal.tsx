@@ -12,6 +12,7 @@ import ContactModal from './ContactModal';
 import UserAvatar, { getUserCode, isCustomAvatar } from './UserAvatar';
 import { readFileAsDataUrl } from '@/lib/imageUtils';
 import MascotWatermark from './MascotWatermark';
+import WavePattern from './WavePattern';
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -184,7 +185,8 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
           <MascotWatermark page="profile" />
           
           {/* Top Banner with Gradient */}
-          <div className="bg-[#E1F5EE] border-b border-[#9FE1CB] p-6 text-[#04342C] text-center relative overflow-hidden">
+          <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] border-b border-[#9FE1CB] p-6 text-[#04342C] text-center relative overflow-hidden isolate">
+            <WavePattern className="text-white/90 -z-10" />
 
             {/* Close Button */}
             <button

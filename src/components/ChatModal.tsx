@@ -12,6 +12,7 @@ import { httpsCallable } from 'firebase/functions';
 import { soundAlert } from '@/lib/soundAlert';
 import UserAvatar from './UserAvatar';
 import MascotWatermark from './MascotWatermark';
+import WavePattern from './WavePattern';
 
 export interface ShopPaymentInfo {
   bank_name?: string;
@@ -499,7 +500,8 @@ export default function ChatModal({
         <MascotWatermark page="chat" />
         
         {/* Header */}
-        <div className="bg-[#E1F5EE] border-b border-[#9FE1CB] p-4 text-[#04342C] flex items-center justify-between shadow-md shrink-0">
+        <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] border-b border-[#9FE1CB] p-4 text-[#04342C] flex items-center justify-between shadow-md shrink-0 relative overflow-hidden isolate">
+          <WavePattern className="text-white/90 -z-10" />
           <div className="flex items-center gap-2.5">
             <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white shadow-md shrink-0 bg-slate-200">
               <UserAvatar

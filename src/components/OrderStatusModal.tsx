@@ -10,6 +10,7 @@ import ReviewModal from './ReviewModal';
 import { formatOrderCode } from '@/lib/orderNumber';
 import { orderItemUnitPrice } from '@/lib/orderItemPrice';
 import MascotWatermark from './MascotWatermark';
+import WavePattern from './WavePattern';
 
 interface OrderStatusModalProps {
   orderId: string;
@@ -127,7 +128,8 @@ export default function OrderStatusModal({
           <MascotWatermark page="tracking" />
           
           {/* Header */}
-          <div className="bg-[#E1F5EE] border-b border-[#9FE1CB] p-4 text-[#04342C] flex items-center justify-between shadow-sm">
+          <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] border-b border-[#9FE1CB] p-4 text-[#04342C] flex items-center justify-between shadow-sm relative overflow-hidden isolate">
+            <WavePattern className="text-white/90 -z-10" />
             <div>
               <span className="text-[11px] bg-white text-[#0F6E56] border border-[#9FE1CB] px-2 py-0.5 rounded-full font-medium">
                 {ordersList.length > 1 ? `สั่งอาหาร ${ordersList.length} ร้านค้า` : `ออเดอร์ #${formatOrderCode(activeOrder)}`}

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import MascotWatermark from './MascotWatermark';
+import WavePattern from './WavePattern';
 import {
   X, ShieldCheck, FileText, Store, Utensils,
   Phone, CheckCircle2, Lock, Sparkles, MapPin, Bike, CreditCard, MessageSquare
@@ -27,7 +28,8 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
         <MascotWatermark page="terms" />
         
         {/* Modal Header */}
-        <div className="bg-[#E1F5EE] border-b border-[#9FE1CB] p-4 sm:p-5 text-[#04342C] flex items-center justify-between shadow-md shrink-0">
+        <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] border-b border-[#9FE1CB] p-4 sm:p-5 text-[#04342C] flex items-center justify-between shadow-md shrink-0 relative overflow-hidden isolate">
+          <WavePattern className="text-white/90 -z-10" />
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-white border border-[#9FE1CB] flex items-center justify-center text-xl shrink-0 shadow-inner">
               <FileText className="w-5 h-5 text-[#1D9E75]" />

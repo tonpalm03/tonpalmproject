@@ -13,6 +13,7 @@ import { db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { formatOrderCode } from '@/lib/orderNumber';
 import MascotWatermark from './MascotWatermark';
+import WavePattern from './WavePattern';
 
 interface OrderHistoryModalProps {
   isOpen: boolean;
@@ -245,7 +246,8 @@ export default function OrderHistoryModal({
         <MascotWatermark page="history" />
         
         {/* Modal Header */}
-        <div className="bg-[#E1F5EE] border-b border-[#9FE1CB] px-5 py-4 text-[#04342C] flex items-center justify-between shadow-xs">
+        <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] border-b border-[#9FE1CB] px-5 py-4 text-[#04342C] flex items-center justify-between shadow-xs relative overflow-hidden isolate">
+          <WavePattern className="text-white/90 -z-10" />
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-2xl bg-white border border-[#9FE1CB] flex items-center justify-center text-xl shadow-inner">
               <FileText className="w-5 h-5 text-[#1D9E75]" />

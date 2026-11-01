@@ -19,6 +19,7 @@ import {
 } from '@/lib/geolocation';
 import { soundAlert } from '@/lib/soundAlert';
 import MascotWatermark from './MascotWatermark';
+import WavePattern from './WavePattern';
 
 
 interface CartCheckoutModalProps {
@@ -381,7 +382,8 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
         <MascotWatermark page="cart" />
         
         {/* Header */}
-        <div className="bg-[#E1F5EE] border-b border-[#9FE1CB] p-4 text-[#04342C] flex items-center justify-between shadow-sm">
+        <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] border-b border-[#9FE1CB] p-4 text-[#04342C] flex items-center justify-between shadow-sm relative overflow-hidden isolate">
+          <WavePattern className="text-white/90 -z-10" />
           <div className="flex items-center gap-2">
             <Store className="w-5 h-5 text-[#0F6E56]" />
             <div>

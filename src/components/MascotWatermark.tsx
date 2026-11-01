@@ -18,7 +18,9 @@ export default function MascotWatermark({ page, fixed = false }: { page: MascotP
       src={`/mascots/bg/${page}.webp`}
       alt=""
       aria-hidden="true"
-      className={`pointer-events-none select-none opacity-[0.12] z-10 ${position}`}
+      // Multiply only darkens what is under it, so dark text stays fully readable
+      // even where the mascot overlaps it.
+      className={`pointer-events-none select-none opacity-25 mix-blend-multiply z-10 ${position}`}
     />
   );
 }

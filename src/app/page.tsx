@@ -29,7 +29,7 @@ import { formatOrderCode } from '@/lib/orderNumber';
 import { aggregateSupporters, subscribeDonations } from '@/lib/donations';
 import DonateModal from '@/components/DonateModal';
 import SupportersModal from '@/components/SupportersModal';
-import HomeHero from '@/components/HomeHero';
+import HomeHero, { HomeHeroCompact } from '@/components/HomeHero';
 import WavePattern from '@/components/WavePattern';
 
 export default function HomePage() {
@@ -62,7 +62,21 @@ export default function HomePage() {
   // 1. ร้านค้าทั้งหมด (All Shops)
   // 2. อาหาร (Food)
   // 3. เครื่องดื่ม/ของหวาน (Drink & Dessert)
-  const [customerTab, setCustomerTab] = useState<'shops' | 'food' | 'drink_dessert'>('shops');
+  const [customerTab, setCustomerTab] = useState<'shops' | 'food' | 'drink_dessert'>('food');
+  // Once the greeting card scrolls under the header, a slim copy joins the pinned bar.
+  const heroRef = useRef<HTMLDivElement | null>(null);
+  const [heroHidden, setHeroHidden] = useState(false);
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setHeroHidden(!entry.isIntersecting),
+      // The header covers the top 58px, so count the card as gone once it slides under it.
+      { rootMargin: '-58px 0px 0px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [viewMode]);
 
   // Shops & Menus state
   const [shops, setShops] = useState<Shop[]>([]);
@@ -695,6 +709,7 @@ export default function HomePage() {
         {viewMode === 'customer' && (
           <div className="space-y-4 md:space-y-6">
             
+            <div ref={heroRef}>
             <HomeHero
               supporters={supporters}
               userName={user?.display_name}
@@ -703,7 +718,19 @@ export default function HomePage() {
               onOpenSupporters={() => setShowSupportersModal(true)}
               onOpenTracking={() => setShowTrackingModal(true)}
             />
+            </div>
 
+            {/* Search and category chips stay pinned under the header while scrolling */}
+            <div className="sticky top-[58px] z-20 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 -mt-2 pt-2 pb-2 bg-slate-50/95 backdrop-blur-md space-y-3">
+            {heroHidden && (
+              <HomeHeroCompact
+                supporters={supporters}
+                openShopCount={shops.filter(isShopOpenAndReady).length}
+                trackingOrders={trackingOrders}
+                onOpenSupporters={() => setShowSupportersModal(true)}
+                onOpenTracking={() => setShowTrackingModal(true)}
+              />
+            )}
             <div className="relative">
               <Search className="w-4 h-4 text-[#0F6E56] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
@@ -717,15 +744,6 @@ export default function HomePage() {
 
             {/* Category chips */}
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 py-2 -my-2">
-                <button
-                  type="button"
-                  onClick={() => setCustomerTab('shops')}
-                  className={`px-3.5 py-2 rounded-full text-xs md:text-sm font-bold flex items-center gap-1.5 whitespace-nowrap border transition ${
-                    customerTab === 'shops' ? 'bg-[#1D9E75] text-white border-[#1D9E75] shadow-[0_6px_14px_-4px_rgba(15,110,86,0.5)]' : 'bg-white text-gray-600 border-[#E1F5EE] shadow-[0_4px_10px_-4px_rgba(15,110,86,0.25)]'
-                  }`}
-                >
-                  <Store className="w-4 h-4" /> ร้านค้า <span className="opacity-70">({filteredShops.length})</span>
-                </button>
                 <button
                   type="button"
                   onClick={() => setCustomerTab('food')}
@@ -744,6 +762,16 @@ export default function HomePage() {
                 >
                   <CupSoda className="w-4 h-4" /> ของหวาน/น้ำ <span className="opacity-70">({filteredDrinks.length})</span>
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setCustomerTab('shops')}
+                  className={`px-3.5 py-2 rounded-full text-xs md:text-sm font-bold flex items-center gap-1.5 whitespace-nowrap border transition ${
+                    customerTab === 'shops' ? 'bg-[#1D9E75] text-white border-[#1D9E75] shadow-[0_6px_14px_-4px_rgba(15,110,86,0.5)]' : 'bg-white text-gray-600 border-[#E1F5EE] shadow-[0_4px_10px_-4px_rgba(15,110,86,0.25)]'
+                  }`}
+                >
+                  <Store className="w-4 h-4" /> ร้านค้า <span className="opacity-70">({filteredShops.length})</span>
+                </button>
+            </div>
             </div>
 
             {(customerTab === 'shops' ? filteredShops : customerTab === 'food' ? filteredFoods : filteredDrinks).length === 0 && (

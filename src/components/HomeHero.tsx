@@ -34,11 +34,16 @@ function mealPrompt(hour: number): string {
   return 'หิวดึกเหรอ';
 }
 
-export default function HomeHero({
-  supporters, userName, openShopCount, trackingOrders, onOpenSupporters, onOpenTracking,
-}: HomeHeroProps) {
-  const firstName = userName?.split(' ')[0];
-  // The supporters pill shows everyone in turn, one every few seconds, then starts over.
+/** The most advanced active order is the most useful one to show at a glance. */
+function pickActiveOrder(trackingOrders: Order[]) {
+  const rank = ['delivering', 'cooking', 'pending', 'completed'];
+  return [...trackingOrders]
+    .filter(o => ORDER_STATUS[o.status])
+    .sort((a, b) => rank.indexOf(a.status) - rank.indexOf(b.status))[0];
+}
+
+/** Shows every supporter in turn, one every few seconds, then starts over. */
+function SupporterTicker({ supporters, compact = false }: { supporters: Supporter[]; compact?: boolean }) {
   const [tick, setTick] = useState(0);
   useEffect(() => {
     if (supporters.length < 2) return;
@@ -46,11 +51,76 @@ export default function HomeHero({
     return () => clearInterval(id);
   }, [supporters.length]);
   const current = supporters.length ? supporters[tick % supporters.length] : null;
-  // The most advanced active order is the most useful one to show at a glance.
-  const rank = ['delivering', 'cooking', 'pending', 'completed'];
-  const activeOrder = [...trackingOrders]
-    .filter(o => ORDER_STATUS[o.status])
-    .sort((a, b) => rank.indexOf(a.status) - rank.indexOf(b.status))[0];
+  const avatar = compact ? 'w-5 h-5' : 'w-6 h-6';
+
+  if (!current) {
+    return (
+      <>
+        <span className={`${avatar} rounded-full bg-rose-50 flex items-center justify-center shrink-0`}>
+          <Heart className="w-3.5 h-3.5 text-pink-500 fill-pink-500" />
+        </span>
+        <span className="text-xs font-black truncate">ผู้สนับสนุน</span>
+      </>
+    );
+  }
+  return (
+    // Keyed by supporter so each one slides in fresh
+    <span key={`${current.key}-${tick}`} className="flex items-center gap-1.5 min-w-0 animate-in fade-in slide-in-from-bottom-3 duration-500 motion-reduce:animate-none">
+      <span className={`${avatar} rounded-full overflow-hidden ring-2 ring-white bg-white shrink-0`}>
+        <UserAvatar src={current.avatar_url} alt={current.display_name} />
+      </span>
+      <span className={`${compact ? 'text-[11px]' : 'text-xs'} font-black truncate`}>{current.display_name}</span>
+      {current.total > 0 && (
+        <span className={`${compact ? 'text-[10px]' : 'text-[11px]'} font-bold text-[#1D9E75] shrink-0`}>{formatBaht(current.total)}</span>
+      )}
+    </span>
+  );
+}
+
+/** A slim version of the hero, pinned under the header once the full card scrolls away. */
+export function HomeHeroCompact({
+  supporters, openShopCount, trackingOrders, onOpenSupporters, onOpenTracking,
+}: Omit<HomeHeroProps, 'userName'>) {
+  const activeOrder = pickActiveOrder(trackingOrders);
+  const status = activeOrder ? ORDER_STATUS[activeOrder.status] : null;
+  return (
+    <div className="relative overflow-hidden isolate rounded-2xl bg-gradient-to-br from-[#C3EBDC] to-[#9FE1CB] px-1.5 py-1 flex items-center gap-1.5 shadow-[0_4px_12px_-6px_rgba(15,110,86,0.35)] animate-in fade-in slide-in-from-top-2 duration-300 motion-reduce:animate-none">
+      <WavePattern className="text-white/70 -z-10" />
+      <img src="/mascots/pung-deng-thanks.webp" alt="น้องพุงเด้ง" className="w-8 h-8 object-contain shrink-0 pointer-events-none select-none" />
+      <span suppressHydrationWarning className="text-xs font-black text-[#04342C] truncate min-w-0 max-w-[30%]">
+        {mealPrompt(new Date().getHours())}
+      </span>
+      <button
+        type="button"
+        onClick={onOpenSupporters}
+        className="flex-1 min-w-0 h-7 rounded-full bg-white text-[#085041] pl-1 pr-2 flex items-center gap-1.5 overflow-hidden active:scale-95 transition"
+      >
+        <SupporterTicker supporters={supporters} compact />
+      </button>
+      {activeOrder && status ? (
+        <button
+          type="button"
+          onClick={onOpenTracking}
+          className="relative h-7 rounded-full bg-white text-[#0F6E56] px-2 flex items-center gap-1 text-[11px] font-bold shrink-0 active:scale-95 transition"
+        >
+          {activeOrder.has_customer_unread_message && <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-rose-500" />}
+          <status.icon className="w-3.5 h-3.5" />
+          <span className="max-w-[72px] truncate">{status.label}</span>
+        </button>
+      ) : (
+        <span className="h-7 rounded-full bg-white text-[#0F6E56] px-2 flex items-center gap-1 text-[11px] font-bold shrink-0">
+          <Store className="w-3.5 h-3.5" /> {openShopCount} ร้านเปิด
+        </span>
+      )}
+    </div>
+  );
+}
+
+export default function HomeHero({
+  supporters, userName, openShopCount, trackingOrders, onOpenSupporters, onOpenTracking,
+}: HomeHeroProps) {
+  const firstName = userName?.split(' ')[0];
+  const activeOrder = pickActiveOrder(trackingOrders);
   const status = activeOrder ? ORDER_STATUS[activeOrder.status] : null;
 
   return (
@@ -87,25 +157,7 @@ export default function HomeHero({
           onClick={onOpenSupporters}
           className="h-9 rounded-full bg-white text-[#085041] border border-[#E1F5EE] shadow-[0_4px_12px_-4px_rgba(15,110,86,0.3)] pl-1 pr-2.5 flex items-center gap-1.5 active:scale-95 transition min-w-0 overflow-hidden"
         >
-          {current ? (
-            // Keyed by supporter so each one slides in fresh
-            <span key={`${current.key}-${tick}`} className="flex items-center gap-1.5 min-w-0 animate-in fade-in slide-in-from-bottom-3 duration-500 motion-reduce:animate-none">
-              <span className="w-6 h-6 rounded-full overflow-hidden ring-2 ring-white bg-white shrink-0">
-                <UserAvatar src={current.avatar_url} alt={current.display_name} />
-              </span>
-              <span className="text-xs font-black truncate">{current.display_name}</span>
-              {current.total > 0 && (
-                <span className="text-[11px] font-bold text-[#1D9E75] shrink-0">{formatBaht(current.total)}</span>
-              )}
-            </span>
-          ) : (
-            <>
-              <span className="w-6 h-6 rounded-full bg-rose-50 flex items-center justify-center shrink-0">
-                <Heart className="w-3.5 h-3.5 text-pink-500 fill-pink-500" />
-              </span>
-              <span className="text-xs font-black truncate">ผู้สนับสนุน</span>
-            </>
-          )}
+          <SupporterTicker supporters={supporters} />
         </button>
 
         {/* My order status, or how many shops are open */}

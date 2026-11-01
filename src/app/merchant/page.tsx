@@ -144,7 +144,7 @@ export default function MerchantAppPage() {
               className="text-[11px] text-brand-700 hover:text-brand-800 underline font-semibold inline-flex items-center gap-1"
             >
               <FileText className="w-3.5 h-3.5" />
-              <span>อ่านข้อกำหนดและเงื่อนไขสำหรับร้านค้า (GP 5%)</span>
+              <span>อ่านข้อกำหนดและเงื่อนไขสำหรับร้านค้า</span>
             </button>
           </div>
 

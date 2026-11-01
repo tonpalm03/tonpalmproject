@@ -26,6 +26,36 @@ const ORDER_STATUS: Record<string, { label: string; icon: typeof Bike }> = {
 
 const TICKER_MS = 2500;
 
+// น้องพุงเด้ง changes pose through the day: [from hour, pose, description].
+const TIME_POSES: [number, string, string][] = [
+  [5, 'morning', 'น้องพุงเด้งตื่นนอนถือกาแฟ'],
+  [10, 'lunch', 'น้องพุงเด้งกินข้าวกะเพราไข่ดาว'],
+  [13, 'afternoon', 'น้องพุงเด้งดูดชานมไข่มุกกับไอศกรีม'],
+  [16, 'evening', 'น้องพุงเด้งขี่สกู๊ตเตอร์ส่งอาหาร'],
+  [19, 'dinner', 'น้องพุงเด้งลูบพุงอิ่ม'],
+  [22, 'night', 'น้องพุงเด้งใส่หมวกนอนกอดบะหมี่'],
+];
+
+function poseFor(hour: number) {
+  const pose = [...TIME_POSES].reverse().find(([from]) => hour >= from) ?? TIME_POSES[TIME_POSES.length - 1];
+  return { src: `/mascots/time/${pose[1]}.webp`, alt: pose[2] };
+}
+
+/**
+ * The pose for the device clock. The page is prerendered at build time, so the first
+ * render shows nothing and the real pose fills in after mount; it re-checks every minute.
+ */
+function useTimePose() {
+  const [pose, setPose] = useState<{ src: string; alt: string } | null>(null);
+  useEffect(() => {
+    const update = () => setPose(poseFor(new Date().getHours()));
+    update();
+    const id = setInterval(update, 60_000);
+    return () => clearInterval(id);
+  }, []);
+  return pose;
+}
+
 
 /** The most advanced active order is the most useful one to show at a glance. */
 function pickActiveOrder(trackingOrders: Order[]) {
@@ -74,12 +104,17 @@ function SupporterTicker({ supporters, compact = false }: { supporters: Supporte
 export function HomeHeroCompact({
   supporters, openShopCount, trackingOrders, onOpenSupporters, onOpenTracking,
 }: Omit<HomeHeroProps, 'userName'>) {
+  const pose = useTimePose();
   const activeOrder = pickActiveOrder(trackingOrders);
   const status = activeOrder ? ORDER_STATUS[activeOrder.status] : null;
   return (
     <div className="relative overflow-hidden isolate rounded-2xl bg-gradient-to-br from-[#C3EBDC] to-[#9FE1CB] px-1.5 py-1 flex items-center gap-1.5 shadow-[0_4px_12px_-6px_rgba(15,110,86,0.35)] animate-in fade-in slide-in-from-top-2 duration-300 motion-reduce:animate-none">
       <WavePattern className="text-white/70 -z-10" />
-      <img src="/mascots/pung-deng-thanks.webp" alt="น้องพุงเด้ง" className="w-8 h-8 object-contain shrink-0 pointer-events-none select-none" />
+      {pose ? (
+        <img src={pose.src} alt={pose.alt} className="w-8 h-8 object-contain shrink-0 pointer-events-none select-none" />
+      ) : (
+        <span className="w-8 h-8 shrink-0" />
+      )}
       <button
         type="button"
         onClick={onOpenSupporters}
@@ -110,6 +145,7 @@ export default function HomeHero({
   supporters, userName, openShopCount, trackingOrders, onOpenSupporters, onOpenTracking,
 }: HomeHeroProps) {
   const firstName = userName?.split(' ')[0];
+  const pose = useTimePose();
   const activeOrder = pickActiveOrder(trackingOrders);
   const status = activeOrder ? ORDER_STATUS[activeOrder.status] : null;
 
@@ -133,11 +169,14 @@ export default function HomeHero({
             <span className="whitespace-nowrap">&amp; มรภ.ชัยภูมิ</span>
           </span>
         </p>
-        <img
-          src="/mascots/pung-deng-thanks.webp"
-          alt="น้องพุงเด้ง"
-          className="absolute right-1.5 top-1/2 -translate-y-1/2 w-[68px] sm:w-24 pointer-events-none select-none drop-shadow-sm"
-        />
+        {pose && (
+          <img
+            key={pose.src}
+            src={pose.src}
+            alt={pose.alt}
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 w-[68px] sm:w-24 pointer-events-none select-none drop-shadow-sm animate-in fade-in zoom-in-95 duration-500 motion-reduce:animate-none"
+          />
+        )}
         <Sparkles className="absolute right-[72px] sm:right-24 top-4 w-3.5 h-3.5 text-white pointer-events-none" />
         <Sparkles className="absolute right-2 top-3 w-3 h-3 text-white/90 pointer-events-none" />
         <Sparkles className="absolute right-3 bottom-3 w-2.5 h-2.5 text-white/80 pointer-events-none" />

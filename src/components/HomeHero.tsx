@@ -72,7 +72,7 @@ export default function HomeHero({
         </p>
         <img
           src="/mascots/pung-deng-thanks.webp"
-          alt="พุงเด้ง"
+          alt="น้องพุงเด้ง"
           className="absolute right-1.5 top-1/2 -translate-y-1/2 w-[68px] sm:w-24 pointer-events-none select-none drop-shadow-sm"
         />
         <Sparkles className="absolute right-[72px] sm:right-24 top-4 w-3.5 h-3.5 text-white pointer-events-none" />

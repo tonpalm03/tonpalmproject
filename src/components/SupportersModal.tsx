@@ -30,7 +30,7 @@ export default function SupportersModal({ supporters, onDonate, onClose }: Suppo
           <>
             <div className="bg-brand-600 text-white px-4 pt-4 pb-5 relative">
               <button onClick={onClose} className="absolute right-3 top-3 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"><X className="w-4 h-4" /></button>
-              <p className="text-sm font-bold opacity-90 flex items-center gap-1.5"><Heart className="w-4 h-4 fill-white" /> ขอบคุณผู้สนับสนุนพุงเด้ง</p>
+              <p className="text-sm font-bold opacity-90 flex items-center gap-1.5"><Heart className="w-4 h-4 fill-white" /> ขอบคุณผู้สนับสนุนน้องพุงเด้ง</p>
               <p className="text-3xl font-black mt-1">{formatBaht(grandTotal)}</p>
               <p className="text-xs opacity-80">จากผู้สนับสนุน {supporters.length} คน</p>
               <button onClick={onDonate} className="mt-3 bg-white text-brand-700 font-black text-sm rounded-full px-4 py-2 flex items-center gap-1.5">

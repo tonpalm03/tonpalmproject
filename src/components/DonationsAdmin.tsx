@@ -369,7 +369,7 @@ function DonationEditor({ users, donation, onClose }: { users: UserProfile[]; do
                   <span className="text-sm truncate">{u.display_name}</span>
                 </button>
               ))}
-              <p className="text-[11px] text-gray-400 text-center">หรือพิมพ์ชื่อเอง (จะใช้รูปพุงเด้งแทนรูปโปรไฟล์)</p>
+              <p className="text-[11px] text-gray-400 text-center">หรือพิมพ์ชื่อเอง (จะใช้รูปน้องพุงเด้งแทนรูปโปรไฟล์)</p>
               <input value={name} onChange={e => setName(e.target.value)} maxLength={40} placeholder="ชื่อที่จะแสดง" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm" />
             </div>
           )

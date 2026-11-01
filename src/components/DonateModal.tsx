@@ -2,12 +2,13 @@
 
 import React, { useState } from 'react';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { X, Heart, Copy, Check, ImagePlus, ArrowLeft, QrCode } from 'lucide-react';
+import { X, Heart, Copy, Check, ImagePlus, ArrowLeft, QrCode, Download } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { SystemSettings, UserProfile } from '@/types';
 import { MASCOT_AVATAR, compressSlip } from '@/lib/donations';
+import { renderDonateCard } from '@/lib/donateCard';
 import Toggle from './Toggle';
-import MascotWatermark from './MascotWatermark';
+import WavePattern from './WavePattern';
 
 interface DonateModalProps {
   settings: SystemSettings | null;
@@ -36,6 +37,60 @@ export default function DonateModal({ settings, user, onRequireLogin, onClose }:
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch { /* clipboard blocked; the number is still visible */ }
+  };
+
+  const [cardState, setCardState] = useState<'idle' | 'busy' | 'saved' | 'copied'>('idle');
+
+  const makeCard = () => renderDonateCard({
+    qrUrl: settings?.donate_qr_url ?? '',
+    name: settings?.donate_promptpay_name?.trim(),
+    number,
+  });
+
+  const flash = (state: 'saved' | 'copied') => {
+    setCardState(state);
+    setTimeout(() => setCardState('idle'), 1800);
+  };
+
+  const saveCard = async () => {
+    if (!settings?.donate_qr_url) return;
+    setCardState('busy');
+    try {
+      const url = URL.createObjectURL(await makeCard());
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'cprufood-donate-qr.png';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      flash('saved');
+    } catch (err) {
+      setCardState('idle');
+      alert(err instanceof Error ? err.message : 'บันทึกรูปไม่สำเร็จ');
+    }
+  };
+
+  const copyCard = async () => {
+    if (!settings?.donate_qr_url) return;
+    setCardState('busy');
+    try {
+      if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+        // Hand the clipboard a promise so Safari still treats this as part of the tap.
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': makeCard() })]);
+        flash('copied');
+        return;
+      }
+      const file = new File([await makeCard()], 'cprufood-donate-qr.png', { type: 'image/png' });
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file] });
+        setCardState('idle');
+        return;
+      }
+      throw new Error('unsupported');
+    } catch (err) {
+      setCardState('idle');
+      if (err instanceof Error && err.name === 'AbortError') return;
+      alert('เครื่องนี้คัดลอกรูปไม่ได้ ลองกด "บันทึกรูป QR" แทน');
+    }
   };
 
   const goToForm = () => {
@@ -86,8 +141,16 @@ export default function DonateModal({ settings, user, onRequireLogin, onClose }:
   return (
     <div className="fixed inset-0 z-[200] bg-black/50 flex items-end sm:items-center justify-center" onClick={onClose}>
       <div className="relative bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
-        <MascotWatermark page="donate" />
         <div className="overflow-y-auto">
+        {step === 'qr' ? (
+          <div className="relative overflow-hidden isolate bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] px-4 pt-4 pb-5">
+            <WavePattern className="text-white/90 -z-10" />
+            <button onClick={onClose} aria-label="ปิด" className="absolute right-3 top-3 w-8 h-8 rounded-full bg-white/80 text-[#0F6E56] flex items-center justify-center z-10"><X className="w-4 h-4" /></button>
+            <p className="text-xs font-bold text-[#0F6E56] flex items-center gap-1"><Heart className="w-3.5 h-3.5 text-pink-500 fill-pink-500" /> สนับสนุนแอป</p>
+            <h3 className="mt-1 text-xl font-black text-[#04342C] leading-snug pr-28">ช่วยให้น้องพุงเด้ง<br />ได้ไปต่อ</h3>
+            <img src="/mascots/bg/donate.webp" alt="น้องพุงเด้งถือกระปุกออมสิน" className="absolute right-12 -bottom-2 w-24 pointer-events-none select-none drop-shadow-sm" />
+          </div>
+        ) : (
         <div className="sticky top-0 bg-white px-4 pt-4 pb-2 flex items-center gap-2 z-10">
           {step === 'form' && (
             <button onClick={() => setStep('qr')} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center"><ArrowLeft className="w-4 h-4" /></button>
@@ -97,29 +160,51 @@ export default function DonateModal({ settings, user, onRequireLogin, onClose }:
           </h3>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center"><X className="w-4 h-4" /></button>
         </div>
+        )}
 
         {step === 'qr' && (
-          <div className="px-4 pb-5 space-y-3 text-center">
-            <p className="text-xs text-gray-500">แอปนี้ใช้ฟรีทุกคน ทั้งลูกค้าและร้านค้า ยอดสนับสนุนจะนำไปเป็นค่าเซิร์ฟเวอร์และพัฒนาแอปต่อ</p>
-            <div className="mx-auto w-60 rounded-2xl border-2 border-brand-100 bg-white p-3">
-              {settings?.donate_qr_url ? (
-                <img src={settings.donate_qr_url} alt="QR พร้อมเพย์" className="w-full aspect-square object-contain" />
-              ) : (
-                <div className="w-full aspect-square flex flex-col items-center justify-center text-gray-300 gap-2">
-                  <QrCode className="w-14 h-14" />
-                  <span className="text-xs text-gray-400">ยังไม่ได้ตั้งค่า QR</span>
-                </div>
+          <div className="px-4 pt-4 pb-5 space-y-3">
+            <div className="space-y-2 text-[13px] text-gray-600 leading-relaxed">
+              <p>CPRUFood ตั้งใจทำขึ้นมาเพื่อร้านค้า คนในชุมชน และนักศึกษารอบ มรภ.ชัยภูมิ แอปไม่หักค่าธรรมเนียมใดๆ ทั้งจากร้านและลูกค้า เราเป็นแค่ตัวกลางให้ลูกค้ากับร้านได้เจอกัน</p>
+              <p>แต่ถ้าวันหนึ่งมีคนใช้มากขึ้น ค่าดูแลเซิร์ฟเวอร์ก็จะมากขึ้นตามไปด้วย จนเราอาจแบกไว้ไม่ไหว จึงเปิดช่องทางนี้ไว้สำหรับผู้ใจดีที่อยากช่วยให้แอปอยู่ต่อไปได้ ทุกบาทจะใช้ดูแลระบบให้ทุกคนได้ใช้งานต่อไปครับ</p>
+            </div>
+
+            <div className="relative !mt-8 rounded-2xl border-2 border-dashed border-[#5DCAA5] bg-[#E1F5EE]/40 p-3 text-center">
+              <img src="/mascots/pung-deng-hello.webp" alt="" aria-hidden="true" className="absolute -left-2 -top-8 w-14 pointer-events-none select-none" />
+              <div className="mx-auto w-52 rounded-xl bg-white p-2.5">
+                {settings?.donate_qr_url ? (
+                  <img src={settings.donate_qr_url} alt="QR พร้อมเพย์" className="w-full aspect-square object-contain" />
+                ) : (
+                  <div className="w-full aspect-square flex flex-col items-center justify-center text-gray-300 gap-2">
+                    <QrCode className="w-14 h-14" />
+                    <span className="text-xs text-gray-400">ยังไม่ได้ตั้งค่า QR</span>
+                  </div>
+                )}
+              </div>
+              {settings?.donate_promptpay_name && <p className="mt-2 text-sm font-black text-[#04342C]">{settings.donate_promptpay_name}</p>}
+              {number && (
+                <button onClick={copyNumber} className="mt-1 inline-flex items-center gap-1.5 text-sm font-bold text-[#0F6E56] bg-white rounded-full px-3 py-1">
+                  พร้อมเพย์ {number}
+                  {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                </button>
               )}
             </div>
-            {settings?.donate_promptpay_name && <p className="text-sm font-bold text-gray-800">{settings.donate_promptpay_name}</p>}
-            {number && (
-              <button onClick={copyNumber} className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-700 bg-brand-50 rounded-full px-3 py-1.5">
-                พร้อมเพย์ {number}
-                {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-              </button>
+
+            {settings?.donate_qr_url && (
+              <div className="grid grid-cols-2 gap-2">
+                <button onClick={saveCard} disabled={cardState === 'busy'} className="py-2.5 rounded-xl border border-[#5DCAA5] text-[#0F6E56] text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition disabled:opacity-50">
+                  {cardState === 'saved' ? <Check className="w-4 h-4" /> : <Download className="w-4 h-4" />}
+                  {cardState === 'saved' ? 'บันทึกแล้ว' : 'บันทึกรูป QR'}
+                </button>
+                <button onClick={copyCard} disabled={cardState === 'busy'} className="py-2.5 rounded-xl border border-[#5DCAA5] text-[#0F6E56] text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition disabled:opacity-50">
+                  {cardState === 'copied' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  {cardState === 'copied' ? 'คัดลอกแล้ว' : 'คัดลอก QR'}
+                </button>
+              </div>
             )}
-            <p className="text-[11px] text-gray-400">สแกนจ่ายด้วยแอปธนาคาร แล้วกด &ldquo;แจ้งโอน&rdquo; เพื่อขึ้นชื่อในรายชื่อผู้สนับสนุน</p>
-            <button onClick={goToForm} className="w-full bg-brand-600 text-white rounded-2xl py-3 font-black">
+
+            <p className="text-[11px] text-gray-500 text-center">โอนแล้วกด &ldquo;แจ้งโอน&rdquo; พร้อมแนบสลิป ชื่อของคุณจะขึ้นในรายชื่อผู้ใจดี</p>
+            <button onClick={goToForm} className="w-full bg-brand-600 text-white rounded-2xl py-3 font-black shadow-[0_6px_16px_-6px_rgba(15,110,86,0.45)] active:scale-95 transition">
               แจ้งโอน
             </button>
           </div>

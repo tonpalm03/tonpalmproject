@@ -29,6 +29,7 @@ import { grantMerchant, setAdminRole } from '@/lib/merchantAccess';
 import MerchantApplicationsAdmin from './MerchantApplicationsAdmin';
 import ShopOwnerTransferModal from './ShopOwnerTransferModal';
 import DonationsAdmin from './DonationsAdmin';
+import MockShopsCard from './MockShopsCard';
 import MascotWatermark from './MascotWatermark';
 
 interface AdminDashboardProps {
@@ -1300,6 +1301,8 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
               </p>
             </div>
           </div>
+
+          <MockShopsCard shops={shops} />
 
           <div className="grid grid-cols-1 gap-4">
             {shops.map((shop) => (

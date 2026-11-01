@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
+import AppUpdateNotice from "@/components/AppUpdateNotice";
 
 export const viewport: Viewport = {
   themeColor: "#E1F5EE",
@@ -51,6 +52,7 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>
             {children}
+            <AppUpdateNotice />
           </CartProvider>
         </AuthProvider>
       </body>

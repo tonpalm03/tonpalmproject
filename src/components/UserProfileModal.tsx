@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import ImageCropModal from './ImageCropModal';
 import MapPicker from './MapPicker';
 import { DEFAULT_CAMPUS_LOCATION } from '@/lib/geolocation';
+import AndroidInstallLink from './AndroidInstallLink';
 import TermsModal from './TermsModal';
 import ContactModal from './ContactModal';
 import UserAvatar, { getUserCode, isCustomAvatar } from './UserAvatar';
@@ -541,6 +542,8 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                 <span className="text-[10px] bg-brand-200 text-brand-900 px-2 py-0.5 rounded-full font-bold">สมัคร</span>
               </a>
             )}
+
+            <AndroidInstallLink variant="row" />
 
             {/* 4. Logout Button */}
             <button

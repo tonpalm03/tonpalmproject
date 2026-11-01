@@ -8,6 +8,7 @@ import WavePattern from '@/components/WavePattern';
 import { soundAlert } from '@/lib/soundAlert';
 import TermsModal from '@/components/TermsModal';
 import MerchantApplicationPanel from '@/components/MerchantApplicationPanel';
+import AndroidInstallLink from '@/components/AndroidInstallLink';
 
 export default function MerchantAppPage() {
   const { user, role, isLoading, loginWithLine, loginWithGoogle, logout } = useAuth();
@@ -122,6 +123,8 @@ export default function MerchantAppPage() {
             </div>
           )}
 
+          <AndroidInstallLink variant="merchant" />
+
           {/* Navigation */}
           <div className="pt-2 border-t border-gray-100 text-center space-y-2">
             <a
@@ -203,7 +206,8 @@ export default function MerchantAppPage() {
       </header>
 
       {/* Main Merchant Content */}
-      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 space-y-3">
+        <AndroidInstallLink variant="merchant" />
         <MerchantDashboard currentUser={user} />
       </main>
 

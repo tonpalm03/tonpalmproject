@@ -65,3 +65,4 @@ android/app/*.iml
 # temp & outputs
 output/
 tmp/
+android/keystore.properties

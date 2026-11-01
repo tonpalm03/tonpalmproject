@@ -30,6 +30,7 @@ import { aggregateSupporters, subscribeDonations } from '@/lib/donations';
 import DonateModal from '@/components/DonateModal';
 import SupportersModal from '@/components/SupportersModal';
 import HomeHero from '@/components/HomeHero';
+import WavePattern from '@/components/WavePattern';
 import DonationPopup from '@/components/DonationPopup';
 
 export default function HomePage() {
@@ -554,7 +555,7 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={handleOpenCart}
-                className="relative w-9 h-9 rounded-full bg-white hover:bg-brand-50 text-[#0F6E56] shadow-2xs flex items-center justify-center shrink-0 active:scale-95 transition"
+                className="relative w-9 h-9 rounded-full bg-white hover:bg-brand-50 text-[#0F6E56] shadow-[0_6px_16px_-6px_rgba(15,110,86,0.3)] flex items-center justify-center shrink-0 active:scale-95 transition"
                 title="ตะกร้าสินค้า"
                 aria-label="ตะกร้าสินค้า"
               >
@@ -580,7 +581,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => setShowAuthModal(true)}
-                  className="h-9 px-3 rounded-full bg-[#1D9E75] text-white text-xs font-black flex items-center gap-1 shrink-0 active:scale-95 transition"
+                  className="h-9 px-3 rounded-full bg-gradient-to-br from-[#2BB585] to-[#178A66] text-white shadow-[0_6px_14px_-4px_rgba(15,110,86,0.55)] text-xs font-black flex items-center gap-1 shrink-0 active:scale-95 transition"
                 >
                   <UserCheck className="w-3.5 h-3.5" /> เข้าสู่ระบบ
                 </button>
@@ -711,17 +712,17 @@ export default function HomePage() {
                 placeholder="ค้นหาร้านค้า, เมนูอาหาร, ชานม..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white border-2 border-brand-400 rounded-2xl text-sm focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-300"
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#C3EBDC] rounded-2xl shadow-[0_6px_16px_-6px_rgba(15,110,86,0.3)] text-sm focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-300"
               />
             </div>
 
             {/* Category chips */}
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 py-2 -my-2">
                 <button
                   type="button"
                   onClick={() => setCustomerTab('shops')}
                   className={`px-3.5 py-2 rounded-full text-xs md:text-sm font-bold flex items-center gap-1.5 whitespace-nowrap border transition ${
-                    customerTab === 'shops' ? 'bg-[#1D9E75] text-white border-[#1D9E75] shadow-sm' : 'bg-white text-gray-600 border-gray-200'
+                    customerTab === 'shops' ? 'bg-[#1D9E75] text-white border-[#1D9E75] shadow-[0_6px_14px_-4px_rgba(15,110,86,0.5)]' : 'bg-white text-gray-600 border-[#E1F5EE] shadow-[0_4px_10px_-4px_rgba(15,110,86,0.25)]'
                   }`}
                 >
                   <Store className="w-4 h-4" /> ร้านค้า <span className="opacity-70">({filteredShops.length})</span>
@@ -730,7 +731,7 @@ export default function HomePage() {
                   type="button"
                   onClick={() => setCustomerTab('food')}
                   className={`px-3.5 py-2 rounded-full text-xs md:text-sm font-bold flex items-center gap-1.5 whitespace-nowrap border transition ${
-                    customerTab === 'food' ? 'bg-[#1D9E75] text-white border-[#1D9E75] shadow-sm' : 'bg-white text-gray-600 border-gray-200'
+                    customerTab === 'food' ? 'bg-[#1D9E75] text-white border-[#1D9E75] shadow-[0_6px_14px_-4px_rgba(15,110,86,0.5)]' : 'bg-white text-gray-600 border-[#E1F5EE] shadow-[0_4px_10px_-4px_rgba(15,110,86,0.25)]'
                   }`}
                 >
                   <UtensilsCrossed className="w-4 h-4" /> อาหาร <span className="opacity-70">({filteredFoods.length})</span>
@@ -739,7 +740,7 @@ export default function HomePage() {
                   type="button"
                   onClick={() => setCustomerTab('drink_dessert')}
                   className={`px-3.5 py-2 rounded-full text-xs md:text-sm font-bold flex items-center gap-1.5 whitespace-nowrap border transition ${
-                    customerTab === 'drink_dessert' ? 'bg-[#1D9E75] text-white border-[#1D9E75] shadow-sm' : 'bg-white text-gray-600 border-gray-200'
+                    customerTab === 'drink_dessert' ? 'bg-[#1D9E75] text-white border-[#1D9E75] shadow-[0_6px_14px_-4px_rgba(15,110,86,0.5)]' : 'bg-white text-gray-600 border-[#E1F5EE] shadow-[0_4px_10px_-4px_rgba(15,110,86,0.25)]'
                   }`}
                 >
                   <CupSoda className="w-4 h-4" /> ของหวาน/น้ำ <span className="opacity-70">({filteredDrinks.length})</span>
@@ -861,7 +862,8 @@ export default function HomePage() {
         {/* Community Footer */}
         {viewMode === 'customer' && (
           <footer className="mt-14 pt-8 pb-28 border-t border-gray-200/80 text-center text-xs text-gray-500 space-y-2.5 animate-in fade-in">
-            <section id="about-cprufood" aria-labelledby="about-cprufood-title" className="scroll-mt-24 mx-auto mb-6 max-w-2xl rounded-3xl border border-brand-100 bg-brand-50/70 p-5 sm:p-6 text-left shadow-2xs">
+            <section id="about-cprufood" aria-labelledby="about-cprufood-title" className="relative overflow-hidden scroll-mt-24 mx-auto mb-6 max-w-2xl rounded-3xl border border-brand-100 bg-brand-50/70 p-5 sm:p-6 text-left shadow-2xs [&>*:not(svg)]:relative">
+              <WavePattern className="text-brand-200/60" />
               <h2 id="about-cprufood-title" className="text-lg sm:text-xl font-black text-slate-900">จากโพสต์ขายของในชุมชน สู่หน้าร้านที่หาเจอง่ายขึ้น</h2>
               <p className="mt-3 text-sm leading-relaxed text-slate-600">
                 เราเห็นพ่อค้าแม่ค้าใกล้บ้านโพสต์ขายอาหารบน Facebook อยู่ทุกวัน จึงอยากทำพื้นที่เล็ก ๆ
@@ -873,7 +875,6 @@ export default function HomePage() {
                 ส่วน CPRUFood ดูแลระบบที่ช่วยให้ร้านกับลูกค้ามาเจอกัน หากมีปัญหา ติดต่อร้านผ่านออเดอร์ได้เลย
                 หรือแจ้งแอดมินให้ช่วยประสานงาน
               </p>
-              <p className="mt-3 font-bold text-brand-900">ร้านเล็ก ๆ ก็มีหน้าร้านออนไลน์ของตัวเองได้ และทุกออเดอร์คือการอุดหนุนคนในชุมชน</p>
             </section>
             <div className="flex items-center justify-center gap-3 sm:gap-4 flex-wrap font-medium">
               <button

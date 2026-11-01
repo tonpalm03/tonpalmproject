@@ -1,11 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Heart, Store, Bike, ChefHat, Clock, CheckCircle2, MapPin } from 'lucide-react';
+import { Heart, Store, Bike, ChefHat, Clock, CheckCircle2, MapPin, Sparkles } from 'lucide-react';
 import { Order } from '@/types';
 import { Supporter } from '@/lib/donations';
 import { formatOrderCode } from '@/lib/orderNumber';
 import UserAvatar from './UserAvatar';
+import WavePattern from './WavePattern';
 
 interface HomeHeroProps {
   supporters: Supporter[];
@@ -46,13 +47,14 @@ export default function HomeHero({
   return (
     <section className="grid grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-2.5">
       {/* Greeting */}
-      <div className="relative overflow-hidden rounded-2xl bg-[#9FE1CB] p-3.5 min-h-[128px]">
-        <p className="text-xs font-bold text-[#085041] truncate pr-16">สวัสดี{firstName ? ` ${firstName}` : ''}</p>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#C3EBDC] to-[#9FE1CB] p-3.5 min-h-[128px] shadow-[0_6px_16px_-6px_rgba(15,110,86,0.35)]">
+        <WavePattern />
+        <p className="relative z-10 text-xs font-bold text-[#085041] truncate pr-16">สวัสดี{firstName ? ` ${firstName}` : ''}</p>
         {/* Rendered from the device clock, so the prerendered text may differ */}
-        <h2 suppressHydrationWarning className="relative z-10 text-base font-black text-[#04342C] mt-1 leading-snug pr-14">
+        <h2 suppressHydrationWarning className="relative z-10 text-base font-black text-[#04342C] mt-1 leading-snug pr-[72px] sm:pr-24">
           {mealPrompt(new Date().getHours())}
         </h2>
-        <p className="relative z-10 mt-1.5 pr-16 text-[11px] font-medium text-[#0F6E56] leading-snug flex gap-1">
+        <p className="relative z-10 mt-1.5 pr-[72px] sm:pr-24 text-[11px] font-medium text-[#0F6E56] leading-snug flex gap-1">
           <MapPin className="w-3 h-3 shrink-0 mt-0.5" />
           <span>
             <span className="whitespace-nowrap">ชุมชนห้วยชัน - นาฝาย</span>{' '}
@@ -60,10 +62,13 @@ export default function HomeHero({
           </span>
         </p>
         <img
-          src="/mascots/pung-deng-hello.webp"
+          src="/mascots/pung-deng-thanks.webp"
           alt="พุงเด้ง"
-          className="absolute -right-3 -bottom-3 w-[88px] sm:w-28 pointer-events-none select-none"
+          className="absolute right-1.5 top-1/2 -translate-y-1/2 w-[68px] sm:w-24 pointer-events-none select-none drop-shadow-sm"
         />
+        <Sparkles className="absolute right-[72px] sm:right-24 top-4 w-3.5 h-3.5 text-white pointer-events-none" />
+        <Sparkles className="absolute right-2 top-3 w-3 h-3 text-white/90 pointer-events-none" />
+        <Sparkles className="absolute right-3 bottom-3 w-2.5 h-2.5 text-white/80 pointer-events-none" />
       </div>
 
       <div className="flex flex-col gap-2.5 min-w-0">
@@ -71,18 +76,18 @@ export default function HomeHero({
         <button
           type="button"
           onClick={onOpenSupporters}
-          className="h-9 rounded-full bg-[#E1F5EE] text-[#085041] pl-1 pr-2.5 flex items-center gap-1.5 active:scale-95 transition min-w-0"
+          className="h-9 rounded-full bg-white text-[#085041] border border-[#E1F5EE] shadow-[0_4px_12px_-4px_rgba(15,110,86,0.3)] pl-1 pr-2.5 flex items-center gap-1.5 active:scale-95 transition min-w-0"
         >
           {faces.length > 0 ? (
             <span className="flex -space-x-2 shrink-0">
               {faces.map(s => (
-                <span key={s.key} className="w-6 h-6 rounded-full overflow-hidden ring-2 ring-[#E1F5EE] bg-white">
+                <span key={s.key} className="w-6 h-6 rounded-full overflow-hidden ring-2 ring-white bg-white">
                   <UserAvatar src={s.avatar_url} alt={s.display_name} />
                 </span>
               ))}
             </span>
           ) : (
-            <span className="w-6 h-6 rounded-full bg-white flex items-center justify-center shrink-0">
+            <span className="w-6 h-6 rounded-full bg-rose-50 flex items-center justify-center shrink-0">
               <Heart className="w-3.5 h-3.5 text-pink-500 fill-pink-500" />
             </span>
           )}
@@ -94,7 +99,7 @@ export default function HomeHero({
           <button
             type="button"
             onClick={onOpenTracking}
-            className="flex-1 bg-white border border-gray-200 rounded-2xl p-2 flex flex-col items-center justify-center text-center active:scale-95 transition relative"
+            className="flex-1 bg-white border border-[#E1F5EE] shadow-[0_6px_16px_-6px_rgba(15,110,86,0.3)] rounded-2xl p-2 flex flex-col items-center justify-center text-center active:scale-95 transition relative"
           >
             {activeOrder.has_customer_unread_message && <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500" />}
             <status.icon className="w-5 h-5 text-[#1D9E75]" />
@@ -104,7 +109,7 @@ export default function HomeHero({
             </span>
           </button>
         ) : (
-          <div className="flex-1 bg-white border border-gray-200 rounded-2xl p-2 flex flex-col items-center justify-center text-center">
+          <div className="flex-1 bg-white border border-[#E1F5EE] shadow-[0_6px_16px_-6px_rgba(15,110,86,0.3)] rounded-2xl p-2 flex flex-col items-center justify-center text-center">
             <Store className="w-4 h-4 text-[#1D9E75] mb-0.5" />
             <span className="text-2xl font-black text-[#1D9E75] leading-tight">{openShopCount}</span>
             <span className="text-[11px] text-gray-500">ร้านเปิดอยู่</span>

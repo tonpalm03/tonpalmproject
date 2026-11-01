@@ -35,7 +35,6 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
     deliveryFee,
     subtotal,
     total,
-    gpAmount,
     updateQuantity,
     removeItem,
     clearCart

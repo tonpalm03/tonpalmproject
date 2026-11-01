@@ -1,9 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import type { Order, Shop, CreditTransaction } from '@/types';
+import { useState } from 'react';
+import type { Order, Shop } from '@/types';
 import { dateKey, summarizeSales } from '@/lib/salesSummary';
 import { formatOrderCode } from '@/lib/orderNumber';
 import { formatThaiDateWithTime } from '@/lib/dateUtils';
@@ -28,23 +26,13 @@ const formatOrderTime = (val: any): string => {
   return formatThaiDateWithTime(d);
 };
 
-export default function SalesDashboard({ orders, shops, shopId, onTopup, onViewCreditHistory }: {
-  orders: Order[]; shops: Shop[]; shopId?: string; onTopup?: () => void; onViewCreditHistory?: () => void;
+export default function SalesDashboard({ orders, shopId }: {
+  orders: Order[]; shops: Shop[]; shopId?: string;
 }) {
   const [period, setPeriod] = useState<Period>('day');
   const [selectedDate, setSelectedDate] = useState(() => dateKey(new Date()));
   const [customEnd, setCustomEnd] = useState(() => dateKey(new Date()));
-  const [transactions, setTransactions] = useState<CreditTransaction[]>([]);
-  const [ledgerStatus, setLedgerStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [selectedBillOrder, setSelectedBillOrder] = useState<Order | null>(null);
-  useEffect(() => {
-    const source = collection(db, 'credit_transactions');
-    return onSnapshot(shopId ? query(source, where('shop_id', '==', shopId)) : source, snap => {
-      setTransactions(snap.docs.map(d => ({ ...d.data(), id: d.id } as CreditTransaction)));
-      setLedgerStatus('ready');
-    }, () => setLedgerStatus('error'));
-  }, [shopId]);
-
   let start = selectedDate, end = selectedDate;
   if (period === 'month') { start = selectedDate.slice(0, 7) + '-01'; end = selectedDate.slice(0, 7) + '-31'; }
   if (period === 'year') { start = selectedDate.slice(0, 4) + '-01-01'; end = selectedDate.slice(0, 4) + '-12-31'; }
@@ -56,13 +44,11 @@ export default function SalesDashboard({ orders, shops, shopId, onTopup, onViewC
   }
   if (period === 'custom') end = customEnd;
   const invalidRange = !start || !end || start > end;
-  const summary = summarizeSales(orders, transactions, invalidRange ? '9999' : start, invalidRange ? '0000' : end);
-  const ready = ledgerStatus === 'ready';
-  const credit = shops.reduce((sum, shop) => sum + (shop.credit_balance ?? 0), 0);
-  const card = (title: string, value: number, detail: string, accent = false, available = true) => (
+  const summary = summarizeSales(orders, invalidRange ? '9999' : start, invalidRange ? '0000' : end);
+  const card = (title: string, value: number, detail: string, accent = false) => (
     <div key={title} className={`rounded-2xl border p-4 ${accent ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-gray-100 bg-white text-slate-900'}`}>
       <p className={`text-xs ${accent ? 'text-emerald-50' : 'text-slate-500'}`}>{title}</p>
-      <p className="mt-2 text-2xl font-black tabular-nums">{available ? `${money(value)} ฿` : '—'}</p>
+      <p className="mt-2 text-2xl font-black tabular-nums">{money(value)} ฿</p>
       <p className={`mt-2 text-[11px] ${accent ? 'text-emerald-50' : 'text-slate-500'}`}>{detail}</p>
     </div>
   );
@@ -88,33 +74,11 @@ export default function SalesDashboard({ orders, shops, shopId, onTopup, onViewC
       </div>
       <p className="text-[11px] text-slate-500">ช่วง {start} ถึง {end} • นับยอดขายตามวันส่งสำเร็จ เวลาไทย • สำเร็จ {summary.completed.length} บิล • ยกเลิกตามวันสั่ง {summary.cancelled} บิล</p>
       {invalidRange && <p role="alert" className="text-xs text-red-600">กรุณาเลือกช่วงวันที่ให้ถูกต้อง</p>}
-      {!ready && <p role="status" className="text-xs text-amber-700">{ledgerStatus === 'error' ? 'โหลดบัญชีเครดิตไม่สำเร็จ จึงยังแสดงค่าบริการและยอดหลังหักไม่ได้ กรุณาลองเปิดหน้านี้อีกครั้ง' : 'กำลังตรวจสอบรายการหักเครดิต…'}</p>}
     </div>
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
       {card(shopId ? 'ยอดขายอาหาร' : 'ยอดอาหารทุกร้าน', summary.food, 'เฉพาะออเดอร์ส่งสำเร็จ')}
       {card('ค่าจัดส่งของร้าน', summary.delivery, 'รวมค่าส่งตามบิลจริง')}
-      {card('ยอดรับจากลูกค้าตามบิล', summary.collected, 'ร้านรับโดยตรง รวมอาหารและค่าส่ง')}
-      {shopId ? card('ยอดหลังหักค่าบริการ', summary.net, 'ยังไม่หักต้นทุนอาหารและค่าใช้จ่ายร้าน', true, ready) : card('รายได้ค่าบริการระบบ', summary.serviceRevenue, 'จากรายการหักเครดิตจริงในช่วงที่เลือก', true, ready)}
-    </div>
-    <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4 space-y-3">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div><h3 className="font-bold text-emerald-950">{shopId ? 'เครดิตและค่าบริการร้านค้า' : 'เครดิตร้านค้าในระบบ'}</h3><p className="mt-1 text-xs text-emerald-900">ยอดเครดิตคงเหลือปัจจุบัน {money(credit)} บาท • ยอดนี้ไม่เปลี่ยนตามตัวกรองวันที่</p></div>
-        <div className="flex flex-wrap items-center gap-2">
-          {onViewCreditHistory && (
-            <button type="button" onClick={onViewCreditHistory} className="rounded-xl bg-white border border-emerald-300 text-emerald-800 hover:bg-emerald-100 px-3 py-2 text-xs font-bold transition active:scale-95 cursor-pointer shadow-2xs inline-flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-emerald-600" />
-              <span>ดูประวัติเครดิต</span>
-            </button>
-          )}
-          {onTopup && <button type="button" onClick={onTopup} className="rounded-xl bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-xs font-bold text-white transition active:scale-95 cursor-pointer shadow-2xs">เติมเครดิต</button>}
-        </div>
-      </div>
-      <div className="grid sm:grid-cols-3 gap-3 text-xs text-emerald-950">
-        <p>เติมเครดิตในช่วงนี้ <strong className="block mt-1 text-lg">{ready ? money(summary.topups) : '—'} ฿</strong></p>
-        <p>ค่าบริการของบิลสำเร็จในช่วงนี้<strong className="block mt-1 text-lg">{ready ? money(summary.gp) : '—'} ฿</strong></p>
-        <p>ปรับลด / คืนเครดิตผ่านแอดมิน<strong className="block mt-1 text-lg">{ready ? money(summary.deductions) : '—'} ฿</strong></p>
-      </div>
-      <p className="text-[11px] leading-relaxed text-emerald-800">ยอดเติมเครดิตเป็นเงินล่วงหน้าสำหรับใช้บริการ จึงแยกจากรายได้ค่าบริการที่หักจริง ไม่ต้องโอน GP ซ้ำรายสัปดาห์ รายการเติมและปรับลดนับตามวันที่ทำรายการ หากคืนค่าอาหารภายหลัง กรุณาให้แอดมินตรวจสอบยอด รายงานนี้ยังไม่หักเงินคืนค่าอาหารที่ทำภายนอกระบบ</p>
+      {card('ยอดรับจากลูกค้าตามบิล', summary.collected, 'ร้านรับเต็มจำนวน ไม่มีค่าบริการ', true)}
     </div>
     <div className="rounded-2xl border border-gray-100 bg-white p-4">
       <h3 className="font-bold text-sm text-slate-900">{shopId ? '5 เมนูขายดี' : 'อันดับยอดขายร้านค้า'} <span className="font-normal text-xs text-slate-500">ในช่วงที่เลือก</span></h3>
@@ -134,22 +98,19 @@ export default function SalesDashboard({ orders, shops, shopId, onTopup, onViewC
               <th className="p-3">ร้านค้า</th>
               <th className="p-3 text-right">ยอดอาหาร</th>
               <th className="p-3 text-right">ค่าส่ง</th>
-              <th className="p-3 text-right">หักเครดิต</th>
-              <th className="p-3 text-right">หลังหักค่าบริการ</th>
+              <th className="p-3 text-right">ยอดรวม</th>
               <th className="p-3 text-center">รายละเอียด</th>
             </tr>
           </thead>
           <tbody>
             {summary.completed.length === 0 && (
               <tr>
-                <td colSpan={7} className="p-6 text-center text-slate-400">
+                <td colSpan={6} className="p-6 text-center text-slate-400">
                   ยังไม่มีออเดอร์ส่งสำเร็จในช่วงนี้
                 </td>
               </tr>
             )}
             {summary.completed.map(o => {
-              const charge = summary.charges.get(o.id) ?? 0;
-              const netAmount = (o.total_amount ?? 0) - charge;
               const timeDisplay = formatOrderTime(o.completed_at || o.created_at);
 
               return (
@@ -166,11 +127,8 @@ export default function SalesDashboard({ orders, shops, shopId, onTopup, onViewC
                   <td className="p-3 font-medium text-slate-800">{o.shop_name}</td>
                   <td className="p-3 text-right font-medium">{money(o.food_subtotal ?? 0)} ฿</td>
                   <td className="p-3 text-right font-medium">{money(o.delivery_fee ?? 0)} ฿</td>
-                  <td className="p-3 text-right text-rose-600 font-medium">
-                    {ready ? `${money(charge)} ฿` : '—'}
-                  </td>
                   <td className="p-3 text-right font-bold text-emerald-700">
-                    {ready ? `${money(netAmount)} ฿` : '—'}
+                    {money(o.total_amount ?? 0)} ฿
                   </td>
                   <td className="p-3 text-center">
                     <button
@@ -328,18 +286,6 @@ export default function SalesDashboard({ orders, shops, shopId, onTopup, onViewC
                 {selectedBillOrder.payment_method === 'cash' ? 'เงินสดปลายทาง' : 'สแกน QR ร้านปลายทาง'}
               </span>
             </div>
-            {ready && (
-              <>
-                <div className="flex justify-between text-rose-700 text-[11px]">
-                  <span>ค่าบริการระบบหักเครดิต (GP):</span>
-                  <span className="font-bold">-{money(summary.charges.get(selectedBillOrder.id) ?? 0)} ฿</span>
-                </div>
-                <div className="flex justify-between text-emerald-800 font-black pt-1 border-t border-emerald-200 text-xs">
-                  <span>ยอดสุทธิของร้านหลังหักค่าบริการ:</span>
-                  <span>{money((selectedBillOrder.total_amount ?? 0) - (summary.charges.get(selectedBillOrder.id) ?? 0))} ฿</span>
-                </div>
-              </>
-            )}
           </div>
 
           {/* Close Button */}

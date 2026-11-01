@@ -192,7 +192,7 @@ exports.notifyNewOrder = region.runWith({ invoker: 'public' }).https.onCall(asyn
 });
 
 /**
- * Complete order atomically: updates status, increments sales, deducts credit if GP enabled
+ * Complete order atomically: updates status and increments sales counters
  */
 // Firebase clients use Firebase Auth, not Google IAM credentials. Allow the
 // callable transport, then enforce authentication and shop ownership below.
@@ -232,7 +232,6 @@ exports.completeOrder = region.runWith({ invoker: 'public' }).https.onCall(async
     const shopRef = db.collection('shops').doc(current.shop_id);
     const shopSnap = await tx.get(shopRef);
     if (!shopSnap.exists) throw new functions.https.HttpsError('not-found', 'Shop not found');
-    const settingsSnap = await tx.get(db.collection('system_settings').doc('general'));
     const marker = db.collection('_completed_orders').doc(orderId);
     const markerSnap = await tx.get(marker);
     const quantities = new Map();
@@ -249,21 +248,6 @@ exports.completeOrder = region.runWith({ invoker: 'public' }).https.onCall(async
       const snap = await tx.get(ref);
       if (snap.exists && snap.data().shop_id === current.shop_id) menus.push({ ref, quantity });
     }
-    const settings = settingsSnap.exists ? settingsSnap.data() : {};
-    let gpAmount = 0;
-    const isGpActive = settings.gp_enabled === true || String(settings.gp_enabled) === 'true';
-    if (isGpActive) {
-      if (typeof current.gp_amount === 'number' && current.gp_amount > 0) {
-        gpAmount = current.gp_amount;
-      } else {
-        const percent = typeof settings.gp_percent === 'number' ? settings.gp_percent : (parseFloat(settings.gp_percent) || 5);
-        const subtotal = typeof current.food_subtotal === 'number' ? current.food_subtotal : (parseFloat(current.food_subtotal) || 0);
-        gpAmount = Math.round(subtotal * (percent / 100) * 100) / 100;
-      }
-    }
-    if (typeof gpAmount !== 'number' || !Number.isFinite(gpAmount) || gpAmount < 0) {
-      throw new functions.https.HttpsError('failed-precondition', 'Invalid order fee');
-    }
     tx.update(orderRef, { status: 'completed', completed_at: admin.firestore.FieldValue.serverTimestamp() });
     const updates = {};
     if (!markerSnap.exists) {
@@ -271,126 +255,11 @@ exports.completeOrder = region.runWith({ invoker: 'public' }).https.onCall(async
       for (const item of menus) tx.update(item.ref, { sales_count: admin.firestore.FieldValue.increment(item.quantity) });
       tx.set(marker, { processed_at: admin.firestore.FieldValue.serverTimestamp() });
     }
-    if (gpAmount > 0) {
-      updates.credit_balance = admin.firestore.FieldValue.increment(-gpAmount);
-      const currentBal = typeof shopSnap.data().credit_balance === 'number' ? shopSnap.data().credit_balance : 0;
-      if (currentBal - gpAmount <= 0) updates.is_open = false;
-      const txRef = db.collection('credit_transactions').doc();
-      tx.set(txRef, {
-        id: txRef.id,
-        shop_id: current.shop_id,
-        shop_name: current.shop_name || shopSnap.data().name || '',
-        order_id: orderId,
-        order_number: current.order_number || null,
-        amount: -gpAmount,
-        type: 'gp_deduct',
-        note: 'หักค่าบริการสำหรับออเดอร์ #' + (current.order_number || orderId),
-        created_by: 'system',
-        created_at: admin.firestore.FieldValue.serverTimestamp(),
-      });
-    }
     if (Object.keys(updates).length) tx.update(shopRef, updates);
   });
 
   await sendShopBadge(order.shop_id).catch(() => {});
   return { success: true };
-});
-
-/**
- * Top up / adjust merchant credit balance (Admin only)
- */
-exports.topUpMerchantCredit = region.runWith({ invoker: 'public' }).https.onCall(async (data, context) => {
-  if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Sign in required');
-  const callerUid = context.auth.uid;
-  const isAdmin = await isCallerAdmin(callerUid);
-  if (!isAdmin) {
-    throw new functions.https.HttpsError('permission-denied', 'Admin access required');
-  }
-
-  const { shopId, amount, note, idempotencyKey } = data || {};
-  if (!shopId || typeof amount !== 'number' || isNaN(amount) || amount === 0) {
-    throw new functions.https.HttpsError('invalid-argument', 'Invalid shopId or amount');
-  }
-
-  const db = admin.firestore();
-  const trimmedIdemp = idempotencyKey && typeof idempotencyKey === 'string' ? idempotencyKey.trim() : null;
-  const idempRef = trimmedIdemp ? db.collection('_topup_requests').doc(trimmedIdemp) : null;
-
-  if (idempRef) {
-    const existingIdemp = await idempRef.get();
-    if (existingIdemp.exists) {
-      const prevData = existingIdemp.data();
-      return { success: true, newBalance: prevData.newBalance, is_open: prevData.is_open, alreadyProcessed: true };
-    }
-  }
-
-  const shopRef = db.collection('shops').doc(shopId);
-  const settingsRef = db.collection('system_settings').doc('general');
-  const txRef = db.collection('credit_transactions').doc();
-
-  let finalBalance = 0;
-  let finalIsOpen = true;
-
-  await db.runTransaction(async tx => {
-    if (idempRef) {
-      const txIdempSnap = await tx.get(idempRef);
-      if (txIdempSnap.exists) {
-        const prevData = txIdempSnap.data();
-        finalBalance = prevData.newBalance;
-        finalIsOpen = prevData.is_open;
-        return;
-      }
-    }
-
-    const [shopSnap, settingsSnap] = await Promise.all([
-      tx.get(shopRef),
-      tx.get(settingsRef)
-    ]);
-
-    if (!shopSnap.exists) throw new functions.https.HttpsError('not-found', 'Shop not found');
-    const shopData = shopSnap.data();
-    const settings = settingsSnap.exists ? settingsSnap.data() : {};
-
-    const currentBalance = typeof shopData.credit_balance === 'number' ? shopData.credit_balance : 0;
-    finalBalance = Math.round((currentBalance + amount) * 100) / 100;
-
-    const updates = {
-      credit_balance: finalBalance,
-    };
-
-    // If GP is active and resulting credit is <= 0, automatically close the shop
-    if (settings.gp_enabled === true && finalBalance <= 0) {
-      updates.is_open = false;
-      finalIsOpen = false;
-    } else {
-      finalIsOpen = shopData.is_open ?? true;
-    }
-
-    tx.update(shopRef, updates);
-    tx.set(txRef, {
-      id: txRef.id,
-      shop_id: shopId,
-      shop_name: shopData.name || '',
-      amount: amount,
-      type: amount > 0 ? 'topup' : 'deduct',
-      note: note || (amount > 0 ? 'แอดมินเติมเครดิต' : 'แอดมินปรับลดยอดเครดิต'),
-      created_by: callerUid,
-      created_at: admin.firestore.FieldValue.serverTimestamp(),
-    });
-
-    if (idempRef) {
-      tx.set(idempRef, {
-        shop_id: shopId,
-        amount,
-        newBalance: finalBalance,
-        is_open: finalIsOpen,
-        created_by: callerUid,
-        created_at: admin.firestore.FieldValue.serverTimestamp(),
-      });
-    }
-  });
-
-  return { success: true, newBalance: finalBalance, is_open: finalIsOpen };
 });
 
 /**

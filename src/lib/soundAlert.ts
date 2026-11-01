@@ -406,7 +406,7 @@ class SoundAlertEngine {
 
   /**
    * Plays an energetic, uplifting departure sound when order is ready and merchant goes out to deliver
-   * ("ปรุงเสร็จแล้ว กำลังออกไปส่ง (10 บ.) 🛵💨")
+   * ("ปรุงเสร็จแล้ว กำลังออกไปส่ง (10 บ.)")
    * Upbeat engine rev / chime fanfare: A4 -> D5 -> F#5 -> A5 -> D6
    */
   public async playOrderDeliveringSound(): Promise<boolean> {
@@ -463,7 +463,7 @@ class SoundAlertEngine {
 
   /**
    * Plays a crisp, ultra-satisfying cash register "Ka-Ching!" + coin clink celebration chime
-   * when merchant delivers and collects money ("ส่งถึงมือแล้ว + รับเงินเรียบร้อย 💰✨")
+   * when merchant delivers and collects money ("ส่งถึงมือแล้ว + รับเงินเรียบร้อย")
    */
   public async playOrderCompletedSound(): Promise<boolean> {
     const ctx = this.getContext();
@@ -641,9 +641,60 @@ class SoundAlertEngine {
   }
 
   /**
-   * Plays a crisp coin / cash sound when admin tops up or adjusts merchant credit
+   * Short soft tick for each step of the random menu shuffle
    */
-  public async playAdminTopupSound(): Promise<boolean> {
+  public playRandomTick(): void {
+    const ctx = this.getContext();
+    if (!ctx || ctx.state !== 'running') return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(1400, now);
+    gainNode.gain.setValueAtTime(0.12, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+    osc.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.05);
+  }
+
+  /**
+   * Bright two-note "ta-da" when the random menu pick lands
+   */
+  public async playRandomLanded(): Promise<boolean> {
+    const ctx = this.getContext();
+    if (!ctx) return false;
+    try {
+      if (ctx.state === 'suspended') await ctx.resume();
+      const now = ctx.currentTime;
+      [
+        { freq: 1046.5, start: 0, duration: 0.18 }, // C6
+        { freq: 1568.0, start: 0.09, duration: 0.4 }, // G6
+      ].forEach(({ freq, start, duration }) => {
+        const osc = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + start);
+        gainNode.gain.setValueAtTime(0.001, now + start);
+        gainNode.gain.linearRampToValueAtTime(0.35, now + start + 0.01);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, now + start + duration);
+        osc.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        osc.start(now + start);
+        osc.stop(now + start + duration + 0.05);
+      });
+      return true;
+    } catch (e) {
+      console.warn('Random landed sound error:', e);
+      return false;
+    }
+  }
+
+  /**
+   * Plays a crisp coin chime for the stream-style donation popup
+   */
+  public async playDonationSound(): Promise<boolean> {
     const ctx = this.getContext();
     if (!ctx) return false;
 

@@ -26,7 +26,6 @@ function buildNewShop(shopId: string, ownerUid: string, input: NewShopInput) {
     rating: 5.0,
     review_count: 0,
     sales_count: 0,
-    credit_balance: 0,
     created_at: new Date().toISOString(),
   };
 }

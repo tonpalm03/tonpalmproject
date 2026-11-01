@@ -8,7 +8,6 @@ export async function seedInitialFirestoreData(): Promise<{ success: boolean; co
 
     // 1. Seed System Settings
     await setDoc(doc(db, 'system_settings', 'general'), {
-      gp_percent: 5,
       delivery_fee: 10,
       platform_name: 'CPRUFood',
       updated_at: serverTimestamp(),

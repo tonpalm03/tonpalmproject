@@ -57,7 +57,6 @@ export interface Shop {
   review_count?: number; // e.g. 18
   sales_count?: number; // total orders sold
   line_webhook_url?: string; // Google Apps Script / Webhook URL for LINE notifications
-  credit_balance?: number; // Prepaid credit balance in THB
   delivery_fee?: number; // Delivery fee set by shop in THB (0 = free delivery)
   delivery_radius_km?: number; // Custom delivery radius in km set by shop (defaults to 1.0 km)
   created_at?: any;
@@ -150,7 +149,6 @@ export interface Order {
   food_subtotal: number;
   delivery_fee: number; // 10 THB
   total_amount: number;
-  gp_amount: number; // 5% of food_subtotal
   payment_method: PaymentMethod;
   cash_change_note?: string;
   status: OrderStatus;
@@ -176,45 +174,41 @@ export interface ChatMessage {
   is_read: boolean;
 }
 
-export interface WeeklySettlement {
-  id: string;
-  shop_id: string;
-  shop_name?: string;
-  cycle_id?: string;
-  cycle_label?: string;
-  week_start: any;
-  week_end: any;
-  total_food_sales: number;
-  delivery_earnings?: number;
-  order_count?: number;
-  gp_due: number; // 5%
-  status: 'unpaid' | 'pending_approval' | 'paid';
-  slip_url?: string;
-  confirmed_by?: string;
-  paid_at?: any;
-  updated_at?: any;
-}
-
 export interface SystemSettings {
-  gp_enabled?: boolean; // Toggle master GP commission ON/OFF
-  gp_percent: number; // default 5
   delivery_fee: number; // default 10
-  admin_promptpay_name?: string;
-  admin_promptpay_number?: string;
+  donate_promptpay_name?: string; // Account name shown under the donation QR
+  donate_promptpay_number?: string; // PromptPay number shown (with copy) beside the QR
+  donate_qr_url?: string; // Uploaded PromptPay QR image (data URL)
   platform_name?: string;
   updated_at?: any;
 }
 
-export interface CreditTransaction {
+export interface DonationRequest {
   id: string;
-  shop_id: string;
-  shop_name?: string;
-  order_id?: string;
-  order_number?: number | null;
+  uid: string;
+  display_name: string;
+  avatar_url?: string;
   amount: number;
-  type: 'topup' | 'deduct' | 'gp_deduct';
-  note?: string;
-  created_by?: string;
+  message: string;
+  is_anonymous: boolean;
+  hide_amount: boolean;
+  slip_url: string;
+  status: 'pending' | 'approved' | 'rejected';
+  created_at?: any;
+}
+
+// Public, approved donation. Leaderboard totals are summed per supporter_key on the client.
+export interface Donation {
+  id: string;
+  supporter_key: string; // uid, 'name:<name>' for admin-added non-users, or 'anon:<id>'
+  display_name: string;
+  avatar_url?: string;
+  amount: number | null; // null when the donor hid the amount
+  message: string;
+  message_hidden?: boolean;
+  notify: boolean; // show the stream-style popup
+  source: 'request' | 'admin';
+  request_id?: string;
   created_at?: any;
 }
 

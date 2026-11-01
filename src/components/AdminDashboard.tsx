@@ -5,9 +5,9 @@ import {
   ShieldCheck, Users, Store, TrendingUp, Calendar, Eye, CheckCircle2,
   AlertCircle, DollarSign, Clock, MessageSquare, Award, Search, Trash2, Phone, X,
   Camera, MapPin, Star, Power, Edit3, Download, Navigation, FileSpreadsheet, Check, Bike, ChefHat, Plus, Edit2, Scissors,
-  Key, Lock, Copy, EyeOff, Settings, ArrowRight, User, RefreshCw, Sparkles, Coffee, Utensils, Percent, Wallet, FileText
+  Key, Lock, Copy, EyeOff, Settings, ArrowRight, User, RefreshCw, Sparkles, Coffee, Utensils, Percent, Wallet, FileText, Heart
 } from 'lucide-react';
-import { UserProfile, Order, UserRole, Shop, MenuItem, MenuItemOption, CreditTransaction } from '@/types';
+import { UserProfile, Order, UserRole, Shop, MenuItem, MenuItemOption } from '@/types';
 import { db, functions } from '@/lib/firebase';
 import {
   collection, onSnapshot, doc, updateDoc, setDoc, deleteDoc, getDocs, serverTimestamp, writeBatch, query, where, orderBy, limit, runTransaction, Transaction
@@ -15,7 +15,6 @@ import {
 import { httpsCallable } from 'firebase/functions';
 import ChatModal from './ChatModal';
 import SalesDashboard from './SalesDashboard';
-import { chargedByOrder } from '@/lib/salesSummary';
 import ImageCropModal from './ImageCropModal';
 import UserAvatar, { getUserCode } from './UserAvatar';
 import { formatOrderCode } from '@/lib/orderNumber';
@@ -29,13 +28,14 @@ import { readFileAsDataUrl } from '@/lib/imageUtils';
 import { grantMerchant, setAdminRole } from '@/lib/merchantAccess';
 import MerchantApplicationsAdmin from './MerchantApplicationsAdmin';
 import ShopOwnerTransferModal from './ShopOwnerTransferModal';
+import DonationsAdmin from './DonationsAdmin';
 
 interface AdminDashboardProps {
   currentUser: UserProfile;
 }
 
 export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'analytics' | 'users' | 'shops' | 'orders' | 'settlement'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'users' | 'shops' | 'orders' | 'donations'>('analytics');
 
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [shops, setShops] = useState<Shop[]>([]);
@@ -107,59 +107,6 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
   const [editMenuItemPrice, setEditMenuItemPrice] = useState('');
   const [editMenuItemCategory, setEditMenuItemCategory] = useState<'food' | 'drink_dessert'>('food');
   const [editMenuItemOptions, setEditMenuItemOptions] = useState<MenuItemOption[]>([]);
-
-  // Platform GP & Merchant Credit Management
-  const [gpEnabled, setGpEnabled] = useState<boolean>(false);
-  const [gpPercent, setGpPercent] = useState<number>(5);
-  const [isSavingGp, setIsSavingGp] = useState<boolean>(false);
-  const [creditTransactions, setCreditTransactions] = useState<CreditTransaction[]>([]);
-  const [creditLedgerReady, setCreditLedgerReady] = useState(false);
-
-  // Top-Up Merchant Credit Modal
-  const [selectedShopForCredit, setSelectedShopForCredit] = useState<Shop | null>(null);
-  const [topupAmount, setTopupAmount] = useState<string>('100');
-  const [topupType, setTopupType] = useState<'topup' | 'deduct'>('topup');
-  const [topupNote, setTopupNote] = useState<string>('');
-  const [isSubmittingCredit, setIsSubmittingCredit] = useState<boolean>(false);
-  const [creditError, setCreditError] = useState<string | null>(null);
-  const creditIdempotencyKeyRef = useRef<string>('');
-
-  // Real-time listener for System Settings (GP toggle & percentage)
-  useEffect(() => {
-    try {
-      const unsub = onSnapshot(doc(db, 'system_settings', 'general'), (snap) => {
-        if (snap.exists()) {
-          const data = snap.data();
-          setGpEnabled(data.gp_enabled === true);
-          setGpPercent(typeof data.gp_percent === 'number' ? data.gp_percent : 5);
-        }
-      }, (err) => {
-        console.warn('System settings listener fallback:', err);
-      });
-      return () => unsub();
-    } catch (e) {
-      console.error(e);
-    }
-  }, []);
-
-  // Real-time listener for Credit Transactions Log
-  useEffect(() => {
-    try {
-      const q = query(collection(db, 'credit_transactions'), orderBy('created_at', 'desc'));
-      const unsub = onSnapshot(q, (snapshot) => {
-        const list: CreditTransaction[] = [];
-        snapshot.forEach((d) => list.push({ id: d.id, ...d.data() } as CreditTransaction));
-        setCreditTransactions(list);
-        setCreditLedgerReady(true);
-      }, (err) => {
-        setCreditLedgerReady(false);
-        console.warn('Credit transactions listener fallback:', err);
-      });
-      return () => unsub();
-    } catch (e) {
-      console.error(e);
-    }
-  }, []);
 
   // Listen to Users
   useEffect(() => {
@@ -519,15 +466,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
         }
       }
 
-      // 5. Delete credit transactions belonging to this shop
-      const transSnap = await getDocs(collection(db, 'credit_transactions'));
-      for (const tDoc of transSnap.docs) {
-        if (tDoc.data().shop_id === shopId) {
-          await deleteDoc(doc(db, 'credit_transactions', tDoc.id));
-        }
-      }
-
-      // 6. Demote owner user back to customer if still active
+      // 5. Demote owner user back to customer if still active
       const ownerUser = users.find((u) => u.shop_id === shopId);
       if (ownerUser && ownerUser.uid !== deletedUserId) {
         await setDoc(doc(db, 'access', ownerUser.uid), { role: 'customer' });
@@ -546,105 +485,6 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
     } catch (e: any) {
       console.error('Delete shop error:', e);
       alert(`ลบร้านค้าไม่สำเร็จ: ${e.message || 'เกิดข้อผิดพลาด'}`);
-    }
-  };
-
-  // Platform GP Settings Save Handler
-  const handleSaveGpSettings = async () => {
-    setIsSavingGp(true);
-    try {
-      await setDoc(
-        doc(db, 'system_settings', 'general'),
-        {
-          gp_enabled: gpEnabled,
-          gp_percent: Number(gpPercent) || 5,
-          updated_at: serverTimestamp(),
-        },
-        { merge: true }
-      );
-
-      // If GP is enabled, close any shops that have 0 or negative credit balance
-      if (gpEnabled) {
-        const depletedShops = shops.filter((s) => (s.credit_balance ?? 0) <= 0 && s.is_open === true);
-        for (const s of depletedShops) {
-          try {
-            await updateDoc(doc(db, 'shops', s.id), { is_open: false });
-          } catch (_) {}
-        }
-      }
-
-      alert('บันทึกการตั้งค่าระบบ GP สำเร็จแล้ว');
-    } catch (err: any) {
-      console.error('Save GP settings error:', err);
-      alert(`บันทึกการตั้งค่า GP ไม่สำเร็จ: ${err.message || 'สิทธิ์ไม่เพียงพอ'}`);
-    } finally {
-      setIsSavingGp(false);
-    }
-  };
-
-  // Top-Up Merchant Credit Submit Handler
-  const handleTopUpCreditSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedShopForCredit) return;
-    const num = parseFloat(topupAmount);
-    if (isNaN(num) || num <= 0) {
-      setCreditError('กรุณาระบุจำนวนเงินที่ถูกต้อง (มากกว่า 0)');
-      return;
-    }
-
-    const finalAmount = topupType === 'deduct' ? -num : num;
-    setIsSubmittingCredit(true);
-    setCreditError(null);
-
-    if (!creditIdempotencyKeyRef.current) {
-      creditIdempotencyKeyRef.current = `topup_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
-    }
-
-    try {
-      const callTopup = httpsCallable<
-        { shopId: string; amount: number; note?: string; idempotencyKey?: string },
-        { success: boolean; newBalance: number; is_open?: boolean; alreadyProcessed?: boolean }
-      >(functions, 'topUpMerchantCredit');
-
-      const res = await callTopup({
-        shopId: selectedShopForCredit.id,
-        amount: finalAmount,
-        note: topupNote.trim() || (topupType === 'topup' ? 'แอดมินเติมเครดิต' : 'แอดมินปรับลดยอดเครดิต'),
-        idempotencyKey: creditIdempotencyKeyRef.current,
-      });
-
-      if (!res.data?.success) {
-        throw new Error('ไม่สามารถปรับยอดเครดิตได้ กรุณาลองใหม่อีกครั้ง');
-      }
-
-      const newBal = res.data.newBalance ?? 0;
-      const willClose = gpEnabled && newBal <= 0;
-
-      soundAlert.playAdminTopupSound().catch(() => {});
-      
-      // Ensure local shop state reflects new credit and status
-      setShops((prev) =>
-        prev.map((s) =>
-          s.id === selectedShopForCredit.id
-            ? { ...s, credit_balance: newBal, is_open: willClose ? false : s.is_open }
-            : s
-        )
-      );
-
-      creditIdempotencyKeyRef.current = '';
-      alert(
-        `${topupType === 'topup' ? 'เติมเครดิต' : 'ปรับลดเครดิต'} ให้ร้าน "${selectedShopForCredit.name}" สำเร็จ!\nยอดคงเหลือใหม่: ฿${newBal.toFixed(2)}${
-          willClose ? '\n\nยอดเครดิตไม่เพียงพอ ระบบได้ทำการปิดร้านค้านี้ชั่วคราวอัตโนมัติ' : ''
-        }`
-      );
-      setSelectedShopForCredit(null);
-      setTopupAmount('');
-      setTopupNote('');
-    } catch (err: any) {
-      console.error('topUpMerchantCredit error:', err);
-      setCreditError(err?.message || 'เกิดข้อผิดพลาดในการทำรายการ กรุณาลองใหม่อีกครั้ง');
-    } finally {
-      setIsSubmittingCredit(false);
     }
   };
 
@@ -784,8 +624,6 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
     }
   };
 
-  const orderCharges = chargedByOrder(creditTransactions);
-
   // Order Log Helper Functions
   const getOrderDate = (o: Order): Date | null => {
     if (!o.created_at) return null;
@@ -866,13 +704,8 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
   const filteredOrdersTotalGMV = filteredAdminOrders
     .filter((o) => o.status === 'completed')
     .reduce((sum, o) => sum + (o.food_subtotal || 0), 0);
-  const filteredOrdersAdminGP = filteredAdminOrders.filter(o => o.status === 'completed').reduce((sum, o) => sum + (orderCharges.get(o.id) ?? 0), 0);
 
   const handleExportCSV = () => {
-    if (!creditLedgerReady) {
-      alert('ยังโหลดรายการเครดิตไม่สำเร็จ กรุณาลองใหม่ก่อนส่งออกรายงาน');
-      return;
-    }
     if (filteredAdminOrders.length === 0) {
       alert('ไม่มีข้อมูลออเดอร์ในตัวกรองนี้');
       return;
@@ -887,7 +720,6 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
       'ยอดรวมทั้งหมด(บาท)',
       'ค่าอาหาร(บาท)',
       'ค่าส่ง(บาท)',
-      'ค่าบริการหักเครดิตจริง(บาท)',
       'วิธีชำระ',
       'สถานะ',
       'ที่อยู่จัดส่ง',
@@ -912,7 +744,6 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
         o.total_amount || 0,
         o.food_subtotal || 0,
         (o.delivery_fee ?? 0),
-        (orderCharges.get(o.id) ?? 0),
         `"${o.payment_method === 'cash' ? 'เงินสด' : 'สแกน'}"`,
         `"${o.status}"`,
         `"${(o.delivery_address || '').replace(/"/g, '""')}"`,
@@ -1005,12 +836,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
       for (const rDoc of reviewsSnap.docs) {
         await deleteDoc(doc(db, 'shop_reviews', rDoc.id));
       }
-      // 3. Delete related credit transactions
-      const transSnap = await getDocs(query(collection(db, 'credit_transactions'), where('order_id', '==', orderId)));
-      for (const tDoc of transSnap.docs) {
-        await deleteDoc(doc(db, 'credit_transactions', tDoc.id));
-      }
-      // 4. Delete order
+      // 3. Delete order
       await deleteDoc(doc(db, 'orders', orderId));
       setOrders((prev) => prev.filter((o) => o.id !== orderId));
       alert(`ลบออเดอร์ #${orderCode || orderId} เรียบร้อยแล้ว!`);
@@ -1022,29 +848,26 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
 
   const handleCleanupOrphanedOrders = async () => {
     try {
-      const [liveShopsSnap, liveOrdersSnap, transSnap] = await Promise.all([
+      const [liveShopsSnap, liveOrdersSnap] = await Promise.all([
         getDocs(collection(db, 'shops')),
         getDocs(collection(db, 'orders')),
-        getDocs(collection(db, 'credit_transactions')),
       ]);
 
       const existingShopIds = new Set(liveShopsSnap.docs.map((d) => d.id));
       const liveOrders = liveOrdersSnap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }));
       const orphaned = liveOrders.filter((o) => !existingShopIds.has(o.shop_id));
-      const orphanedTrans = transSnap.docs.filter((tDoc) => {
-        const data = tDoc.data();
-        return !existingShopIds.has(data.shop_id) || (data.order_id && !liveOrders.some((o) => o.id === data.order_id));
-      });
 
-      if (orphaned.length === 0 && orphanedTrans.length === 0) {
-        alert('ไม่พบออเดอร์หรือรายการค่าบริการตกค้าง');
+      if (orphaned.length === 0) {
+        alert('ไม่พบออเดอร์ตกค้าง');
         return;
       }
-      if (!confirm(`พบข้อมูลตกค้าง:\n- ออเดอร์ของร้านที่ถูกลบ: ${orphaned.length} บิล\n- รายการค่าบริการ/เครดิตตกค้าง: ${orphanedTrans.length} รายการ\n\nยืนยันการล้างข้อมูลเหล่านี้หรือไม่?`)) {
+      if (!confirm(`พบออเดอร์ของร้านที่ถูกลบ ${orphaned.length} บิล
+
+ยืนยันการล้างข้อมูลเหล่านี้หรือไม่?`)) {
         return;
       }
       setIsCleaningChats(true);
-      setCleanupStatusMessage(`กำลังล้างข้อมูลตกค้าง (${orphaned.length} บิล, ${orphanedTrans.length} ธุรกรรม)...`);
+      setCleanupStatusMessage(`กำลังล้างออเดอร์ตกค้าง (${orphaned.length} บิล)...`);
       for (const ord of orphaned) {
         try {
           const msgsSnap = await getDocs(collection(db, 'orders', ord.id, 'messages'));
@@ -1053,9 +876,6 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
           }
         } catch (_) {}
         await deleteDoc(doc(db, 'orders', ord.id));
-      }
-      for (const tDoc of orphanedTrans) {
-        await deleteDoc(doc(db, 'credit_transactions', tDoc.id));
       }
       setOrders((prev) => prev.filter((o) => existingShopIds.has(o.shop_id)));
       alert(`ลบข้อมูลตกค้างเรียบร้อยแล้ว!`);
@@ -1070,7 +890,9 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
   };
 
   const handleResetAllOrders = async () => {
-    if (!confirm(`ยืนยันการล้างข้อมูลออเดอร์ ยอดขาย และประวัติค่าบริการทั้งหมดหรือไม่?\n\n*ข้อควรระวัง: บิลคำสั่งซื้อ ยอดขาย รายการหักค่าบริการ (GP) และรีวิวทดสอบทั้งหมดจะถูกรีเซ็ตกลับเป็น 0 เพื่อเตรียมเปิดใช้งานระบบจริง*`)) {
+    if (!confirm(`ยืนยันการล้างข้อมูลออเดอร์และยอดขายทั้งหมดหรือไม่?
+
+*ข้อควรระวัง: บิลคำสั่งซื้อ ยอดขาย และรีวิวทดสอบทั้งหมดจะถูกรีเซ็ตกลับเป็น 0 เพื่อเตรียมเปิดใช้งานระบบจริง*`)) {
       return;
     }
     setIsCleaningChats(true);
@@ -1094,13 +916,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
         await deleteDoc(doc(db, 'shop_reviews', rDoc.id));
       }
 
-      // 3. Delete all credit transactions (GP & deductions)
-      const transSnap = await getDocs(collection(db, 'credit_transactions'));
-      for (const tDoc of transSnap.docs) {
-        await deleteDoc(doc(db, 'credit_transactions', tDoc.id));
-      }
-
-      // 4. Reset shop sales_count and rating metrics
+      // 3. Reset shop sales_count and rating metrics
       const shopsSnap = await getDocs(collection(db, 'shops'));
       for (const sDoc of shopsSnap.docs) {
         await updateDoc(doc(db, 'shops', sDoc.id), {
@@ -1111,7 +927,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
         }).catch(console.warn);
       }
 
-      // 5. Reset counter and checkout requests
+      // 4. Reset counter and checkout requests
       try {
         await setDoc(doc(db, 'system_settings', 'order_counter'), {
           last_order_number: 1000,
@@ -1127,32 +943,10 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
       } catch (_) {}
 
       setOrders([]);
-      alert('ล้างข้อมูลออเดอร์ ยอดขาย และรายได้ค่าบริการทดสอบทั้งหมดเรียบร้อยแล้ว!\n\nทุกยอดกลับมาเป็น 0.00 ฿ พร้อมเริ่มระบบใหม่');
+      alert('ล้างข้อมูลออเดอร์และยอดขายทดสอบทั้งหมดเรียบร้อยแล้ว!\n\nทุกยอดกลับมาเป็น 0.00 ฿ พร้อมเริ่มระบบใหม่');
       setShowMaintenanceModal(false);
     } catch (e: any) {
       console.error('Reset all orders error:', e);
-      alert(`เกิดข้อผิดพลาด: ${e.message || 'ไม่สามารถดำเนินการได้'}`);
-    } finally {
-      setIsCleaningChats(false);
-      setCleanupStatusMessage(null);
-    }
-  };
-
-  const handleResetCreditTransactions = async () => {
-    if (!confirm('ยืนยันการล้างประวัติการหักค่าบริการ (GP) และธุรกรรมเครดิตทั้งหมดหรือไม่?\n\n*ยอด "รายได้ค่าบริการระบบ" จะถูกรีเซ็ตกลับเป็น 0.00 ฿ ทันที*')) {
-      return;
-    }
-    setIsCleaningChats(true);
-    setCleanupStatusMessage('กำลังล้างประวัติค่าบริการและธุรกรรมเครดิต...');
-    try {
-      const transSnap = await getDocs(collection(db, 'credit_transactions'));
-      for (const tDoc of transSnap.docs) {
-        await deleteDoc(doc(db, 'credit_transactions', tDoc.id));
-      }
-      alert(`ล้างประวัติค่าบริการและธุรกรรมเครดิต (${transSnap.size} รายการ) เรียบร้อยแล้ว!\n\nยอดรายได้ค่าบริการระบบเป็น 0.00 ฿`);
-      setShowMaintenanceModal(false);
-    } catch (e: any) {
-      console.error('Reset credit transactions error:', e);
       alert(`เกิดข้อผิดพลาด: ${e.message || 'ไม่สามารถดำเนินการได้'}`);
     } finally {
       setIsCleaningChats(false);
@@ -1221,13 +1015,13 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
         </button>
 
         <button
-          onClick={() => setActiveTab('settlement')}
+          onClick={() => setActiveTab('donations')}
           className={`flex-1 min-w-[100px] py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition ${
-            activeTab === 'settlement' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500'
+            activeTab === 'donations' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500'
           }`}
         >
-          <DollarSign className="w-4 h-4 text-emerald-500" />
-          <span>เครดิต & ค่าบริการ</span>
+          <Heart className="w-4 h-4 text-pink-500" />
+          <span>สนับสนุน</span>
         </button>
       </div>
 
@@ -1665,30 +1459,6 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                   </button>
                 </div>
 
-                {/* Credit Balance & Quick Topup Row */}
-                <div className="px-3.5 py-2.5 bg-emerald-50/60 border-t border-emerald-100 flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-gray-600 font-bold text-[11px]">เครดิตร้าน:</span>
-                    <span className={`font-black text-sm ${((shop.credit_balance ?? 0) < 0) ? 'text-rose-600' : 'text-emerald-700'}`}>
-                      ฿{(shop.credit_balance ?? 0).toFixed(2)}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedShopForCredit(shop);
-                      setTopupAmount('100');
-                      setTopupType('topup');
-                      setTopupNote('');
-                      setCreditError(null);
-                    }}
-                    className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1 shadow-2xs transition active:scale-95 cursor-pointer"
-                  >
-                    <DollarSign className="w-3.5 h-3.5" />
-                    <span>เติม/ปรับเครดิต</span>
-                  </button>
-                </div>
-
                 {/* Bottom Row */}
                 <div className="p-3.5 bg-white flex items-center justify-between text-xs border-t border-gray-100">
                   <div className="space-y-0.5 text-gray-600">
@@ -1948,7 +1718,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
               พบทั้งหมด <strong className="text-zinc-900 font-bold">{filteredAdminOrders.length}</strong> ออเดอร์
             </span>
             <span>
-              ยอดอาหารรวม <strong className="text-[#FF8500] font-bold">{filteredOrdersTotalGMV} ฿</strong> (ค่าบริการหักเครดิตจริง: {creditLedgerReady ? filteredOrdersAdminGP.toFixed(2) : 'ยังไม่พร้อม'} ฿)
+              ยอดอาหารรวม <strong className="text-[#FF8500] font-bold">{filteredOrdersTotalGMV} ฿</strong>
             </span>
           </div>
 
@@ -2096,223 +1866,8 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
         </div>
       )}
 
-      {/* TAB 4: GP COMMISSION & MERCHANT CREDIT MANAGEMENT */}
-      {activeTab === 'settlement' && (
-        <div className="space-y-4">
-          {/* 1. Master GP Commission Settings Card */}
-          <div className="bg-white rounded-3xl p-5 border border-gray-150 shadow-xs space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl">
-                  <Settings className="w-5 h-5 text-amber-600" />
-                </div>
-                <div>
-                  <h3 className="font-black text-sm text-gray-900">
-                    การตั้งค่าระบบค่าคอมมิชชั่น (GP Commission)
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    เปิด/ปิด การหักค่าคอมมิชชั่นจากร้านค้า และกำหนดอัตราส่วนแบ่ง
-                  </p>
-                </div>
-              </div>
-
-              {/* Toggle Switch */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-gray-600">
-                  {gpEnabled ? 'เปิดเก็บ GP' : 'ปิดเก็บ GP (0%)'}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setGpEnabled(!gpEnabled)}
-                  className={`w-14 h-8 rounded-full transition-colors relative p-1 cursor-pointer ${
-                    gpEnabled ? 'bg-emerald-500' : 'bg-gray-300'
-                  }`}
-                >
-                  <div
-                    className={`w-6 h-6 rounded-full bg-white shadow-md transform transition-transform ${
-                      gpEnabled ? 'translate-x-6' : 'translate-x-0'
-                    }`}
-                  />
-                </button>
-              </div>
-            </div>
-
-            {/* Status Banner */}
-            {!gpEnabled ? (
-              <div className="p-3.5 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl text-xs text-emerald-900 space-y-1">
-                <p className="font-bold flex items-center gap-1.5 text-emerald-800">
-                  <Sparkles className="w-4 h-4 text-emerald-600" />
-                  <span>กำลังเปิดใช้งานโหมด &ldquo;ฟรีค่าคอมมิชชั่น (GP 0%)&rdquo;</span>
-                </p>
-                <p className="text-[11px] text-emerald-700 leading-relaxed">
-                  ร้านค้าจะได้รับยอดขายอาหารเต็ม 100% โดยระบบจะไม่หักเครดิตหรือคิดค่าคอมมิชชั่นใด ๆ เมื่อออเดอร์จัดส่งสำเร็จ
-                </p>
-              </div>
-            ) : (
-              <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-900 space-y-1">
-                <p className="font-bold flex items-center gap-1.5 text-amber-800">
-                  <CheckCircle2 className="w-4 h-4 text-amber-600" />
-                  <span>กำลังเปิดเก็บค่าคอมมิชชั่น (GP)</span>
-                </p>
-                <p className="text-[11px] text-amber-700 leading-relaxed">
-                  เมื่อร้านค้าจัดส่งออเดอร์สำเร็จ ระบบจะหักเครดิตของร้านค้าอัตโนมัติตามอัตรา {gpPercent}% ของยอดอาหาร
-                </p>
-              </div>
-            )}
-
-            {/* Settings Inputs & Save Button */}
-            <div className="flex flex-wrap items-center gap-3 pt-1 border-t border-gray-100">
-              <div className="flex items-center gap-2">
-                <label className="text-xs font-bold text-gray-700">อัตรา GP (%):</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.5"
-                  value={gpPercent}
-                  onChange={(e) => setGpPercent(parseFloat(e.target.value) || 0)}
-                  className="w-20 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold text-gray-800 text-center focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                />
-              </div>
-
-              <button
-                type="button"
-                disabled={isSavingGp}
-                onClick={handleSaveGpSettings}
-                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs transition active:scale-95 flex items-center gap-1.5 cursor-pointer ml-auto"
-              >
-                {isSavingGp ? (
-                  <span>กำลังบันทึก...</span>
-                ) : (
-                  <>
-                    <Check className="w-3.5 h-3.5" />
-                    <span>บันทึกการตั้งค่า GP</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* 2. Merchant Credit Balances Overview */}
-          <div className="bg-white rounded-3xl p-5 border border-gray-150 shadow-xs space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-black text-sm text-gray-900 flex items-center gap-1.5">
-                  <DollarSign className="w-4 h-4 text-emerald-600" />
-                  <span>ยอดเครดิตคงเหลือของร้านค้า ({shops.length} ร้าน)</span>
-                </h3>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  ร้านค้าติดต่อแอดมินเพื่อเติมเครดิตผ่าน LINE Official (@887nrlyw)
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {shops.map((shop) => (
-                <div
-                  key={shop.id}
-                  className="p-3.5 rounded-2xl bg-gray-50 border border-gray-150 flex items-center justify-between gap-3"
-                >
-                  <div className="min-w-0">
-                    <h4 className="font-bold text-xs text-gray-800 truncate">{shop.name}</h4>
-                    <p className="text-[11px] text-gray-400">
-                      โทร: {shop.phone || '-'} • ขายแล้ว {shop.sales_count || 0} ออเดอร์
-                    </p>
-                    <div className="mt-1 flex items-center gap-1.5">
-                      <span className="text-[11px] font-medium text-gray-500">เครดิต:</span>
-                      <span
-                        className={`text-sm font-black ${
-                          (shop.credit_balance ?? 0) < 0 ? 'text-rose-600' : 'text-emerald-700'
-                        }`}
-                      >
-                        ฿{(shop.credit_balance ?? 0).toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedShopForCredit(shop);
-                      setTopupAmount('100');
-                      setTopupType('topup');
-                      setTopupNote('');
-                      setCreditError(null);
-                    }}
-                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1 shadow-2xs transition active:scale-95 shrink-0 cursor-pointer"
-                  >
-                    <DollarSign className="w-3.5 h-3.5" />
-                    <span>เติม/ปรับเครดิต</span>
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 3. Recent Credit Transactions Log */}
-          <div className="bg-white rounded-3xl p-5 border border-gray-150 shadow-xs space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="font-black text-sm text-gray-900 flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-blue-600" />
-                <span>ประวัติธุรกรรมเครดิตล่าสุด ({creditTransactions.length} รายการ)</span>
-              </h3>
-            </div>
-
-            {creditTransactions.length === 0 ? (
-              <p className="text-xs text-gray-400 py-4 text-center">ยังไม่มีประวัติการทำรายการเครดิต</p>
-            ) : (
-              <div className="divide-y divide-gray-100 max-h-80 overflow-y-auto pr-1">
-                {creditTransactions.map((tx) => {
-                  const txDate = tx.created_at?.seconds
-                    ? new Date(tx.created_at.seconds * 1000)
-                    : tx.created_at
-                    ? new Date(tx.created_at)
-                    : null;
-
-                  return (
-                    <div key={tx.id} className="py-2.5 flex items-center justify-between gap-2 text-xs">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-gray-800 truncate">{tx.shop_name || tx.shop_id}</span>
-                          <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                              tx.type === 'topup'
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : tx.type === 'gp_deduct'
-                                ? 'bg-amber-100 text-amber-800'
-                                : 'bg-gray-100 text-gray-700'
-                            }`}
-                          >
-                            {tx.type === 'topup'
-                              ? 'เติมเครดิต'
-                              : tx.type === 'gp_deduct'
-                              ? 'หัก GP อัตโนมัติ'
-                              : 'ปรับลดยอด'}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-gray-400 mt-0.5 truncate">
-                          {tx.note || '-'}
-                          {txDate && ` • ${formatThaiDateWithTime(txDate)}`}
-                        </p>
-                      </div>
-
-                      <div className="text-right shrink-0">
-                        <span
-                          className={`text-sm font-black ${
-                            tx.amount > 0 ? 'text-emerald-600' : 'text-rose-600'
-                          }`}
-                        >
-                          {tx.amount > 0 ? `+฿${tx.amount.toFixed(2)}` : `-฿${Math.abs(tx.amount).toFixed(2)}`}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {/* TAB 4: DONATIONS */}
+      {activeTab === 'donations' && <DonationsAdmin currentUser={currentUser} users={users} />}
 
       {/* Audit Chat Modal for Admin */}
       {activeChatOrder && (
@@ -2411,14 +1966,14 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-red-900 group-hover:text-red-800">
-                      ล้างออเดอร์ & รีเซ็ตยอดขายและค่าบริการทั้งหมด
+                      ล้างออเดอร์ & รีเซ็ตยอดขายทั้งหมด
                     </span>
                     <span className="text-[10px] bg-red-200 text-red-800 px-2 py-0.5 rounded-full font-bold">
                       ล้างหมด
                     </span>
                   </div>
                   <p className="text-[11px] text-red-700/80 mt-0.5">
-                    ลบข้อมูลออเดอร์ บิล ค่าบริการ GP และรีวิวทดสอบทั้งหมด พร้อมรีเซ็ตเลขออเดอร์เริ่มต้น
+                    ลบข้อมูลออเดอร์ บิล และรีวิวทดสอบทั้งหมด พร้อมรีเซ็ตเลขออเดอร์เริ่มต้น
                   </p>
                 </div>
                 <div className="text-right shrink-0">
@@ -2427,30 +1982,6 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                 </div>
               </button>
 
-              {/* Reset Credit & GP Transactions Only */}
-              <button
-                type="button"
-                disabled={isCleaningChats}
-                onClick={handleResetCreditTransactions}
-                className="w-full text-left p-3.5 rounded-2xl border border-emerald-200 bg-emerald-50/40 hover:bg-emerald-100/60 transition group flex items-center justify-between disabled:opacity-50"
-              >
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-emerald-900 group-hover:text-emerald-800">
-                      ล้างประวัติหักค่าบริการ (GP) และธุรกรรมเครดิต
-                    </span>
-                    <span className="text-[10px] bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full font-bold">
-                      รีเซ็ต GP
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-emerald-700/80 mt-0.5">
-                    ลบประวัติการหักค่าบริการ GP และยอดเติม/ตัดเครดิตทั้งหมด เพื่อให้ "รายได้ค่าบริการระบบ" กลับเป็น 0.00 ฿
-                  </p>
-                </div>
-                <div className="text-right shrink-0">
-                  <span className="text-xs font-extrabold text-emerald-800">0.00 ฿</span>
-                </div>
-              </button>
             </div>
 
             {/* Section 2: Clean Old Chats */}
@@ -2761,7 +2292,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                   placeholder="0 (ส่งฟรี)"
                 />
                 <span className="text-[10px] text-gray-400 mt-0.5 block">
-                  * กำหนด 0 บาทหากร้านส่งฟรี หรือใส่ตามระยะทางจริง (GP ไม่หักค่าส่ง)
+                  * กำหนด 0 บาทหากร้านส่งฟรี หรือใส่ตามระยะทางจริง
                 </span>
               </div>
 
@@ -3313,160 +2844,6 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                 ปิดหน้าต่าง
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Top-Up Merchant Credit Modal */}
-      {selectedShopForCredit && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-gray-100 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-              <div>
-                <h3 className="font-black text-base text-gray-900 flex items-center gap-1.5">
-                  <DollarSign className="w-5 h-5 text-emerald-600" />
-                  <span>เติม / ปรับยอดเครดิตร้านค้า</span>
-                </h3>
-                <p className="text-xs text-gray-500 mt-0.5">ร้าน: {selectedShopForCredit.name}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedShopForCredit(null);
-                  setCreditError(null);
-                }}
-                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-150 flex items-center justify-between text-xs">
-              <span className="text-gray-500 font-medium">ยอดเครดิตปัจจุบัน:</span>
-              <span
-                className={`text-base font-black ${
-                  (selectedShopForCredit.credit_balance ?? 0) < 0 ? 'text-rose-600' : 'text-emerald-700'
-                }`}
-              >
-                ฿{(selectedShopForCredit.credit_balance ?? 0).toFixed(2)}
-              </span>
-            </div>
-
-            <form onSubmit={handleTopUpCreditSubmit} className="space-y-4">
-              {/* Type Switcher */}
-              <div className="grid grid-cols-2 gap-2 bg-gray-100 p-1 rounded-2xl">
-                <button
-                  type="button"
-                  onClick={() => setTopupType('topup')}
-                  className={`py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
-                    topupType === 'topup'
-                      ? 'bg-emerald-600 text-white shadow-xs'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <span>+ เติมเครดิต (เพิ่มยอด)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTopupType('deduct')}
-                  className={`py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
-                    topupType === 'deduct'
-                      ? 'bg-rose-600 text-white shadow-xs'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <span>- ปรับลด (หักยอด)</span>
-                </button>
-              </div>
-
-              {/* Amount Input */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  จำนวนเงิน (บาท)
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">
-                    ฿
-                  </span>
-                  <input
-                    type="number"
-                    step="any"
-                    min="1"
-                    required
-                    value={topupAmount}
-                    onChange={(e) => setTopupAmount(e.target.value)}
-                    className="w-full pl-8 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-2xl text-base font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    placeholder="100"
-                  />
-                </div>
-              </div>
-
-              {/* Quick Amount Buttons */}
-              <div className="flex gap-1.5">
-                {['50', '100', '200', '500', '1000'].map((amt) => (
-                  <button
-                    key={amt}
-                    type="button"
-                    onClick={() => setTopupAmount(amt)}
-                    className={`flex-1 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
-                      topupAmount === amt
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-                    }`}
-                  >
-                    +{amt}
-                  </button>
-                ))}
-              </div>
-
-              {/* Note / Memo */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
-                  หมายเหตุ / บันทึกช่วยจำ (ไม่บังคับ)
-                </label>
-                <input
-                  type="text"
-                  value={topupNote}
-                  onChange={(e) => setTopupNote(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  placeholder="เช่น ร้านโอนผ่านกสิกรไทย 14:30 น."
-                />
-              </div>
-
-              {creditError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-medium">
-                  {creditError}
-                </div>
-              )}
-
-              <div className="flex gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedShopForCredit(null);
-                    setCreditError(null);
-                  }}
-                  className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-2xl transition cursor-pointer"
-                >
-                  ยกเลิก
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmittingCredit}
-                  className={`flex-1 py-2.5 font-bold text-xs rounded-2xl text-white shadow-md transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer ${
-                    topupType === 'topup'
-                      ? 'bg-emerald-600 hover:bg-emerald-700'
-                      : 'bg-rose-600 hover:bg-rose-700'
-                  }`}
-                >
-                  {isSubmittingCredit ? (
-                    <span>กำลังบันทึก...</span>
-                  ) : (
-                    <span>ยืนยัน{topupType === 'topup' ? 'เติมเครดิต' : 'ปรับลดยอด'}</span>
-                  )}
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}

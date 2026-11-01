@@ -5,11 +5,11 @@ import {
   Store, UtensilsCrossed, CupSoda, ShoppingBag, MapPin, Phone,
   Plus, Search, ShieldCheck, UserCheck, ChevronRight, Sparkles,
   Star, Flame, FileText, Bike, CheckCircle2, MessageSquare,
-  Lock, ChefHat
+  Lock, ChefHat, ShoppingCart
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
-import { Shop, MenuItem, Order, UserRole } from '@/types';
+import { Shop, MenuItem, Order, UserRole, SystemSettings, Donation } from '@/types';
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, doc, getDoc, query, where, getDocs } from 'firebase/firestore';
 import { soundAlert } from '@/lib/soundAlert';
@@ -26,6 +26,11 @@ import TermsModal from '@/components/TermsModal';
 import ContactModal from '@/components/ContactModal';
 import UserAvatar from '@/components/UserAvatar';
 import { formatOrderCode } from '@/lib/orderNumber';
+import { aggregateSupporters, subscribeDonations } from '@/lib/donations';
+import DonateModal from '@/components/DonateModal';
+import SupportersModal from '@/components/SupportersModal';
+import HomeHero from '@/components/HomeHero';
+import DonationPopup from '@/components/DonationPopup';
 
 export default function HomePage() {
   const { user, role, isLineLoggingIn, logout } = useAuth();
@@ -74,8 +79,15 @@ export default function HomePage() {
   const [termsTab, setTermsTab] = useState<'customer' | 'privacy'>('customer');
   const [showContactModal, setShowContactModal] = useState(false);
 
-  // System Settings state (GP enabled, percent)
-  const [systemSettings, setSystemSettings] = useState<{ gp_enabled?: boolean; gp_percent?: number } | null>(null);
+  // System Settings (donation PromptPay details and other platform-wide values)
+  const [systemSettings, setSystemSettings] = useState<SystemSettings | null>(null);
+
+  // Donations: public supporter list, donate flow and live popup
+  const [donations, setDonations] = useState<Donation[]>([]);
+  const [showDonateModal, setShowDonateModal] = useState(false);
+  const [showSupportersModal, setShowSupportersModal] = useState(false);
+  useEffect(() => subscribeDonations(setDonations), []);
+  const supporters = useMemo(() => aggregateSupporters(donations), [donations]);
 
   // Firestore Realtime synchronization
   useEffect(() => {
@@ -120,7 +132,7 @@ export default function HomePage() {
 
       const unsubSettings = onSnapshot(doc(db, 'system_settings', 'general'), (snap) => {
         if (snap.exists()) {
-          setSystemSettings(snap.data() as any);
+          setSystemSettings(snap.data() as SystemSettings);
         }
       }, (err) => console.warn('Settings listener fallback:', err));
 
@@ -394,12 +406,8 @@ export default function HomePage() {
     }
   };
 
-  // Helper to determine if shop is open and allowed to receive orders (with GP credit validation)
-  const isShopOpenAndReady = (s: Shop) => {
-    if (s.is_open === false) return false;
-    if (systemSettings?.gp_enabled === true && (s.credit_balance ?? 0) <= 0) return false;
-    return true;
-  };
+  // Helper to determine if shop is open and allowed to receive orders
+  const isShopOpenAndReady = (s: Shop) => s.is_open !== false;
 
   // Helper to calculate shop ranking score (Sales count + Rating + Review count)
   const getShopRankScore = (shop: Shop): number => {
@@ -434,7 +442,7 @@ export default function HomePage() {
     };
 
     return [...sortShopList(openShops), ...sortShopList(closedShops)];
-  }, [shops, systemSettings?.gp_enabled]);
+  }, [shops]);
 
   // 2. Ranked Foods: Available items sorted by Sales & Shop score descending, followed by unavailable items
   const rankedFoods = useMemo(() => {
@@ -466,7 +474,7 @@ export default function HomePage() {
     };
 
     return [...sortMenuList(available), ...sortMenuList(unavailable)];
-  }, [menuItems, shops, systemSettings?.gp_enabled]);
+  }, [menuItems, shops]);
 
   // 3. Ranked Drinks & Desserts: Available items sorted by Sales & Shop score descending, followed by unavailable items
   const rankedDrinks = useMemo(() => {
@@ -498,7 +506,7 @@ export default function HomePage() {
     };
 
     return [...sortMenuList(available), ...sortMenuList(unavailable)];
-  }, [menuItems, shops, systemSettings?.gp_enabled]);
+  }, [menuItems, shops]);
 
   // Search filter applied on ranked lists
   const filteredShops = useMemo(() => {
@@ -523,6 +531,83 @@ export default function HomePage() {
     <main className="min-h-screen bg-slate-50 pb-24 text-gray-800">
       
       {/* Top Header Bar */}
+      {/* Customer header: brand, delivery area, quick actions and search */}
+      {viewMode === 'customer' && (
+        <header className="sticky top-0 z-30 bg-[#E1F5EE] border-b border-[#9FE1CB]/60">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-2.5 pb-3">
+            <div className="flex items-center gap-2">
+              <img src="/logo.png?v=5" alt="CPRUFood" className="w-9 h-9 object-contain shrink-0 drop-shadow-sm" />
+              <div className="flex-1 min-w-0">
+                <h1 className="text-base font-black tracking-tight text-[#085041] leading-tight">CPRUFood</h1>
+                <p className="text-[11px] text-[#0F6E56] font-medium flex items-center gap-1 min-w-0">
+                  <MapPin className="w-3 h-3 shrink-0" />
+                  <span className="truncate">ชุมชนห้วยชัน - นาฝาย &amp; มรภ.ชัยภูมิ</span>
+                </p>
+              </div>
+
+              {(role === 'merchant' || role === 'admin') && (
+                <button
+                  type="button"
+                  onClick={() => setViewMode(role === 'admin' ? 'admin' : 'merchant')}
+                  className="w-9 h-9 rounded-full bg-white hover:bg-emerald-50 text-[#0F6E56] shadow-2xs flex items-center justify-center shrink-0 active:scale-95 transition"
+                  title={role === 'admin' ? 'จัดการหลังบ้าน' : 'จัดการร้านค้า'}
+                  aria-label={role === 'admin' ? 'จัดการหลังบ้าน' : 'จัดการร้านค้า'}
+                >
+                  {role === 'admin' ? <ShieldCheck className="w-4.5 h-4.5" /> : <ChefHat className="w-4.5 h-4.5" />}
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={handleOpenCart}
+                className="relative w-9 h-9 rounded-full bg-white hover:bg-emerald-50 text-[#0F6E56] shadow-2xs flex items-center justify-center shrink-0 active:scale-95 transition"
+                title="ตะกร้าสินค้า"
+                aria-label="ตะกร้าสินค้า"
+              >
+                <ShoppingCart className="w-5 h-5" strokeWidth={2.4} />
+                {itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-black min-w-4 h-4 px-1 rounded-full flex items-center justify-center ring-2 ring-[#E1F5EE]">
+                    {itemCount}
+                  </span>
+                )}
+              </button>
+
+              {user ? (
+                <button
+                  type="button"
+                  onClick={() => setShowProfileModal(true)}
+                  className="w-9 h-9 rounded-full overflow-hidden bg-[#1D9E75] ring-2 ring-[#1D9E75] shrink-0 active:scale-95 transition"
+                  title="โปรไฟล์"
+                  aria-label="โปรไฟล์"
+                >
+                  <UserAvatar src={user.picture_url} alt={user.display_name} />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowAuthModal(true)}
+                  className="h-9 px-3 rounded-full bg-[#1D9E75] text-white text-xs font-black flex items-center gap-1 shrink-0 active:scale-95 transition"
+                >
+                  <UserCheck className="w-3.5 h-3.5" /> เข้าสู่ระบบ
+                </button>
+              )}
+            </div>
+
+            <div className="relative mt-2.5">
+              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="ค้นหาร้านค้า, เมนูอาหาร, ชานม..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#9FE1CB] rounded-2xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#5DCAA5]"
+              />
+            </div>
+          </div>
+        </header>
+      )}
+
+      {viewMode !== 'customer' && (
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-xs">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 flex items-center justify-between gap-1.5 sm:gap-4">
           
@@ -552,52 +637,6 @@ export default function HomePage() {
           {/* Header Action Buttons */}
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
 
-            {/* Customer Order History Button */}
-            {user && viewMode === 'customer' && (
-              <button
-                type="button"
-                onClick={() => setShowOrderHistoryModal(true)}
-                className="px-2 py-1.5 sm:px-2.5 rounded-xl text-xs font-bold bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200/80 shadow-2xs transition active:scale-95 flex items-center gap-1.5 whitespace-nowrap shrink-0"
-                title="ประวัติการสั่งซื้อของฉัน"
-              >
-                <FileText className="w-3.5 h-3.5 text-gray-500" />
-                <span className="hidden md:inline">ประวัติสั่งซื้อ</span>
-              </button>
-            )}
-
-            {/* Customer Active Orders Quick Tracker Button in Header */}
-            {viewMode === 'customer' && trackingOrders.length > 0 && (() => {
-              const activeCount = trackingOrders.filter((o) => o.status !== 'completed').length;
-              const hasCompleted = trackingOrders.some((o) => o.status === 'completed');
-              return (
-                <button
-                  type="button"
-                  onClick={() => setShowTrackingModal(true)}
-                  className={`px-2 py-1.5 sm:px-2.5 rounded-xl text-xs font-bold transition active:scale-95 flex items-center gap-1.5 shadow-xs whitespace-nowrap shrink-0 ${
-                    hasCustomerUnreadMessage
-                      ? 'bg-amber-500 text-white animate-pulse ring-2 ring-amber-300'
-                      : activeCount === 0 && hasCompleted
-                      ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                      : 'bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/80'
-                  }`}
-                  title="ติดตามสถานะออเดอร์ & แชทกับร้าน"
-                >
-                  {activeCount === 0 && hasCompleted ? (
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
-                  ) : (
-                    <Bike className={`w-3.5 h-3.5 shrink-0 ${hasCustomerUnreadMessage || (activeCount === 0 && hasCompleted) ? 'text-white' : 'text-amber-600'}`} />
-                  )}
-                  <span className="hidden sm:inline">
-                    {activeCount === 0 && hasCompleted ? `ส่งถึงแล้ว (${trackingOrders.length})` : `ออเดอร์ (${trackingOrders.length})`}
-                  </span>
-                  <span className="sm:hidden text-[11px] font-bold">({trackingOrders.length})</span>
-                  {hasCustomerUnreadMessage && (
-                    <span className="w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white animate-ping shrink-0" />
-                  )}
-                </button>
-              );
-            })()}
-            
             {/* Merchant / Admin View Mode Switcher */}
             {role === 'merchant' && (
               <button
@@ -651,25 +690,10 @@ export default function HomePage() {
               </button>
             )}
 
-            {/* Cart Button (Visible in customer view) */}
-            {viewMode === 'customer' && (
-              <button
-                type="button"
-                onClick={handleOpenCart}
-                className="relative p-2 bg-amber-50 hover:bg-amber-100 text-amber-600 border border-amber-200/80 rounded-xl sm:rounded-2xl shadow-xs hover:scale-105 active:scale-95 transition shrink-0"
-                title="ดูตะกร้าสินค้า"
-              >
-                <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
-                {itemCount > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-black min-w-4 h-4 px-1 rounded-full flex items-center justify-center shadow-xs">
-                    {itemCount}
-                  </span>
-                )}
-              </button>
-            )}
           </div>
         </div>
       </header>
+      )}
 
       {/* Main Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 md:pt-6">
@@ -688,315 +712,152 @@ export default function HomePage() {
         {viewMode === 'customer' && (
           <div className="space-y-4 md:space-y-6">
             
-            {/* Campus Banner / Value Proposition */}
-            <div className="bg-white rounded-3xl p-5 md:p-8 text-gray-900 border border-gray-100 shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="relative z-10 max-w-2xl">
-                <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                  <span className="text-[10px] md:text-xs bg-amber-50 text-amber-700 border border-amber-200/60 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
-                    <Bike className="w-3 h-3 text-amber-600" /> ชุมชนห้วยชัน - นาฝาย & มรภ.ชัยภูมิ
-                  </span>
-                  <span className="hidden sm:inline-flex items-center gap-1 text-[10px] md:text-xs bg-orange-50 text-orange-700 border border-orange-200/60 px-2.5 py-0.5 rounded-full font-bold">
-                    <Sparkles className="w-3 h-3 text-orange-500" /> ส่งตรงถึงหน้าบ้านและหอพัก
-                  </span>
-                </div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tight leading-tight text-gray-900">
-                  สั่งร้านเด็ดรอบ ม. และชุมชน ส่งถึงหน้าบ้านทันใจ
-                </h2>
-                <p className="text-xs sm:text-sm md:text-base text-gray-500 mt-1 md:mt-2 leading-relaxed">
-                  ร้านค้าชุมชนส่งเอง • ค่าส่งตามแต่ละร้านกำหนด
-                </p>
-                <div className="hidden sm:flex items-center gap-3 mt-3.5 text-xs font-bold text-gray-600">
-                  <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-200/70 px-3 py-1.5 rounded-xl">
-                    <Bike className="w-3.5 h-3.5 text-amber-600" />
-                    <span>ส่งตรงถึงหน้าบ้านและหอพัก</span>
-                  </div>
-                </div>
-              </div>
+            <HomeHero
+              supporters={supporters}
+              userName={user?.display_name}
+              openShopCount={shops.filter(isShopOpenAndReady).length}
+              trackingOrders={trackingOrders}
+              onOpenSupporters={() => setShowSupportersModal(true)}
+              onOpenTracking={() => setShowTrackingModal(true)}
+            />
 
-              {/* Decorative background watermark */}
-              <div className="absolute -right-6 -bottom-6 text-amber-500/10 select-none pointer-events-none">
-                <UtensilsCrossed className="w-28 h-28 md:w-36 md:h-36" />
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-2xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-xs text-amber-950 shadow-2xs">
-              <p className="leading-relaxed">
-                <strong>อุดหนุนร้านใกล้บ้าน ผ่านพื้นที่กลางของชุมชน</strong>
-                <span className="block text-amber-800">ร้านค้าขายและส่งเอง • คุยกับร้านได้โดยตรง • เราดูแลระบบและช่วยประสานงาน</span>
-              </p>
-              <a href="#about-cprufood" className="shrink-0 font-bold underline underline-offset-4 text-amber-700 hover:text-amber-900">รู้จัก CPRUFood</a>
-            </div>
-
-            {/* Search Input & Category Filter Tabs */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-              {/* Search Input */}
-              <div className="relative flex-1 md:max-w-md">
-                <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="ค้นหาร้านค้า, เมนูอาหาร, ชานม..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-white border border-gray-200 rounded-2xl text-xs md:text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-500 shadow-xs transition"
-                />
-              </div>
-
-              {/* 3 Main User Tabs: [ร้านค้าทั้งหมด] [อาหาร] [เครื่องดื่ม/ของหวาน] */}
-              <div className="grid grid-cols-3 md:flex items-center gap-1.5 bg-white p-1 rounded-2xl border border-gray-100 shadow-xs shrink-0">
+            {/* Category chips */}
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
                 <button
                   type="button"
                   onClick={() => setCustomerTab('shops')}
-                  className={`py-2 px-3 md:px-5 rounded-xl text-xs md:text-sm font-bold flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 transition ${
-                    customerTab === 'shops'
-                      ? 'bg-amber-500 text-white shadow-sm'
-                      : 'text-gray-500 hover:text-gray-800 hover:bg-slate-50'
+                  className={`px-3.5 py-2 rounded-full text-xs md:text-sm font-bold flex items-center gap-1.5 whitespace-nowrap border transition ${
+                    customerTab === 'shops' ? 'bg-[#1D9E75] text-white border-[#1D9E75] shadow-sm' : 'bg-white text-gray-600 border-gray-200'
                   }`}
                 >
-                  <Store className="w-4 h-4" />
-                  <span>ร้านค้าทั้งหมด ({filteredShops.length})</span>
+                  <Store className="w-4 h-4" /> ร้านค้า <span className="opacity-70">({filteredShops.length})</span>
                 </button>
-
                 <button
                   type="button"
                   onClick={() => setCustomerTab('food')}
-                  className={`py-2 px-3 md:px-5 rounded-xl text-xs md:text-sm font-bold flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 transition ${
-                    customerTab === 'food'
-                      ? 'bg-amber-500 text-white shadow-sm'
-                      : 'text-gray-500 hover:text-gray-800 hover:bg-slate-50'
+                  className={`px-3.5 py-2 rounded-full text-xs md:text-sm font-bold flex items-center gap-1.5 whitespace-nowrap border transition ${
+                    customerTab === 'food' ? 'bg-[#1D9E75] text-white border-[#1D9E75] shadow-sm' : 'bg-white text-gray-600 border-gray-200'
                   }`}
                 >
-                  <UtensilsCrossed className="w-4 h-4" />
-                  <span>อาหาร ({filteredFoods.length})</span>
+                  <UtensilsCrossed className="w-4 h-4" /> อาหาร <span className="opacity-70">({filteredFoods.length})</span>
                 </button>
-
                 <button
                   type="button"
                   onClick={() => setCustomerTab('drink_dessert')}
-                  className={`py-2 px-3 md:px-5 rounded-xl text-xs md:text-sm font-bold flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 transition ${
-                    customerTab === 'drink_dessert'
-                      ? 'bg-amber-500 text-white shadow-sm'
-                      : 'text-gray-500 hover:text-gray-800 hover:bg-slate-50'
+                  className={`px-3.5 py-2 rounded-full text-xs md:text-sm font-bold flex items-center gap-1.5 whitespace-nowrap border transition ${
+                    customerTab === 'drink_dessert' ? 'bg-[#1D9E75] text-white border-[#1D9E75] shadow-sm' : 'bg-white text-gray-600 border-gray-200'
                   }`}
                 >
-                  <CupSoda className="w-4 h-4" />
-                  <span>ของหวาน/น้ำ ({filteredDrinks.length})</span>
+                  <CupSoda className="w-4 h-4" /> ของหวาน/น้ำ <span className="opacity-70">({filteredDrinks.length})</span>
                 </button>
-              </div>
             </div>
 
-            {/* TAB 1 CONTENT: ร้านค้าทั้งหมด */}
+            {(customerTab === 'shops' ? filteredShops : customerTab === 'food' ? filteredFoods : filteredDrinks).length === 0 && (
+              <div className="text-center py-10">
+                <img src="/mascots/empty-shops.webp" alt="" className="w-44 mx-auto" />
+                <p className="mt-2 text-sm font-bold text-gray-500">
+                  {searchQuery.trim() ? 'ไม่พบสิ่งที่ค้นหา' : customerTab === 'shops' ? 'ยังไม่มีร้านค้าในตอนนี้' : 'ยังไม่มีเมนูในหมวดนี้'}
+                </p>
+              </div>
+            )}
+
+            {/* TAB 1 CONTENT: ร้านค้าทั้งหมด (2-column grid) */}
             {customerTab === 'shops' && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs md:text-sm text-gray-500 px-1 font-bold">
-                  <span>ร้านค้าชุมชน ({filteredShops.length})</span>
-                  <span>แตะเพื่อดูเมนู</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
-                  {filteredShops.map((shop) => {
-                    const shopMenu = menuItems.filter((m) => m.shop_id === shop.id);
-                    return (
-                      <div
-                        key={shop.id}
-                        onClick={() => setSelectedShopForDetail(shop)}
-                        className="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-xs hover:shadow-lg transition-all duration-300 cursor-pointer active:scale-98 group flex flex-col justify-between"
-                      >
-                        <div className="relative h-36 sm:h-40 md:h-44 bg-slate-100">
-                          {shop.image_url ? (
-                            <img
-                              key={shop.image_url}
-                              src={shop.image_url}
-                              alt={shop.name}
-                              className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-amber-400 via-orange-400 to-amber-600 flex flex-col items-center justify-center text-white select-none">
-                              <Store className="w-10 h-10 opacity-80 mb-1" />
-                              <span className="text-[11px] font-bold text-white/90 px-2 truncate max-w-[85%]">{shop.name}</span>
-                            </div>
-                          )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent pointer-events-none" />
-                          <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 flex-wrap">
-                            <span
-                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs ${
-                                isShopOpenAndReady(shop) ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'
-                              }`}
-                            >
-                              {isShopOpenAndReady(shop) ? 'เปิดรับออเดอร์' : 'ปิดร้านชั่วคราว'}
-                            </span>
-                            {(shop.sales_count ?? 0) > 0 && (
-                              <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-xs flex items-center gap-0.5">
-                                <Flame className="w-3 h-3 fill-white" />
-                                <span>ขายแล้ว {shop.sales_count}</span>
-                              </span>
-                            )}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+                {filteredShops.map((shop) => {
+                  const open = isShopOpenAndReady(shop);
+                  return (
+                    <button
+                      type="button"
+                      key={shop.id}
+                      onClick={() => setSelectedShopForDetail(shop)}
+                      className={`text-left bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-xs hover:shadow-md transition active:scale-98 ${open ? '' : 'opacity-60 grayscale'}`}
+                    >
+                      <div className="relative aspect-[4/3] bg-slate-100">
+                        {shop.image_url ? (
+                          <img key={shop.image_url} src={shop.image_url} alt={shop.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                            <Store className="w-9 h-9" />
                           </div>
-
-                          <div className="absolute top-2.5 right-2.5 bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded-full text-white text-[11px] font-bold flex items-center gap-1 shadow-xs">
-                            <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                            <span>{(shop.rating ?? 0).toFixed(1)}</span>
-                            <span className="text-[10px] text-gray-300">({shop.review_count || 0})</span>
-                          </div>
-
-                          <div className="absolute bottom-2.5 left-3 right-3 text-white">
-                            <h3 className="font-bold text-sm md:text-base leading-tight drop-shadow-md">
-                              {shop.name}
-                            </h3>
-                            <div className="flex items-center justify-between gap-1 text-[11px] text-amber-200 mt-0.5">
-                              <p className="flex items-center gap-1 truncate">
-                                <MapPin className="w-3 h-3 shrink-0" /> {shop.address_detail || 'รอบ มรภ. ชัยภูมิ'}
-                              </p>
-                              {shop.location?.lat && shop.location?.lng && (
-                                <span className="shrink-0 text-[10px] bg-emerald-500/90 text-white font-bold px-1.5 py-0.2 rounded-md shadow-2xs flex items-center gap-0.5">
-                                  <MapPin className="w-2.5 h-2.5" /> มีพิกัด
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="p-3 flex items-center justify-between text-xs border-t border-gray-50 bg-slate-50/50">
-                          <div className="flex items-center gap-2 text-gray-500">
-                            <span className="flex items-center gap-1 font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200/50">
-                              <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                              {(shop.rating ?? 0).toFixed(1)}
-                            </span>
-                            <span>{shopMenu.length} เมนู • {(shop.delivery_fee ?? 0) === 0 ? <span className="text-emerald-600 font-bold">ส่งฟรี</span> : <span className="text-amber-700 font-bold">ค่าส่ง {shop.delivery_fee} บ.</span>}</span>
-                          </div>
-                          <span className="text-amber-600 font-bold flex items-center gap-0.5 group-hover:translate-x-1 transition">
-                            ดูเมนู <ChevronRight className="w-3.5 h-3.5" />
+                        )}
+                        {!open && (
+                          <span className="absolute inset-0 flex items-center justify-center">
+                            <span className="bg-black/70 text-white text-xs font-bold px-2.5 py-1 rounded-full">ปิดอยู่</span>
                           </span>
+                        )}
+                        {(shop.sales_count ?? 0) > 0 && open && (
+                          <span className="absolute top-2 left-2 text-[10px] font-black px-1.5 py-0.5 rounded-full bg-orange-500 text-white flex items-center gap-0.5">
+                            <Flame className="w-3 h-3 fill-white" /> ขายแล้ว {shop.sales_count}
+                          </span>
+                        )}
+                      </div>
+                      <div className="p-2.5">
+                        <h3 className="font-bold text-sm text-gray-900 leading-tight truncate">{shop.name}</h3>
+                        <div className="flex items-center gap-1.5 mt-1 text-[11px] text-gray-500">
+                          <span className="flex items-center gap-0.5 font-bold text-gray-700">
+                            <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                            {(shop.rating ?? 0).toFixed(1)}
+                          </span>
+                          <span className="text-gray-300">•</span>
+                          {(shop.delivery_fee ?? 0) === 0
+                            ? <span className="text-emerald-600 font-bold">ส่งฟรี</span>
+                            : <span className="truncate">ค่าส่ง {shop.delivery_fee} บ.</span>}
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
+                    </button>
+                  );
+                })}
               </div>
             )}
 
-            {/* TAB 2 CONTENT: อาหาร */}
-            {customerTab === 'food' && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs md:text-sm text-gray-500 px-1 font-bold">
-                  <span>เมนูอาหารทั้งหมด ({filteredFoods.length})</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-                  {filteredFoods.map((item) => {
-                    const shop = shops.find((s) => s.id === item.shop_id);
-                    const isShopReady = isShopOpenAndReady(shop || ({} as Shop));
-                    return (
-                      <div
-                        key={item.id}
-                        className="bg-white rounded-2xl p-3 border border-gray-100 shadow-xs flex items-center justify-between gap-3 hover:shadow-md transition group"
-                      >
-                        <div className="flex items-center gap-3 overflow-hidden">
-                          {item.image_url ? (
-                            <img
-                              src={item.image_url}
-                              alt={item.name}
-                              className="w-16 h-16 rounded-xl object-cover border border-gray-100 shrink-0 group-hover:scale-105 transition"
-                            />
-                          ) : (
-                            <div className="w-16 h-16 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 shrink-0">
-                              <UtensilsCrossed className="w-6 h-6" />
-                            </div>
-                          )}
-                          <div className="min-w-0">
-                            <h4 className="font-bold text-sm text-gray-800 leading-tight truncate">
-                              {item.name}
-                            </h4>
-                            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                              <p className="text-xs text-amber-600 font-black">
-                                {item.price} บาท
-                              </p>
-                              {(item.sales_count ?? 0) > 0 && (
-                                <span className="text-[10px] bg-orange-50 text-orange-600 font-bold px-1.5 py-0.2 rounded-md border border-orange-200 flex items-center gap-0.5">
-                                  <Flame className="w-3 h-3" /> ขายแล้ว {item.sales_count} จาน
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[10px] text-gray-400 mt-0.5 truncate">
-                              ร้าน: {shop?.name || 'ร้านค้าชุมชน'}
-                            </p>
+            {/* TAB 2-3 CONTENT: เมนู (2-column grid) */}
+            {customerTab !== 'shops' && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+                {(customerTab === 'food' ? filteredFoods : filteredDrinks).map((item) => {
+                  const shop = shops.find((s) => s.id === item.shop_id);
+                  const canOrder = isShopOpenAndReady(shop || ({} as Shop)) && item.is_available !== false;
+                  const FallbackIcon = customerTab === 'food' ? UtensilsCrossed : CupSoda;
+                  return (
+                    <div
+                      key={item.id}
+                      className={`bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-xs flex flex-col ${canOrder ? '' : 'opacity-60 grayscale'}`}
+                    >
+                      <button type="button" onClick={() => shop && setSelectedShopForDetail(shop)} className="relative aspect-square bg-slate-100">
+                        {item.image_url ? (
+                          <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full bg-emerald-50 text-emerald-500 flex items-center justify-center">
+                            <FallbackIcon className="w-9 h-9" />
                           </div>
+                        )}
+                        {!canOrder && (
+                          <span className="absolute inset-0 flex items-center justify-center">
+                            <span className="bg-black/70 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                              {item.is_available === false ? 'หมด' : 'ร้านปิด'}
+                            </span>
+                          </span>
+                        )}
+                      </button>
+                      <div className="p-2.5 flex-1 flex flex-col">
+                        <h4 className="font-bold text-sm text-gray-900 leading-tight line-clamp-2">{item.name}</h4>
+                        <p className="text-[11px] text-gray-400 mt-0.5 truncate">{shop?.name || 'ร้านค้าชุมชน'}</p>
+                        <div className="mt-auto pt-1.5 flex items-center justify-between">
+                          <span className="text-sm font-black text-emerald-700">{item.price} บ.</span>
+                          <button
+                            type="button"
+                            onClick={() => handleAddItemFromFeed(item)}
+                            disabled={!canOrder}
+                            aria-label={`ใส่ ${item.name} ลงตะกร้า`}
+                            className="w-8 h-8 rounded-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 text-white flex items-center justify-center shadow-xs active:scale-90 transition"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
                         </div>
-
-                        <button
-                          type="button"
-                          onClick={() => handleAddItemFromFeed(item)}
-                          disabled={!isShopReady || !item.is_available}
-                          className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 disabled:opacity-40 text-white rounded-xl text-xs font-bold flex items-center gap-1 shadow-xs transition active:scale-95 shrink-0"
-                        >
-                          <Plus className="w-3.5 h-3.5" /> ใส่ตะกร้า
-                        </button>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* TAB 3 CONTENT: เครื่องดื่ม & ของหวาน */}
-            {customerTab === 'drink_dessert' && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs md:text-sm text-gray-500 px-1 font-bold">
-                  <span>เครื่องดื่ม & ของหวานทั้งหมด ({filteredDrinks.length})</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-                  {filteredDrinks.map((item) => {
-                    const shop = shops.find((s) => s.id === item.shop_id);
-                    const isShopReady = isShopOpenAndReady(shop || ({} as Shop));
-                    return (
-                      <div
-                        key={item.id}
-                        className="bg-white rounded-2xl p-3 border border-gray-100 shadow-xs flex items-center justify-between gap-3 hover:shadow-md transition group"
-                      >
-                        <div className="flex items-center gap-3 overflow-hidden">
-                          {item.image_url ? (
-                            <img
-                              src={item.image_url}
-                              alt={item.name}
-                              className="w-16 h-16 rounded-xl object-cover border border-gray-100 shrink-0 group-hover:scale-105 transition"
-                            />
-                          ) : (
-                            <div className="w-16 h-16 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center border border-orange-100 shrink-0">
-                              <CupSoda className="w-6 h-6" />
-                            </div>
-                          )}
-                          <div className="min-w-0">
-                            <h4 className="font-bold text-sm text-gray-800 leading-tight truncate">
-                              {item.name}
-                            </h4>
-                            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                              <p className="text-xs text-amber-600 font-black">
-                                {item.price} บาท
-                              </p>
-                              {(item.sales_count ?? 0) > 0 && (
-                                <span className="text-[10px] bg-orange-50 text-orange-600 font-bold px-1.5 py-0.2 rounded-md border border-orange-200 flex items-center gap-0.5">
-                                  <Flame className="w-3 h-3" /> ขายแล้ว {item.sales_count} แก้ว
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[10px] text-gray-400 mt-0.5 truncate">
-                              ร้าน: {shop?.name || 'ร้านค้าชุมชน'}
-                            </p>
-                          </div>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => handleAddItemFromFeed(item)}
-                          disabled={!isShopReady || !item.is_available}
-                          className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 disabled:opacity-40 text-white rounded-xl text-xs font-bold flex items-center gap-1 shadow-xs transition active:scale-95 shrink-0"
-                        >
-                          <Plus className="w-3.5 h-3.5" /> ใส่ตะกร้า
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
 
@@ -1219,7 +1080,6 @@ export default function HomePage() {
           onClose={() => setShowOrderHistoryModal(false)}
           shops={shops}
           menuItems={menuItems}
-          systemSettings={systemSettings}
           onOpenCart={handleOpenCart}
           onTrackOrder={(order) => {
             setTrackingOrders((prev) => {
@@ -1245,6 +1105,25 @@ export default function HomePage() {
         isOpen={showContactModal}
         onClose={() => setShowContactModal(false)}
       />
+
+      {showSupportersModal && (
+        <SupportersModal
+          supporters={supporters}
+          onDonate={() => { setShowSupportersModal(false); setShowDonateModal(true); }}
+          onClose={() => setShowSupportersModal(false)}
+        />
+      )}
+
+      {showDonateModal && (
+        <DonateModal
+          settings={systemSettings}
+          user={user}
+          onRequireLogin={() => { setShowDonateModal(false); setShowAuthModal(true); }}
+          onClose={() => setShowDonateModal(false)}
+        />
+      )}
+
+      <DonationPopup donations={donations} />
 
       {/* LINE Login Global Loading Overlay */}
       {isLineLoggingIn && (

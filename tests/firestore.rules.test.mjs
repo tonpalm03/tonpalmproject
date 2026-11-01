@@ -24,7 +24,8 @@ beforeEach(async () => {
       'orders/two': { customer_uid: 'bob', shop_id: 'b', status: 'pending' },
       'orders/done': { customer_uid: 'alice', shop_id: 'a', status: 'completed' },
       'orders/one/messages/msg': { sender_uid: 'alice', text: 'Hello', is_read: false },
-      'weekly_settlements/settle': { shop_id: 'a', status: 'pending_approval', gp_due: 5 },
+      'donation_requests/pendingAlice': { uid: 'alice', status: 'pending', amount: 50, slip_url: 'data:image/jpeg;base64,x' },
+      'donations/public': { supporter_key: 'alice', display_name: 'Alice', amount: 50, message: 'Thanks', notify: true, source: 'request' },
       'shop_private/a/devices/merchantA': { tokens: ['secret-token'] },
     })) await setDoc(doc(ctx.firestore(), path), data);
   });
@@ -48,7 +49,7 @@ test('deleted account sessions cannot recreate profiles; fresh registration is a
 test('guest: public catalog only, no private reads or writes', async () => {
   await allow(getDocs(collection(db(), 'shops')));
   await allow(getDoc(doc(db(), 'menu_items/food')));
-  for (const p of ['users/alice', 'orders/one', 'orders/one/messages/msg', 'weekly_settlements/settle', 'shop_private/a/devices/merchantA', 'access/admin']) await deny(getDoc(doc(db(), p)));
+  for (const p of ['users/alice', 'orders/one', 'orders/one/messages/msg', 'donation_requests/pendingAlice', 'shop_private/a/devices/merchantA', 'access/admin']) await deny(getDoc(doc(db(), p)));
   await deny(updateDoc(doc(db(), 'shops/a'), { name: 'attack' }));
 });
 test('customers: own profile/order and constrained query only', async () => {
@@ -96,10 +97,21 @@ test('chat: forged role, sender and unrelated participant rejected', async () =>
   await deny(setDoc(doc(db('alice'), 'orders/one/messages/fake'), { ...data, sender_role: 'admin' }));
   await deny(setDoc(doc(db('bob'), 'orders/one/messages/fake'), { ...data, sender_uid: 'bob' }));
 });
-test('settlement: merchant may resubmit but cannot approve or alter totals', async () => {
-  await allow(updateDoc(doc(db('merchantA'), 'weekly_settlements/settle'), { slip_url: 'image', status: 'pending_approval', updated_at: serverTimestamp() }));
-  await deny(updateDoc(doc(db('merchantA'), 'weekly_settlements/settle'), { status: 'paid' }));
-  await deny(updateDoc(doc(db('merchantA'), 'weekly_settlements/settle'), { gp_due: 0 }));
+test('donations: donors report their own slip, only admins approve, public list is read-only', async () => {
+  const request = { uid: 'bob', display_name: 'Bob', avatar_url: '', amount: 100, message: 'Keep going', is_anonymous: false, hide_amount: false, slip_url: 'data:image/jpeg;base64,x', status: 'pending', created_at: serverTimestamp() };
+  await allow(setDoc(doc(db('bob'), 'donation_requests/bob1'), request));
+  await deny(setDoc(doc(db('bob'), 'donation_requests/forged'), { ...request, uid: 'alice' }));
+  await deny(setDoc(doc(db('bob'), 'donation_requests/approved'), { ...request, status: 'approved' }));
+  await deny(setDoc(doc(db('bob'), 'donation_requests/zero'), { ...request, amount: 0 }));
+  await deny(setDoc(doc(db(), 'donation_requests/guest'), request));
+  await allow(getDoc(doc(db('alice'), 'donation_requests/pendingAlice')));
+  await deny(getDoc(doc(db('bob'), 'donation_requests/pendingAlice')));
+  await deny(updateDoc(doc(db('alice'), 'donation_requests/pendingAlice'), { status: 'approved' }));
+  await allow(updateDoc(doc(db('admin'), 'donation_requests/pendingAlice'), { status: 'approved' }));
+  await allow(getDoc(doc(db(), 'donations/public')));
+  await deny(setDoc(doc(db('alice'), 'donations/fake'), { supporter_key: 'alice', amount: 99999 }));
+  await deny(updateDoc(doc(db('alice'), 'donations/public'), { amount: 99999 }));
+  await allow(setDoc(doc(db('admin'), 'donations/manual'), { supporter_key: 'name:Somchai', display_name: 'Somchai', amount: 20, message: '', notify: false, source: 'admin' }));
 });
 test('review: completed owner only, unique order ID, aggregate protected', async () => {
   const review = { order_id: 'done', shop_id: 'a', customer_uid: 'alice', rating: 5, comment: 'Good', created_at: serverTimestamp() };
@@ -110,7 +122,7 @@ test('review: completed owner only, unique order ID, aggregate protected', async
 });
 test('unknown collection defaults to deny', async () => { await deny(setDoc(doc(db('alice'), 'anything/new'), { public: true })); });
 test('direct client order creation is denied; customer can cancel own pending order', async () => {
-  const order = { customer_uid: 'alice', shop_id: 'a', status: 'pending', items: [{ menu_id: 'food', quantity: 1 }], food_subtotal: 50, delivery_fee: 10, total_amount: 60, gp_amount: 2.5, payment_method: 'cash', created_at: serverTimestamp() };
+  const order = { customer_uid: 'alice', shop_id: 'a', status: 'pending', items: [{ menu_id: 'food', quantity: 1 }], food_subtotal: 50, delivery_fee: 10, total_amount: 60, payment_method: 'cash', created_at: serverTimestamp() };
   await deny(setDoc(doc(db('alice'), 'orders/new'), order));
   await allow(updateDoc(doc(db('alice'), 'orders/one'), { status: 'cancelled', cancelled_by: 'customer', cancelled_at: serverTimestamp() }));
 });

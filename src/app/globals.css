@@ -42,3 +42,24 @@ button {
     display: none;
   }
 }
+
+/* Donation popup */
+@keyframes donate-pop {
+  0% { transform: scale(0.6) translateY(-20px); opacity: 0; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes donate-confetti {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+@keyframes donate-scooter {
+  0% { transform: translateX(-60vw); }
+  100% { transform: translateX(60vw); }
+}
+.donate-pop { animation: donate-pop 0.45s ease-out both; }
+.donate-confetti { animation-name: donate-confetti; animation-timing-function: linear; animation-fill-mode: both; }
+.donate-scooter { animation: donate-scooter 4.5s linear both; }
+@media (prefers-reduced-motion: reduce) {
+  .donate-confetti, .donate-scooter { animation: none; }
+}

@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
-import { Order, Shop, MenuItem, SystemSettings } from '@/types';
+import { Order, Shop, MenuItem } from '@/types';
 import { db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { formatOrderCode } from '@/lib/orderNumber';
@@ -18,7 +18,6 @@ interface OrderHistoryModalProps {
   onClose: () => void;
   shops: Shop[];
   menuItems?: MenuItem[];
-  systemSettings?: { gp_enabled?: boolean; gp_percent?: number } | null;
   onOpenCart?: () => void;
   onTrackOrder?: (order: Order) => void;
 }
@@ -28,7 +27,6 @@ export default function OrderHistoryModal({
   onClose,
   shops,
   menuItems = [],
-  systemSettings,
   onOpenCart,
   onTrackOrder
 }: OrderHistoryModalProps) {
@@ -121,12 +119,6 @@ export default function OrderHistoryModal({
         return;
       }
 
-      // Check GP balance if GP is enabled
-      if (systemSettings?.gp_enabled === true && (targetShop.credit_balance ?? 0) <= 0) {
-        alert(`ขออภัย ร้าน "${targetShop.name}" เครดิตร้านค้าหมดชั่วคราว ยังไม่พร้อมรับออเดอร์ในขณะนี้`);
-        setReorderingId(null);
-        return;
-      }
 
       // 2. Add items to cart
       let addedCount = 0;

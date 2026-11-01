@@ -20,7 +20,6 @@ interface CartContextType {
   deliveryFee: number;
   subtotal: number;
   total: number;
-  gpAmount: number;
   addItem: (
     item: MenuItem,
     shop: { id: string; name: string; phone?: string; delivery_fee?: number; delivery_radius_km?: number; location?: { lat: number; lng: number } },
@@ -148,7 +147,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, 0);
   const deliveryFee = groupedItems.reduce((sum, g) => sum + g.deliveryFee, 0);
   const total = subtotal > 0 ? subtotal + deliveryFee : 0;
-  const gpAmount = Math.round(subtotal * 0.05 * 100) / 100; // 5% of food sales
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const addItem = (
@@ -258,7 +256,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       deliveryFee,
       subtotal,
       total,
-      gpAmount,
       addItem,
       confirmSwitchShopAndAdd,
       updateQuantity,

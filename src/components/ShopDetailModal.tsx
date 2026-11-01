@@ -4,13 +4,13 @@ import React, { useState, useEffect, useMemo } from 'react';
 import {
   X, Phone, MapPin, Plus, Store, Star, Flame, MessageSquare,
   UtensilsCrossed, CupSoda, Search, Minus, Check, Navigation,
-  Lock, Sparkles, FileEdit, Bike, AlertCircle
+  Lock, Sparkles, FileEdit, Bike, AlertCircle, ArrowRight
 } from 'lucide-react';
 import { Shop, MenuItem, MenuItemOption, OptionGroup, OptionItem, ShopReview } from '@/types';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
-import { collection, query, where, onSnapshot, doc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import ReviewModal from './ReviewModal';
 
 interface ShopDetailModalProps {
@@ -29,7 +29,6 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
   const [searchQuery, setSearchQuery] = useState('');
   const [reviews, setReviews] = useState<ShopReview[]>([]);
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [systemSettings, setSystemSettings] = useState<{ gp_enabled?: boolean; gp_percent?: number } | null>(null);
 
   // Item Customization & Toppings State
   const [customizingItem, setCustomizingItem] = useState<MenuItem | null>(null);
@@ -38,18 +37,6 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
   const [validationError, setValidationError] = useState<string | null>(null);
   const [customNote, setCustomNote] = useState('');
   const [customQuantity, setCustomQuantity] = useState(1);
-
-  // Realtime System Settings Listener
-  useEffect(() => {
-    try {
-      const unsub = onSnapshot(doc(db, 'system_settings', 'general'), (snap) => {
-        if (snap.exists()) {
-          setSystemSettings(snap.data() as any);
-        }
-      });
-      return () => unsub();
-    } catch (_) {}
-  }, []);
 
   useEffect(() => {
     if (!shop.id) return;
@@ -76,7 +63,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
   }, [shop.id]);
 
   const isOwnShop = Boolean(user && user.role === 'merchant' && user.shop_id && user.shop_id === shop.id);
-  const isShopOpenAndReady = shop.is_open !== false && !(systemSettings?.gp_enabled === true && (shop.credit_balance ?? 0) <= 0);
+  const isShopOpenAndReady = shop.is_open !== false;
 
   const handleItemClick = (item: MenuItem) => {
     if (!user) {
@@ -737,7 +724,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                 className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-white font-bold text-xs rounded-xl shadow-md transition active:scale-95 flex items-center gap-1"
               >
                 <span>ดูตะกร้า & สั่งซื้อ</span>
-                <span>➔</span>
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
           )}

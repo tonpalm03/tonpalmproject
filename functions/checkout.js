@@ -119,8 +119,6 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
       const generalSettingsSnap = await tx.get(generalSettingsRef);
       const generalSettings = generalSettingsSnap.exists ? generalSettingsSnap.data() : {};
 
-      const gpEnabled = generalSettings.gp_enabled === true || String(generalSettings.gp_enabled) === 'true';
-      const gpPercent = typeof generalSettings.gp_percent === 'number' ? generalSettings.gp_percent : (parseFloat(generalSettings.gp_percent) || 5);
       const defaultDeliveryFee = typeof generalSettings.delivery_fee === 'number' ? generalSettings.delivery_fee : 10;
 
       // Read system_settings/order_counter
@@ -219,13 +217,6 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
 
         if (shopData.is_open === false) {
           throw new functions.https.HttpsError('failed-precondition', `ร้าน ${shopData.name || shopId} ปิดให้บริการอยู่ในขณะนี้`);
-        }
-
-        if (gpEnabled) {
-          const creditBal = typeof shopData.credit_balance === 'number' ? shopData.credit_balance : 0;
-          if (creditBal <= 0) {
-            throw new functions.https.HttpsError('failed-precondition', `ร้าน ${shopData.name || shopId} ไม่พร้อมรับออเดอร์ (เครดิตไม่เพียงพอ)`);
-          }
         }
 
         let shopFoodSubtotal = 0;
@@ -411,7 +402,6 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
           : 0;
         const deliveryFee = shopDeliveryFee;
         const totalAmount = shopFoodSubtotal + deliveryFee;
-        const gpAmount = gpEnabled ? Math.round(shopFoodSubtotal * (gpPercent / 100) * 100) / 100 : 0;
 
         nextOrderNum += 1;
         const assignedOrderNum = nextOrderNum;
@@ -504,7 +494,6 @@ module.exports = function createCheckoutHandler(admin, functions, helpers = {}) 
           food_subtotal: shopFoodSubtotal,
           delivery_fee: deliveryFee,
           total_amount: totalAmount,
-          gp_amount: gpAmount,
           payment_method: selectedPaymentMethod,
           cash_change_note: selectedPaymentMethod === 'cash' ? (orderReq.cash_change_note || cash_change_note || '') : null,
           status: 'pending',

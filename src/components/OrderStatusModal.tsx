@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Phone, MessageSquare, CheckCircle, Clock, ChefHat, Bike, AlertCircle, MapPin, Star, Store, CreditCard, CheckCircle2 } from 'lucide-react';
+import { X, Phone, MessageSquare, CheckCircle, Clock, ChefHat, Bike, AlertCircle, MapPin, Star, Store, CreditCard, CheckCircle2, ArrowRight } from 'lucide-react';
 import { Order, UserRole, UserProfile } from '@/types';
 import { db } from '@/lib/firebase';
 import { doc, onSnapshot, collection, query, where, updateDoc, serverTimestamp } from 'firebase/firestore';
@@ -263,7 +263,8 @@ export default function OrderStatusModal({
                   className="w-full py-2.5 bg-white text-orange-600 hover:bg-amber-50 font-black rounded-xl text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5"
                 >
                   <MessageSquare className="w-4 h-4" />
-                  <span>เปิดแชทเพื่อโอนเงิน & ส่งสลิปทันที ➔</span>
+                  <span>เปิดแชทเพื่อโอนเงิน & ส่งสลิปทันที</span>
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
             )}

@@ -64,11 +64,7 @@ service cloud.firestore {
     && changedOnly(['name','phone','promptpay_number','image_url','address_detail','location','category','is_open','delivery_fee','delivery_radius_km','bank_name','bank_account_number','bank_account_name','promptpay_qr_url','allow_cod'])
     && request.resource.data.name is string && request.resource.data.is_open is bool
     && (!('delivery_fee' in request.resource.data) || (request.resource.data.delivery_fee is number && request.resource.data.delivery_fee >= 0))
-    && (!('delivery_radius_km' in request.resource.data) || (request.resource.data.delivery_radius_km is number && request.resource.data.delivery_radius_km > 0 && request.resource.data.delivery_radius_km <= 50))
-    && (request.resource.data.is_open == false
-        || !exists(/databases/$(database)/documents/system_settings/general)
-        || get(/databases/$(database)/documents/system_settings/general).data.get('gp_enabled', false) != true
-        || (resource.data.credit_balance is number && resource.data.credit_balance > 0)));
+    && (!('delivery_radius_km' in request.resource.data) || (request.resource.data.delivery_radius_km is number && request.resource.data.delivery_radius_km > 0 && request.resource.data.delivery_radius_km <= 50)));
   }
   match /shop_private/{shop}/devices/{uid} {
    allow read, delete: if admin() || (signedIn() && uid == request.auth.uid && merchant(shop));
@@ -115,17 +111,6 @@ service cloud.firestore {
     allow delete: if admin();
    }
   }
-  match /weekly_settlements/{id} {
-   allow read: if admin() || merchant(resource.data.shop_id);
-   // Submitted totals remain unapproved merchant claims until checked by admin.
-   allow create: if merchant(request.resource.data.shop_id)
-    && request.resource.data.keys().hasOnly(['id','shop_id','shop_name','cycle_id','cycle_label','week_start','week_end','total_food_sales','delivery_earnings','order_count','gp_due','status','slip_url','updated_at'])
-    && request.resource.data.status == 'pending_approval' && request.resource.data.slip_url is string && request.resource.data.updated_at == request.time;
-   allow update: if admin() || (merchant(resource.data.shop_id) && resource.data.status != 'paid'
-    && changedOnly(['slip_url','status','updated_at']) && request.resource.data.status == 'pending_approval'
-    && request.resource.data.slip_url is string && request.resource.data.updated_at == request.time);
-   allow delete: if admin();
-  }
   match /shop_reviews/{id} {
    allow read: if true;
    allow create: if signedIn() && request.resource.data.keys().hasOnly(['shop_id','order_id','customer_uid','customer_name','customer_avatar','rating','comment','created_at'])
@@ -135,11 +120,24 @@ service cloud.firestore {
     && request.resource.data.comment is string && request.resource.data.comment.size() <= 2000 && request.resource.data.created_at == request.time;
    allow delete: if admin();
   }
-  match /credit_transactions/{id} {
-   allow read: if admin() || (signedIn() && merchant(resource.data.shop_id));
-   allow create: if admin() && request.resource.data.keys().hasOnly(['id','shop_id','shop_name','order_id','order_number','amount','type','note','created_by','created_at'])
-    && request.resource.data.amount is number && request.resource.data.shop_id is string && request.resource.data.created_at == request.time;
-   allow update, delete: if admin();
+  // Donors report a PromptPay transfer with a slip; only admins can see slips and approve.
+  match /donation_requests/{id} {
+   allow read: if admin() || (signedIn() && resource.data.uid == request.auth.uid);
+   allow create: if signedIn() && request.resource.data.uid == request.auth.uid
+    && request.resource.data.keys().hasOnly(['uid','display_name','avatar_url','amount','message','is_anonymous','hide_amount','slip_url','status','created_at'])
+    && request.resource.data.status == 'pending' && request.resource.data.created_at == request.time
+    && request.resource.data.amount is number && request.resource.data.amount >= 1 && request.resource.data.amount <= 100000
+    && request.resource.data.display_name is string && request.resource.data.display_name.size() <= 40
+    && request.resource.data.message is string && request.resource.data.message.size() <= 200
+    && request.resource.data.is_anonymous is bool && request.resource.data.hide_amount is bool
+    && request.resource.data.slip_url is string && request.resource.data.slip_url.size() <= 900000;
+   allow update: if admin();
+   allow delete: if admin() || (signedIn() && resource.data.uid == request.auth.uid && resource.data.status == 'pending');
+  }
+  // Approved donations are public (no slips); only admins write them.
+  match /donations/{id} {
+   allow read: if true;
+   allow write: if admin();
   }
   match /_checkout_requests/{id} {
    allow read, write: if admin();

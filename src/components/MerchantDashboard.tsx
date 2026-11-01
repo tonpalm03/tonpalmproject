@@ -6,9 +6,10 @@ import {
   Clock, ChefHat, Bike, AlertCircle, Plus, DollarSign, Calendar, Upload, QrCode, X,
   Camera, Image as ImageIcon, Trash2, Scissors, Volume2, VolumeX, Sun, Moon, Edit2,
   ChevronLeft, ChevronRight, CheckCircle2, Eye, TrendingUp, Filter, UtensilsCrossed,
-  CupSoda, Star, CreditCard, FileText, Sparkles, Package, BellRing, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp
+  CupSoda, Star, CreditCard, FileText, Sparkles, Package, BellRing, ChevronDown, ChevronUp, ChevronsDown, ChevronsUp,
+  Soup, Drumstick, type LucideIcon
 } from 'lucide-react';
-import { Order, MenuItem, MenuItemOption, OptionGroup, OptionItem, MenuCategory, UserProfile, Shop, CreditTransaction } from '@/types';
+import { Order, MenuItem, MenuItemOption, OptionGroup, OptionItem, MenuCategory, UserProfile, Shop } from '@/types';
 import { db, functions } from '@/lib/firebase';
 import {
   collection, query, where, onSnapshot, doc, updateDoc, addDoc, setDoc, deleteDoc, serverTimestamp, getDoc
@@ -16,7 +17,6 @@ import {
 import { httpsCallable } from 'firebase/functions';
 import ChatModal from './ChatModal';
 import SalesDashboard from './SalesDashboard';
-import MerchantCreditHistoryModal from './MerchantCreditHistoryModal';
 import ImageCropModal from './ImageCropModal';
 import FloatingBubbleControl from './FloatingBubbleControl';
 import MapPicker from './MapPicker';
@@ -30,10 +30,10 @@ import {
 import { registerMerchantPushNotifications } from '@/lib/pushNotifications';
 import { readFileAsDataUrl } from '@/lib/imageUtils';
 
-export const OPTION_PRESETS: { label: string; icon: string; groups: () => OptionGroup[] }[] = [
+export const OPTION_PRESETS: { label: string; icon: LucideIcon; groups: () => OptionGroup[] }[] = [
   {
     label: 'ก๋วยเตี๋ยว',
-    icon: '🍜',
+    icon: Soup,
     groups: () => [
       {
         id: `grp_${Date.now()}_1`,
@@ -90,7 +90,7 @@ export const OPTION_PRESETS: { label: string; icon: string; groups: () => Option
   },
   {
     label: 'ลูกชิ้น / ของทอด',
-    icon: '🍢',
+    icon: Drumstick,
     groups: () => [
       {
         id: `grp_${Date.now()}_1`,
@@ -139,7 +139,7 @@ export const OPTION_PRESETS: { label: string; icon: string; groups: () => Option
   },
   {
     label: 'เครื่องดื่ม / ชานม',
-    icon: '🧋',
+    icon: CupSoda,
     groups: () => [
       {
         id: `grp_${Date.now()}_1`,
@@ -180,7 +180,7 @@ export const OPTION_PRESETS: { label: string; icon: string; groups: () => Option
   },
   {
     label: 'อาหารตามสั่ง',
-    icon: '🍚',
+    icon: UtensilsCrossed,
     groups: () => [
       {
         id: `grp_${Date.now()}_1`,
@@ -237,10 +237,6 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
   const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'sales' | 'shop_info'>('orders');
   const [orderFilterTab, setOrderFilterTab] = useState<'active' | 'completed' | 'cancelled'>('active');
   const [activeChatOrder, setActiveChatOrder] = useState<Order | null>(null);
-  const [systemSettings, setSystemSettings] = useState<{ gp_enabled?: boolean; gp_percent?: number } | null>(null);
-  const [showTopupContactModal, setShowTopupContactModal] = useState(false);
-  const [showCreditHistoryModal, setShowCreditHistoryModal] = useState(false);
-  const [creditTransactions, setCreditTransactions] = useState<CreditTransaction[]>([]);
   const [collapsedOrderMap, setCollapsedOrderMap] = useState<{ [id: string]: boolean }>({});
 
   const isOrderCollapsed = (order: Order) => {
@@ -268,36 +264,6 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
     });
     setCollapsedOrderMap((prev) => ({ ...prev, ...updated }));
   };
-
-  // Realtime listener for platform GP settings
-  useEffect(() => {
-    const unsub = onSnapshot(doc(db, 'system_settings', 'general'), (snap) => {
-      if (snap.exists()) {
-        setSystemSettings(snap.data() as any);
-      }
-    });
-    return () => unsub();
-  }, []);
-
-  // Realtime listener for shop's credit transactions (top-ups, GP deductions, adjustments)
-  useEffect(() => {
-    if (!shopId) return;
-    try {
-      const q = query(collection(db, 'credit_transactions'), where('shop_id', '==', shopId));
-      const unsub = onSnapshot(q, (snap) => {
-        const list: CreditTransaction[] = [];
-        snap.forEach((d) => {
-          list.push({ id: d.id, ...d.data() } as CreditTransaction);
-        });
-        setCreditTransactions(list);
-      }, (err) => {
-        console.warn('Shop credit transactions listener warning:', err);
-      });
-      return () => unsub();
-    } catch (e) {
-      console.warn('Shop credit transactions setup error:', e);
-    }
-  }, [shopId]);
 
   // Sound & Continuous Alarm States
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
@@ -461,16 +427,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
           const data = { id: docSnap.id, ...docSnap.data() } as Shop;
           setShopData(data);
 
-          // If GP is active and credit is 0 or negative, automatically lock shop closed
-          const isCreditDepleted = systemSettings?.gp_enabled === true && (data.credit_balance ?? 0) <= 0;
-          if (isCreditDepleted) {
-            setIsOpen(false);
-            if (data.is_open !== false) {
-              updateDoc(doc(db, 'shops', shopId), { is_open: false }).catch(() => {});
-            }
-          } else {
-            setIsOpen(data.is_open ?? true);
-          }
+          setIsOpen(data.is_open ?? true);
 
           // BUG-19: only reset edit fields if not currently being edited
           if (!shopNameDirtyRef.current) setEditShopName(data.name || '');
@@ -493,15 +450,9 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
     } catch (e) {
       console.warn('Shop data listener error:', e);
     }
-  }, [shopId, systemSettings?.gp_enabled]);
+  }, [shopId]);
 
-  // Monitor GP toggle and credit balance changes to auto-close if credit runs out
-  useEffect(() => {
-    if (systemSettings?.gp_enabled === true && (shopData?.credit_balance ?? 0) <= 0 && isOpen && shopId) {
-      setIsOpen(false);
-      updateDoc(doc(db, 'shops', shopId), { is_open: false }).catch(() => {});
-    }
-  }, [systemSettings?.gp_enabled, shopData?.credit_balance, isOpen, shopId]);
+
 
 
   // Realtime Orders Listener
@@ -630,7 +581,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
   // Derived list of orders awaiting restaurant acceptance
   const pendingOrders = orders.filter((o) => o.status === 'pending');
 
-  // 🔔 Continuous Alarm Loop: rings every 3.5 seconds while pending orders exist
+  // Continuous Alarm Loop: rings every 3.5 seconds while pending orders exist
   useEffect(() => {
     if (pendingOrders.length === 0 || !isSoundEnabled || isAlarmMuted) {
       return;
@@ -752,7 +703,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
         });
       }
 
-      // 🔔 Play sound effect ONLY after server update succeeds
+      // Play sound effect ONLY after server update succeeds
       if (nextStatus === 'cooking') {
         soundAlert.playOrderAcceptedSound();
       } else if (nextStatus === 'delivering') {
@@ -783,18 +734,6 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
   const handleToggleOpen = async () => {
     if (!shopId) return;
     const next = !isOpen;
-
-    // ตรวจสอบเครดิตก่อนเปิดร้าน: หากระบบเปิดเก็บ GP อยู่ และเครดิตหมด (<= 0) จะไม่อนุญาตให้เปิดร้าน
-    if (next && systemSettings?.gp_enabled === true) {
-      const currentCredit = shopData?.credit_balance ?? 0;
-      if (currentCredit <= 0) {
-        setShowTopupContactModal(true);
-        alert(
-          `ไม่สามารถเปิดร้านได้!\n\nยอดเครดิตคงเหลือของคุณไม่เพียงพอ (฿${currentCredit.toFixed(2)})\nระบบจำเป็นต้องมีเครดิตเพื่อใช้หักค่าคอมมิชชั่น GP ${systemSettings?.gp_percent || 5}%\n\nกรุณาแตะปุ่ม "เติมเครดิต" เพื่อติดต่อแอดมินทาง LINE ครับ`
-        );
-        return;
-      }
-    }
 
     try {
       await updateDoc(doc(db, 'shops', shopId), { is_open: next });
@@ -1212,8 +1151,6 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
             className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-md transition active:scale-95 cursor-pointer ${
               isOpen
                 ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                : systemSettings?.gp_enabled === true && (shopData?.credit_balance ?? 0) <= 0
-                ? 'bg-rose-600 hover:bg-rose-700 text-white animate-pulse'
                 : 'bg-red-500 hover:bg-red-600 text-white'
             }`}
           >
@@ -1221,8 +1158,6 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
             <span>
               {isOpen
                 ? 'เปิดร้านรับออเดอร์'
-                : systemSettings?.gp_enabled === true && (shopData?.credit_balance ?? 0) <= 0
-                ? 'ปิดร้าน (เครดิตหมด แตะเพื่อเติม)'
                 : 'ปิดร้านชั่วคราว (แตะเพื่อเปิด)'}
             </span>
           </button>
@@ -1285,58 +1220,6 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
           <p className="text-xs text-amber-200 mt-0.5 flex items-center gap-1 truncate">
             <MapPin className="w-3 h-3 shrink-0" /> {shopData?.address_detail || 'รอบ มรภ. ชัยภูมิ'}
           </p>
-        </div>
-      </div>
-
-      {/* Credit & Commission Status Card */}
-      <div className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl font-bold shrink-0 shadow-2xs">
-            <CreditCard className="w-6 h-6 text-amber-600" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-gray-500">ยอดเครดิตคงเหลือ:</span>
-              <span className={`text-lg font-black ${((shopData?.credit_balance ?? 0) < 0) ? 'text-rose-600' : 'text-emerald-600'}`}>
-                ฿{(shopData?.credit_balance ?? 0).toFixed(2)}
-              </span>
-            </div>
-            {systemSettings?.gp_enabled === false ? (
-              <p className="text-[11px] text-emerald-600 font-bold flex items-center gap-1 mt-0.5">
-                <span>ฟรีค่าคอมมิชชั่น 0% (ไม่ต้องเติมเครดิต)</span>
-              </p>
-            ) : (
-              <p className="text-[11px] text-gray-500 mt-0.5">
-                หักค่าคอม GP {systemSettings?.gp_percent || 5}% อัตโนมัติเมื่อส่งออเดอร์สำเร็จ
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end shrink-0">
-          <button
-            type="button"
-            onClick={() => setShowCreditHistoryModal(true)}
-            className="flex-1 sm:flex-none px-3.5 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 font-bold text-xs rounded-xl shadow-2xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
-            title="ดูประวัติการเติมเงินและหักค่าบริการทั้งหมด"
-          >
-            <FileText className="w-3.5 h-3.5" />
-            <span>ดูประวัติเครดิต</span>
-            {creditTransactions.length > 0 && (
-              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-black px-1.5 py-0.2 rounded-full">
-                {creditTransactions.length}
-              </span>
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setShowTopupContactModal(true)}
-            className="flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-xs rounded-xl shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
-          >
-            <MessageSquare className="w-3.5 h-3.5" />
-            <span>เติมเครดิต (ทัก LINE)</span>
-          </button>
         </div>
       </div>
 
@@ -2209,7 +2092,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                         }}
                         className="p-2 rounded-xl bg-white hover:bg-amber-50 text-gray-800 border border-amber-200/80 text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs hover:shadow-xs transition active:scale-95 text-center"
                       >
-                        <span className="text-base">{preset.icon}</span>
+                        <preset.icon className="w-4 h-4 text-amber-600 shrink-0" aria-hidden="true" />
                         <span className="truncate">{preset.label}</span>
                       </button>
                     ))}
@@ -2624,7 +2507,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                               }}
                               className="p-1.5 rounded-lg bg-white hover:bg-amber-50 text-gray-800 border border-amber-200/80 text-[10px] font-bold flex items-center justify-center gap-1 shadow-2xs transition active:scale-95"
                             >
-                              <span>{preset.icon}</span>
+                              <preset.icon className="w-3.5 h-3.5 text-amber-600 shrink-0" aria-hidden="true" />
                               <span className="truncate">{preset.label}</span>
                             </button>
                           ))}
@@ -2925,14 +2808,12 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
         </div>
       )}
 
-      {/* Sales use completed orders and actual credit charges. */}
+      {/* Sales use completed orders only; the app takes no fee. */}
       {activeTab === 'sales' && shopId && (
         <SalesDashboard
           orders={orders}
           shops={shopData ? [shopData] : []}
           shopId={shopId}
-          onTopup={() => setShowTopupContactModal(true)}
-          onViewCreditHistory={() => setShowCreditHistoryModal(true)}
         />
       )}
 
@@ -3054,9 +2935,6 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                 <Bike className="w-3.5 h-3.5 text-amber-600" />
                 <span>ค่าจัดส่งของร้าน (บาท)</span>
               </label>
-              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
-                GP ไม่หักค่าส่ง
-              </span>
             </div>
             <p className="text-[11px] text-amber-800/80">
               กำหนดค่าส่งเหมาของร้านคุณสำหรับออเดอร์นี้ (หากไม่กรอกหรือใส่ 0 ระบบจะขึ้นว่า "ส่งฟรี")
@@ -3127,7 +3005,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
                       : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
                   }`}
                 >
-                  {preset} กม.{preset === 1.0 ? ' ★' : ''}
+                  {preset} กม.{preset === 1.0 ? ' (แนะนำ)' : ''}
                 </button>
               ))}
             </div>
@@ -3372,72 +3250,6 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
           onCancel={() => setRawImageForCrop(null)}
         />
       )}
-
-      {/* Top-up Credit Contact Modal */}
-      {showTopupContactModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-2xl border border-gray-100 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-              <h3 className="text-base font-black text-gray-900 flex items-center gap-2">
-                <span>เติมเครดิตร้านค้า</span>
-              </h3>
-              <button
-            type="button"
-            onClick={() => setShowTopupContactModal(false)}
-            className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 font-bold transition text-xs"
-          >
-            <X className="w-4 h-4" />
-          </button>
-            </div>
-
-            <div className="space-y-3 text-xs text-gray-600">
-              <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 space-y-1.5">
-                <p className="font-bold">ขั้นตอนการเติมเครดิตร้านค้า:</p>
-                <ol className="list-decimal list-inside space-y-1 text-[11px] text-amber-800">
-                  <li>ทัก LINE Official Account: <strong className="text-amber-950 font-mono">@887nrlyw</strong></li>
-                  <li>แจ้งชื่อร้านค้า: <strong className="text-amber-950">{shopData?.name || 'ครัวต้นปาล์ม'}</strong></li>
-                  <li>โอนเงินเติมเครดิตตามต้องการ (เช่น 100, 200, 500 บาท)</li>
-                  <li>ส่งสลิปให้แอดมิน แอดมินจะกดเพิ่มเครดิตเข้าระบบทันทีครับ</li>
-                </ol>
-              </div>
-
-              <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-emerald-900 flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] text-emerald-700 font-bold">LINE Official (CPRUFood)</p>
-                  <p className="text-sm font-black text-emerald-950 font-mono">@887nrlyw</p>
-                </div>
-                <a
-                  href="https://line.me/R/ti/p/@887nrlyw"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3.5 py-2 bg-[#06C755] hover:bg-[#05b34c] text-white font-black text-xs rounded-xl shadow-xs flex items-center gap-1 transition active:scale-95"
-                >
-                  <span>เปิด LINE</span>
-                </a>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowTopupContactModal(false)}
-              className="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-xl transition cursor-pointer"
-            >
-              ปิดหน้าต่าง
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Merchant Transparent Credit History Modal */}
-      <MerchantCreditHistoryModal
-        isOpen={showCreditHistoryModal}
-        onClose={() => setShowCreditHistoryModal(false)}
-        shopData={shopData}
-        transactions={creditTransactions}
-        gpEnabled={systemSettings?.gp_enabled}
-        gpPercent={systemSettings?.gp_percent}
-        onOpenTopupContact={() => setShowTopupContactModal(true)}
-      />
 
     </div>
   );

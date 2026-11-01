@@ -18,6 +18,7 @@ import {
   formatDistance,
 } from '@/lib/geolocation';
 import { soundAlert } from '@/lib/soundAlert';
+import MascotWatermark from './MascotWatermark';
 
 
 interface CartCheckoutModalProps {
@@ -376,24 +377,25 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
 
   return (
     <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3">
-      <div className="bg-white w-full max-w-md md:max-w-2xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative bg-white w-full max-w-md md:max-w-2xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+        <MascotWatermark page="cart" />
         
         {/* Header */}
-        <div className="bg-gradient-to-r from-brand-500 to-brand-500 p-4 text-white flex items-center justify-between shadow-sm">
+        <div className="bg-[#E1F5EE] border-b border-[#9FE1CB] p-4 text-[#04342C] flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <Store className="w-5 h-5 text-brand-100" />
+            <Store className="w-5 h-5 text-[#0F6E56]" />
             <div>
               <h2 className="font-bold text-base leading-tight">ตะกร้าสั่งอาหาร</h2>
-              <p className="text-xs text-brand-100">
+              <p className="text-xs text-[#0F6E56]">
                 {shopCount === 1 ? shopsInCart[0]?.name : `${shopCount} ร้านค้า (ร้านแยกกันส่ง)`}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-black/15 hover:bg-black/25 flex items-center justify-center transition active:scale-95"
+            className="w-9 h-9 rounded-full bg-white hover:bg-brand-50 border border-[#9FE1CB] flex items-center justify-center transition active:scale-95"
           >
-            <X className="w-5 h-5 text-white" />
+            <X className="w-5 h-5 text-[#0F6E56]" />
           </button>
         </div>
 

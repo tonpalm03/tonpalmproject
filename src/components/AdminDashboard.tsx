@@ -29,6 +29,7 @@ import { grantMerchant, setAdminRole } from '@/lib/merchantAccess';
 import MerchantApplicationsAdmin from './MerchantApplicationsAdmin';
 import ShopOwnerTransferModal from './ShopOwnerTransferModal';
 import DonationsAdmin from './DonationsAdmin';
+import MascotWatermark from './MascotWatermark';
 
 interface AdminDashboardProps {
   currentUser: UserProfile;
@@ -956,18 +957,19 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
 
   return (
     <div className="space-y-4">
+      <MascotWatermark page="admin" fixed />
       {/* Admin Header */}
-      <div className="bg-gradient-to-r from-slate-900 via-rose-950 to-slate-900 rounded-3xl p-5 text-white shadow-xl flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-[#E1F5EE] border border-[#9FE1CB] rounded-3xl p-5 text-[#04342C] flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center border border-rose-500/30 shrink-0">
-            <ShieldCheck className="w-6 h-6 text-rose-400" />
+          <div className="w-12 h-12 rounded-2xl bg-white text-[#1D9E75] flex items-center justify-center border border-[#9FE1CB] shrink-0">
+            <ShieldCheck className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-[10px] bg-rose-500/30 text-rose-300 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+            <span className="text-[10px] bg-[#1D9E75] text-white px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
               Super Admin Panel
             </span>
             <h1 className="text-xl font-black mt-0.5">CPRUFood • หลังบ้าน</h1>
-            <p className="text-xs text-gray-300">ดูแลร้านค้า ติดตามออเดอร์ และจัดการเครดิตกับค่าบริการระบบ</p>
+            <p className="text-xs text-[#0F6E56]">ดูแลร้านค้า ติดตามออเดอร์ และจัดการผู้สนับสนุน</p>
           </div>
         </div>
       </div>
@@ -1294,7 +1296,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                 รายชื่อร้านค้าในระบบ ({shops.length} ร้าน)
               </h3>
               <p className="text-xs text-gray-400">
-                จัดการข้อมูลร้านค้า, ค่าจัดส่ง, รูปหน้าร้าน, เมนู และยอดเครดิต
+                จัดการข้อมูลร้านค้า, ค่าจัดส่ง, รูปหน้าร้าน และเมนู
               </p>
             </div>
           </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Heart, Store, Bike, ChefHat, Clock, CheckCircle2 } from 'lucide-react';
+import { Heart, Store, Bike, ChefHat, Clock, CheckCircle2, MapPin } from 'lucide-react';
 import { Order } from '@/types';
 import { Supporter } from '@/lib/donations';
 import { formatOrderCode } from '@/lib/orderNumber';
@@ -23,6 +23,14 @@ const ORDER_STATUS: Record<string, { label: string; icon: typeof Bike }> = {
   completed: { label: 'ส่งถึงแล้ว', icon: CheckCircle2 },
 };
 
+function mealPrompt(hour: number): string {
+  if (hour >= 5 && hour < 11) return 'เช้านี้กินอะไรดี';
+  if (hour >= 11 && hour < 14) return 'ได้เวลาข้าวเที่ยงแล้ว';
+  if (hour >= 14 && hour < 17) return 'บ่ายนี้หาของหวานกินไหม';
+  if (hour >= 17 && hour < 21) return 'มื้อเย็นวันนี้กินอะไรดี';
+  return 'หิวดึกเหรอ';
+}
+
 export default function HomeHero({
   supporters, userName, openShopCount, trackingOrders, onOpenSupporters, onOpenTracking,
 }: HomeHeroProps) {
@@ -40,7 +48,17 @@ export default function HomeHero({
       {/* Greeting */}
       <div className="relative overflow-hidden rounded-2xl bg-[#9FE1CB] p-3.5 min-h-[128px]">
         <p className="text-xs font-bold text-[#085041] truncate pr-16">สวัสดี{firstName ? ` ${firstName}` : ''}</p>
-        <h2 className="relative z-10 text-xl font-black text-[#04342C] mt-1 leading-tight">หิวละ<br />ยางงงง</h2>
+        {/* Rendered from the device clock, so the prerendered text may differ */}
+        <h2 suppressHydrationWarning className="relative z-10 text-base font-black text-[#04342C] mt-1 leading-snug pr-14">
+          {mealPrompt(new Date().getHours())}
+        </h2>
+        <p className="relative z-10 mt-1.5 pr-16 text-[11px] font-medium text-[#0F6E56] leading-snug flex gap-1">
+          <MapPin className="w-3 h-3 shrink-0 mt-0.5" />
+          <span>
+            <span className="whitespace-nowrap">ชุมชนห้วยชัน - นาฝาย</span>{' '}
+            <span className="whitespace-nowrap">&amp; มรภ.ชัยภูมิ</span>
+          </span>
+        </p>
         <img
           src="/mascots/pung-deng-hello.webp"
           alt="พุงเด้ง"

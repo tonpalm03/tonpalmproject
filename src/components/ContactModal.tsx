@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { X, ExternalLink, Sparkles, MessageSquare, Utensils, Store, HelpCircle, MapPin } from 'lucide-react';
+import { X, ExternalLink, MessageSquare, MapPin } from 'lucide-react';
+import MascotWatermark from './MascotWatermark';
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -13,19 +14,20 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-      <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-brand-100 animate-in zoom-in-95 duration-200">
+      <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-brand-100 animate-in zoom-in-95 duration-200">
+        <MascotWatermark page="contact" />
         
         {/* Modal Header */}
-        <div className="bg-gradient-to-r from-brand-500 via-brand-500 to-brand-600 p-4 sm:p-5 text-white flex items-center justify-between shadow-md shrink-0">
+        <div className="bg-[#E1F5EE] border-b border-[#9FE1CB] p-4 sm:p-5 text-[#04342C] flex items-center justify-between shadow-md shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center text-xl shrink-0 shadow-inner">
-              <MessageSquare className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-2xl bg-white border border-[#9FE1CB] flex items-center justify-center text-xl shrink-0 shadow-inner">
+              <MessageSquare className="w-5 h-5 text-[#1D9E75]" />
             </div>
             <div>
               <h2 className="font-black text-base sm:text-lg leading-tight flex items-center gap-1.5">
                 ติดต่อเรา & ฝ่ายบริการ
               </h2>
-              <p className="text-xs text-brand-100 font-medium mt-0.5">
+              <p className="text-xs text-[#0F6E56] font-medium mt-0.5">
                 CPRUFood • ชุมชนห้วยชัน - นาฝาย & มรภ. ชัยภูมิ
               </p>
             </div>
@@ -33,7 +35,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-black/20 hover:bg-black/35 text-white flex items-center justify-center transition active:scale-95 shrink-0"
+            className="w-8 h-8 rounded-full bg-white hover:bg-brand-50 text-[#0F6E56] border border-[#9FE1CB] flex items-center justify-center transition active:scale-95 shrink-0"
             title="ปิด"
           >
             <X className="w-4 h-4" />
@@ -77,46 +79,6 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                 <span>เพิ่มเพื่อน / แชท</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
-            </div>
-          </div>
-
-          {/* Contact Topic Guidance */}
-          <div className="space-y-2">
-            <p className="font-bold text-gray-900 text-xs flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-brand-500" />
-              <span>เรื่องที่สามารถติดต่อได้:</span>
-            </p>
-
-            <div className="grid grid-cols-1 gap-2">
-              <div className="p-3 bg-white rounded-2xl border border-gray-200/90 flex items-start gap-3 shadow-2xs">
-                <div className="w-8 h-8 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0">
-                  <Utensils className="w-4 h-4" />
-                </div>
-                <div>
-                  <p className="font-bold text-gray-900 text-xs">สำหรับลูกค้า</p>
-                  <p className="text-[11px] text-gray-500 mt-0.5">กรณีติดต่อร้านค้าไม่ได้ หรือพบปัญหาการจัดส่งและคุณภาพอาหาร</p>
-                </div>
-              </div>
-
-              <div className="p-3 bg-white rounded-2xl border border-gray-200/90 flex items-start gap-3 shadow-2xs">
-                <div className="w-8 h-8 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0">
-                  <Store className="w-4 h-4" />
-                </div>
-                <div>
-                  <p className="font-bold text-gray-900 text-xs">สำหรับร้านค้า</p>
-                  <p className="text-[11px] text-gray-500 mt-0.5">สมัครเปิดร้านใหม่, แนะนำการใช้งาน, หรือสอบถามการเติมเครดิต</p>
-                </div>
-              </div>
-
-              <div className="p-3 bg-white rounded-2xl border border-gray-200/90 flex items-start gap-3 shadow-2xs">
-                <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                  <HelpCircle className="w-4 h-4" />
-                </div>
-                <div>
-                  <p className="font-bold text-gray-900 text-xs">ข้อเสนอแนะเพื่อพัฒนาชุมชน</p>
-                  <p className="text-[11px] text-gray-500 mt-0.5">แจ้งข้อคิดเห็น ติชม หรือเสนอแนะฟังก์ชันที่อยากให้มีในระบบ</p>
-                </div>
-              </div>
             </div>
           </div>
 

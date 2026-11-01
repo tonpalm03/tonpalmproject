@@ -11,6 +11,7 @@ import TermsModal from './TermsModal';
 import ContactModal from './ContactModal';
 import UserAvatar, { getUserCode, isCustomAvatar } from './UserAvatar';
 import { readFileAsDataUrl } from '@/lib/imageUtils';
+import MascotWatermark from './MascotWatermark';
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -180,25 +181,23 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
     <>
       <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200 border border-gray-150 relative">
+          <MascotWatermark page="profile" />
           
           {/* Top Banner with Gradient */}
-          <div className="bg-gradient-to-br from-brand-500 via-brand-500 to-brand-600 p-6 text-white text-center relative overflow-hidden">
-            {/* Background Decorative Blob */}
-            <div className="absolute -right-8 -top-8 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none" />
-            <div className="absolute -left-8 -bottom-8 w-28 h-28 bg-black/10 rounded-full blur-xl pointer-events-none" />
+          <div className="bg-[#E1F5EE] border-b border-[#9FE1CB] p-6 text-[#04342C] text-center relative overflow-hidden">
 
             {/* Close Button */}
             <button
               type="button"
               onClick={onClose}
-              className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-black/20 hover:bg-black/35 flex items-center justify-center text-white transition active:scale-95"
+              className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-white hover:bg-brand-50 border border-[#9FE1CB] flex items-center justify-center text-[#0F6E56] transition active:scale-95"
             >
               <X className="w-4 h-4" />
             </button>
 
             {/* Avatar with Camera Overlay */}
             <div className="relative mx-auto w-24 h-24 mb-3">
-              <div className="w-full h-full rounded-full p-1 bg-white/30 backdrop-blur-xs shadow-xl">
+              <div className="w-full h-full rounded-full p-1 bg-white shadow-md">
                 <div className="w-full h-full rounded-full overflow-hidden ring-2 ring-white shadow-inner bg-slate-200">
                   <UserAvatar src={user.picture_url} alt={user.display_name} />
                 </div>
@@ -229,7 +228,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
             </div>
 
             {/* User Name */}
-            <h3 className="text-xl font-black text-white drop-shadow-sm truncate">
+            <h3 className="text-xl font-black text-[#04342C] truncate">
               {user.display_name}
             </h3>
 
@@ -237,12 +236,12 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
             {(role === 'admin' || role === 'merchant') && (
               <div className="mt-1.5 flex items-center justify-center gap-1.5">
                 {role === 'admin' ? (
-                  <span className="inline-flex items-center gap-1 bg-rose-500/80 text-white border border-rose-300/40 text-[11px] font-bold px-3 py-0.5 rounded-full shadow-2xs">
+                  <span className="inline-flex items-center gap-1 bg-white text-[#0F6E56] border border-[#9FE1CB] text-[11px] font-bold px-3 py-0.5 rounded-full shadow-2xs">
                     <ShieldCheck className="w-3.5 h-3.5" />
                     <span>ผู้ดูแลระบบ (Super Admin)</span>
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 bg-brand-600/80 text-white border border-brand-300/40 text-[11px] font-bold px-3 py-0.5 rounded-full shadow-2xs">
+                  <span className="inline-flex items-center gap-1 bg-white text-[#0F6E56] border border-[#9FE1CB] text-[11px] font-bold px-3 py-0.5 rounded-full shadow-2xs">
                     <Store className="w-3.5 h-3.5" />
                     <span>ร้านค้าชุมชน (Merchant)</span>
                   </span>

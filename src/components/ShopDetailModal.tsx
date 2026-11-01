@@ -12,6 +12,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import ReviewModal from './ReviewModal';
+import MascotWatermark from './MascotWatermark';
 
 interface ShopDetailModalProps {
   shop: Shop;
@@ -209,7 +210,8 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3">
-        <div className="bg-white w-full max-w-md md:max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+        <div className="relative bg-white w-full max-w-md md:max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+        <MascotWatermark page="shop" />
           
           {/* Cover Image & Header */}
           <div className="relative h-44 md:h-56 bg-slate-100 shrink-0">

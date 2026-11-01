@@ -7,6 +7,7 @@ import { db } from '@/lib/firebase';
 import { SystemSettings, UserProfile } from '@/types';
 import { MASCOT_AVATAR, compressSlip } from '@/lib/donations';
 import Toggle from './Toggle';
+import MascotWatermark from './MascotWatermark';
 
 interface DonateModalProps {
   settings: SystemSettings | null;
@@ -84,7 +85,9 @@ export default function DonateModal({ settings, user, onRequireLogin, onClose }:
 
   return (
     <div className="fixed inset-0 z-[200] bg-black/50 flex items-end sm:items-center justify-center" onClick={onClose}>
-      <div className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+      <div className="relative bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
+        <MascotWatermark page="donate" />
+        <div className="overflow-y-auto">
         <div className="sticky top-0 bg-white px-4 pt-4 pb-2 flex items-center gap-2 z-10">
           {step === 'form' && (
             <button onClick={() => setStep('qr')} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center"><ArrowLeft className="w-4 h-4" /></button>
@@ -158,6 +161,7 @@ export default function DonateModal({ settings, user, onRequireLogin, onClose }:
             <button onClick={onClose} className="w-full bg-brand-600 text-white rounded-2xl py-3 font-black">ปิด</button>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

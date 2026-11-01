@@ -29,6 +29,7 @@ import {
 } from '@/lib/dateUtils';
 import { registerMerchantPushNotifications } from '@/lib/pushNotifications';
 import { readFileAsDataUrl } from '@/lib/imageUtils';
+import MascotWatermark from './MascotWatermark';
 
 export const OPTION_PRESETS: { label: string; icon: LucideIcon; groups: () => OptionGroup[] }[] = [
   {
@@ -1086,6 +1087,7 @@ export default function MerchantDashboard({ currentUser }: MerchantDashboardProp
 
   return (
     <div className="space-y-4">
+      <MascotWatermark page="merchant" fixed />
       {/* Shop Status Toggle Floating Toast */}
       {statusToast && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-300 pointer-events-none">

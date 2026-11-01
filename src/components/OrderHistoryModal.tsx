@@ -12,6 +12,7 @@ import { Order, Shop, MenuItem } from '@/types';
 import { db } from '@/lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { formatOrderCode } from '@/lib/orderNumber';
+import MascotWatermark from './MascotWatermark';
 
 interface OrderHistoryModalProps {
   isOpen: boolean;
@@ -240,17 +241,18 @@ export default function OrderHistoryModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-150">
-      <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 border border-brand-100">
+      <div className="relative bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 border border-brand-100">
+        <MascotWatermark page="history" />
         
         {/* Modal Header */}
-        <div className="bg-gradient-to-r from-brand-500 via-brand-500 to-brand-600 px-5 py-4 text-white flex items-center justify-between shadow-xs">
+        <div className="bg-[#E1F5EE] border-b border-[#9FE1CB] px-5 py-4 text-[#04342C] flex items-center justify-between shadow-xs">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-xl shadow-inner">
-              <FileText className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-2xl bg-white border border-[#9FE1CB] flex items-center justify-center text-xl shadow-inner">
+              <FileText className="w-5 h-5 text-[#1D9E75]" />
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-black tracking-tight">ประวัติการสั่งซื้อของคุณ</h2>
-              <p className="text-[11px] sm:text-xs text-brand-100">
+              <p className="text-[11px] sm:text-xs text-[#0F6E56]">
                 รายการออเดอร์ทั้งหมด {orders.length} รายการ
               </p>
             </div>
@@ -258,7 +260,7 @@ export default function OrderHistoryModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition active:scale-95"
+            className="w-8 h-8 rounded-full bg-white hover:bg-brand-50 text-[#0F6E56] border border-[#9FE1CB] flex items-center justify-center transition active:scale-95"
           >
             <X className="w-5 h-5" />
           </button>

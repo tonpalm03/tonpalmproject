@@ -9,6 +9,7 @@ import ChatModal from './ChatModal';
 import ReviewModal from './ReviewModal';
 import { formatOrderCode } from '@/lib/orderNumber';
 import { orderItemUnitPrice } from '@/lib/orderItemPrice';
+import MascotWatermark from './MascotWatermark';
 
 interface OrderStatusModalProps {
   orderId: string;
@@ -122,21 +123,22 @@ export default function OrderStatusModal({
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3">
-        <div className="bg-white w-full max-w-md md:max-w-xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+        <div className="relative bg-white w-full max-w-md md:max-w-xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+          <MascotWatermark page="tracking" />
           
           {/* Header */}
-          <div className="bg-gradient-to-r from-brand-500 via-brand-500 to-brand-600 p-4 text-white flex items-center justify-between shadow-sm">
+          <div className="bg-[#E1F5EE] border-b border-[#9FE1CB] p-4 text-[#04342C] flex items-center justify-between shadow-sm">
             <div>
-              <span className="text-[11px] bg-white/20 px-2 py-0.5 rounded-full font-medium">
+              <span className="text-[11px] bg-white text-[#0F6E56] border border-[#9FE1CB] px-2 py-0.5 rounded-full font-medium">
                 {ordersList.length > 1 ? `สั่งอาหาร ${ordersList.length} ร้านค้า` : `ออเดอร์ #${formatOrderCode(activeOrder)}`}
               </span>
               <h2 className="font-black text-lg mt-0.5">สถานะการจัดส่ง</h2>
             </div>
             <button
               onClick={onClose}
-              className="w-9 h-9 rounded-full bg-black/15 hover:bg-black/25 flex items-center justify-center transition active:scale-95"
+              className="w-9 h-9 rounded-full bg-white hover:bg-brand-50 border border-[#9FE1CB] flex items-center justify-center transition active:scale-95"
             >
-              <X className="w-5 h-5 text-white" />
+              <X className="w-5 h-5 text-[#0F6E56]" />
             </button>
           </div>
 

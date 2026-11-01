@@ -5,6 +5,7 @@ import { X, Heart, ArrowLeft, Crown } from 'lucide-react';
 import { Supporter, formatBaht, toMillis } from '@/lib/donations';
 import { formatThaiDateWithTime } from '@/lib/dateUtils';
 import UserAvatar from './UserAvatar';
+import MascotWatermark from './MascotWatermark';
 
 interface SupportersModalProps {
   supporters: Supporter[];
@@ -31,7 +32,8 @@ export default function SupportersModal({ supporters, onDonate, onClose }: Suppo
 
   return (
     <div className="fixed inset-0 z-[200] bg-black/50 flex items-end sm:items-center justify-center" onClick={onClose}>
-      <div className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl max-h-[92vh] flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
+      <div className="relative bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl max-h-[92vh] flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
+      <MascotWatermark page="supporters" />
         {selected ? (
           <SupporterHistory supporter={selected} onBack={() => setSelected(null)} onClose={onClose} />
         ) : (

@@ -11,6 +11,7 @@ import { collection, query, orderBy, onSnapshot, addDoc, updateDoc, serverTimest
 import { httpsCallable } from 'firebase/functions';
 import { soundAlert } from '@/lib/soundAlert';
 import UserAvatar from './UserAvatar';
+import MascotWatermark from './MascotWatermark';
 
 export interface ShopPaymentInfo {
   bank_name?: string;
@@ -494,12 +495,13 @@ export default function ChatModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3">
-      <div className="bg-white w-full max-w-md h-[88vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative bg-white w-full max-w-md h-[88vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+        <MascotWatermark page="chat" />
         
         {/* Header */}
-        <div className="bg-gradient-to-r from-brand-500 to-brand-500 p-4 text-white flex items-center justify-between shadow-md shrink-0">
+        <div className="bg-[#E1F5EE] border-b border-[#9FE1CB] p-4 text-[#04342C] flex items-center justify-between shadow-md shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/60 shadow-md shrink-0 bg-slate-200">
+            <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white shadow-md shrink-0 bg-slate-200">
               <UserAvatar
                 src={targetAvatar}
                 alt={currentUser.role === 'merchant' ? customerName : shopName}
@@ -516,17 +518,17 @@ export default function ChatModal({
                   </span>
                 )}
               </div>
-              <p className="text-xs text-brand-100">
+              <p className="text-xs text-[#0F6E56]">
                 ออเดอร์ #{orderCode || orderId.slice(0, 6)} • สั่งส่งตรงถึงหอพัก
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center transition active:scale-95"
+            className="w-9 h-9 rounded-full bg-white hover:bg-brand-50 border border-[#9FE1CB] flex items-center justify-center transition active:scale-95"
             title="ปิดหน้าต่างแชท"
           >
-            <X className="w-5 h-5 text-white" />
+            <X className="w-5 h-5 text-[#0F6E56]" />
           </button>
         </div>
 

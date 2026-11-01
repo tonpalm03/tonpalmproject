@@ -90,22 +90,22 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
 
   if (application?.status === 'pending' && !editing) {
     return (
-      <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs space-y-2">
+      <div className="p-4 rounded-2xl bg-brand-50 border border-brand-200 text-brand-900 text-xs space-y-2">
         <p className="font-bold flex items-center gap-1.5 text-sm">
-          <Clock className="w-4 h-4 text-amber-600" />
+          <Clock className="w-4 h-4 text-brand-600" />
           ส่งคำขอเปิดร้านแล้ว รอแอดมินอนุมัติ
         </p>
         <p>
           ร้าน <strong>{application.shop_name}</strong> • โทร {application.phone}
         </p>
-        <p className="text-[11px] text-amber-700 leading-relaxed">
+        <p className="text-[11px] text-brand-700 leading-relaxed">
           เมื่อแอดมินอนุมัติ หน้านี้จะเปลี่ยนเป็นระบบจัดการร้านค้าให้อัตโนมัติ ระหว่างนี้ยังสั่งอาหารในฐานะลูกค้าได้ตามปกติ
         </p>
         <div className="flex gap-2 pt-1">
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="flex-1 py-2 bg-white hover:bg-amber-100 border border-amber-200 rounded-xl font-bold transition"
+            className="flex-1 py-2 bg-white hover:bg-brand-100 border border-brand-200 rounded-xl font-bold transition"
           >
             แก้ไขคำขอ
           </button>
@@ -125,7 +125,7 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <div className="flex items-center gap-2 text-gray-900">
-        <Store className="w-5 h-5 text-orange-500" />
+        <Store className="w-5 h-5 text-brand-500" />
         <h2 className="font-black text-base">สมัครเปิดร้านค้า</h2>
       </div>
 
@@ -153,7 +153,7 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
           placeholder="เช่น ส้มตำยายเพ็ญ มรภ."
           value={shopName}
           onChange={(e) => setShopName(e.target.value)}
-          className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-hidden focus:ring-2 focus:ring-orange-500"
+          className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-hidden focus:ring-2 focus:ring-brand-500"
         />
       </div>
 
@@ -166,7 +166,7 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
           placeholder="08xxxxxxxx"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-hidden focus:ring-2 focus:ring-orange-500"
+          className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-hidden focus:ring-2 focus:ring-brand-500"
         />
       </div>
 
@@ -182,7 +182,7 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
               type="button"
               onClick={() => setCategory(value)}
               className={`py-2 rounded-xl text-xs font-bold border transition ${
-                category === value ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                category === value ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
               }`}
             >
               {label}
@@ -199,7 +199,7 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
           placeholder="เช่น หน้าหอพัก... ซอย..."
           value={address}
           onChange={(e) => setAddress(e.target.value)}
-          className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-hidden focus:ring-2 focus:ring-orange-500"
+          className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-hidden focus:ring-2 focus:ring-brand-500"
         />
       </div>
 
@@ -211,7 +211,7 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
           placeholder="เช่น เวลาเปิด-ปิด, เมนูแนะนำ, LINE ID สำหรับติดต่อกลับ"
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-hidden focus:ring-2 focus:ring-orange-500"
+          className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-hidden focus:ring-2 focus:ring-brand-500"
         />
       </div>
 
@@ -235,7 +235,7 @@ export default function MerchantApplicationPanel({ user }: MerchantApplicationPa
         <button
           type="submit"
           disabled={submitting}
-          className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 disabled:opacity-50 text-white font-black text-sm rounded-xl shadow-md transition active:scale-95 flex items-center justify-center gap-2"
+          className="flex-1 py-3 bg-gradient-to-r from-brand-500 to-brand-500 hover:from-brand-600 hover:to-brand-600 disabled:opacity-50 text-white font-black text-sm rounded-xl shadow-md transition active:scale-95 flex items-center justify-center gap-2"
         >
           <Send className="w-4 h-4" />
           <span>{submitting ? 'กำลังส่ง...' : editing ? 'บันทึกการแก้ไข' : 'ส่งคำขอเปิดร้าน'}</span>

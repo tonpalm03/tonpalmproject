@@ -88,13 +88,13 @@ export default function FloatingBubbleControl({ shopId, isOpen, count, onOpenOrd
     } finally { setBusy(false); }
   };
   if (!supported) return null;
-  return <div className="pt-2 border-t border-amber-100 text-xs space-y-2">
+  return <div className="pt-2 border-t border-brand-100 text-xs space-y-2">
     <label className="flex items-center justify-between gap-3 font-bold text-gray-700">
       <span className="flex items-center gap-1.5">
-        <CircleDot className="w-3.5 h-3.5 text-amber-600" />
+        <CircleDot className="w-3.5 h-3.5 text-brand-600" />
         <span>แสดงปุ่มลอยเมื่อสลับไปแอปอื่น</span>
       </span>
-      <input type="checkbox" role="switch" checked={enabled} disabled={busy} onChange={() => void toggle()} className="h-5 w-5 accent-orange-500" />
+      <input type="checkbox" role="switch" checked={enabled} disabled={busy} onChange={() => void toggle()} className="h-5 w-5 accent-brand-500" />
     </label>
     {enabled && <p className="text-gray-600">{isOpen ? 'แตะปุ่มลอยเพื่อกลับมารับออเดอร์' : 'ปุ่มลอยพักอยู่ระหว่างปิดร้าน'}</p>}
     {error && <p role="alert" className="text-red-600">{error}</p>}

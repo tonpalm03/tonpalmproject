@@ -75,8 +75,8 @@ export default function ShopOwnerTransferModal({ shop, users, currentUser, onClo
           </p>
         </div>
 
-        <div className="text-[11px] text-amber-900 bg-amber-50 border border-amber-200 rounded-xl p-2.5 flex gap-1.5 leading-relaxed">
-          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+        <div className="text-[11px] text-brand-900 bg-brand-50 border border-brand-200 rounded-xl p-2.5 flex gap-1.5 leading-relaxed">
+          <AlertTriangle className="w-4 h-4 text-brand-600 shrink-0" />
           <span>
             ให้เจ้าของร้านเข้าสู่ระบบด้วยบัญชี LINE หรือ Google ใหม่ก่อน 1 ครั้ง แล้วค้นหาบัญชีนั้นด้านล่าง ควรยืนยันตัวตนเจ้าของร้าน (เช่น โทรกลับเบอร์ร้าน) ก่อนย้ายสิทธิ์
           </span>

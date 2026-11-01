@@ -66,15 +66,15 @@ export default function MerchantApplicationsAdmin({ users, currentUser }: Mercha
   };
 
   return (
-    <div className="bg-orange-50/70 border border-orange-200 rounded-2xl p-3 space-y-2">
-      <h3 className="font-black text-sm text-orange-900 flex items-center gap-1.5">
-        <Store className="w-4 h-4 text-orange-500" />
+    <div className="bg-brand-50/70 border border-brand-200 rounded-2xl p-3 space-y-2">
+      <h3 className="font-black text-sm text-brand-900 flex items-center gap-1.5">
+        <Store className="w-4 h-4 text-brand-500" />
         คำขอเปิดร้านรออนุมัติ ({applications.length})
       </h3>
       {applications.map((app) => {
         const applicant = users.find((u) => u.uid === app.uid);
         return (
-          <div key={app.uid} className="bg-white rounded-xl p-3 border border-orange-100 space-y-1.5 text-xs">
+          <div key={app.uid} className="bg-white rounded-xl p-3 border border-brand-100 space-y-1.5 text-xs">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <p className="font-bold text-sm text-gray-900 truncate">{app.shop_name}</p>
@@ -87,7 +87,7 @@ export default function MerchantApplicationsAdmin({ users, currentUser }: Mercha
                 <span className="text-[10px] text-gray-400 shrink-0">{formatThaiDateWithTime(app.created_at.toDate())}</span>
               )}
             </div>
-            <p className="flex items-center gap-1 text-amber-700 font-semibold">
+            <p className="flex items-center gap-1 text-brand-700 font-semibold">
               <Phone className="w-3 h-3" /> {app.phone}
             </p>
             {app.address_detail && (
@@ -101,7 +101,7 @@ export default function MerchantApplicationsAdmin({ users, currentUser }: Mercha
                 type="button"
                 disabled={busyUid === app.uid}
                 onClick={() => handleApprove(app)}
-                className="flex-1 py-1.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white rounded-lg font-bold flex items-center justify-center gap-1 transition"
+                className="flex-1 py-1.5 bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white rounded-lg font-bold flex items-center justify-center gap-1 transition"
               >
                 <Check className="w-3.5 h-3.5" /> อนุมัติ
               </button>

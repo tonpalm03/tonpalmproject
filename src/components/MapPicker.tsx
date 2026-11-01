@@ -62,7 +62,7 @@ export default function MapPicker({
 
   // Helper to create custom HTML Pin
   const createPinIcon = (L: any, label: string, isOutOfRange: boolean = false) => {
-    const pinColor = isOutOfRange ? '#e11d48' : '#ea580c';
+    const pinColor = isOutOfRange ? '#e11d48' : '#1D9E75';
     return L.divIcon({
       className: 'custom-map-pin',
       html: `
@@ -107,7 +107,7 @@ export default function MapPicker({
       if (showRadiusCircle) {
         const circle = L.circle([defaultLat, defaultLng], {
           radius: maxRadiusKm * 1000,
-          color: '#f59e0b',
+          color: '#1D9E75',
           fillColor: '#fbbf24',
           fillOpacity: 0.12,
           weight: 2,
@@ -191,7 +191,7 @@ export default function MapPicker({
       if (showRadiusCircle) {
         const circle = L.circle([defaultLat, defaultLng], {
           radius: maxRadiusKm * 1000,
-          color: '#f59e0b',
+          color: '#1D9E75',
           fillColor: '#fbbf24',
           fillOpacity: 0.12,
           weight: 2,
@@ -278,7 +278,7 @@ export default function MapPicker({
             type="button"
             onClick={handleGetLocation}
             disabled={isLocating || readOnly}
-            className="text-xs px-2.5 py-1 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white rounded-xl font-bold flex items-center gap-1 shadow-xs transition active:scale-95"
+            className="text-xs px-2.5 py-1 bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white rounded-xl font-bold flex items-center gap-1 shadow-xs transition active:scale-95"
             title="ดึงพิกัดตำแหน่งปัจจุบันของคุณด้วย GPS"
           >
             <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
@@ -287,7 +287,7 @@ export default function MapPicker({
           <button
             type="button"
             onClick={() => setIsFullScreen(true)}
-            className="p-1.5 text-gray-600 hover:bg-amber-100 hover:text-amber-800 bg-white border border-gray-200 rounded-xl transition shadow-2xs"
+            className="p-1.5 text-gray-600 hover:bg-brand-100 hover:text-brand-800 bg-white border border-gray-200 rounded-xl transition shadow-2xs"
             title="ซูมปักหมุดแบบเต็มจอ"
           >
             <Maximize2 className="w-4 h-4" />
@@ -296,8 +296,8 @@ export default function MapPicker({
       </div>
 
       {/* Inline Interactive Leaflet Map */}
-      {locationError && <p role="alert" className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs text-amber-900">{locationError}</p>}
-      <div className="relative w-full h-52 rounded-2xl overflow-hidden border border-amber-200 shadow-inner bg-slate-100">
+      {locationError && <p role="alert" className="rounded-xl bg-brand-50 border border-brand-200 p-3 text-xs text-brand-900">{locationError}</p>}
+      <div className="relative w-full h-52 rounded-2xl overflow-hidden border border-brand-200 shadow-inner bg-slate-100">
         <div ref={inlineMapContainerRef} className="w-full h-full z-10" />
 
         {/* Top Status Badges */}
@@ -306,12 +306,12 @@ export default function MapPicker({
           {showRadiusCircle && (
             <div className={`px-2.5 py-1 rounded-xl text-[10px] font-bold shadow-md flex items-center gap-1 backdrop-blur-xs pointer-events-auto border transition ${
               isWithinRadius
-                ? 'bg-emerald-600/90 text-white border-emerald-400/50'
+                ? 'bg-brand-600/90 text-white border-brand-400/50'
                 : 'bg-rose-600/95 text-white border-rose-300 animate-pulse'
             }`}>
               {isWithinRadius ? (
                 <>
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-200" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-brand-200" />
                   <span>ระยะ {formatDistance(distanceKm)} (ในพื้นที่ {maxRadiusKm} กม.)</span>
                 </>
               ) : (
@@ -337,7 +337,7 @@ export default function MapPicker({
           onClick={() => setIsFullScreen(true)}
           className="absolute bottom-2 right-2 z-20 bg-slate-900/90 hover:bg-slate-900 text-white px-2.5 py-1 rounded-xl text-[10px] font-bold shadow-md flex items-center gap-1 backdrop-blur-xs transition active:scale-95"
         >
-          <ZoomIn className="w-3 h-3 text-amber-400" />
+          <ZoomIn className="w-3 h-3 text-brand-400" />
           <span>ซูมปักหมุดแบบขยายใหญ่</span>
         </button>
 
@@ -354,8 +354,8 @@ export default function MapPicker({
           {/* Modal Header */}
           <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-gray-800 shrink-0">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-black">
-                <MapPin className="w-4 h-4 text-amber-400" />
+              <div className="w-8 h-8 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center font-black">
+                <MapPin className="w-4 h-4 text-brand-400" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -363,7 +363,7 @@ export default function MapPicker({
                   {showRadiusCircle && (
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                       isWithinRadius
-                        ? 'bg-emerald-950 text-emerald-300 border-emerald-700'
+                        ? 'bg-brand-950 text-brand-300 border-brand-700'
                         : 'bg-rose-950 text-rose-300 border-rose-700 animate-pulse'
                     }`}>
                       {isWithinRadius ? `ในพื้นที่ (${formatDistance(distanceKm)})` : `เกิน ${maxRadiusKm} กม. (${formatDistance(distanceKm)})`}
@@ -379,7 +379,7 @@ export default function MapPicker({
                 type="button"
                 onClick={handleGetLocation}
                 disabled={isLocating || readOnly}
-                className="px-2.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl flex items-center gap-1 shadow-sm transition active:scale-95"
+                className="px-2.5 py-1.5 bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold rounded-xl flex items-center gap-1 shadow-sm transition active:scale-95"
               >
                 <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
                 <span>GPS</span>
@@ -387,7 +387,7 @@ export default function MapPicker({
               <button
                 type="button"
                 onClick={() => setIsFullScreen(false)}
-                className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl flex items-center gap-1 shadow-md transition active:scale-95"
+                className="px-3.5 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-black rounded-xl flex items-center gap-1 shadow-md transition active:scale-95"
               >
                 <Check className="w-4 h-4" />
                 <span>ยืนยันพิกัด</span>
@@ -396,7 +396,7 @@ export default function MapPicker({
           </div>
 
           {/* Map canvas */}
-          {locationError && <p role="alert" className="shrink-0 bg-amber-50 px-4 py-3 text-xs text-amber-900">{locationError}</p>}
+          {locationError && <p role="alert" className="shrink-0 bg-brand-50 px-4 py-3 text-xs text-brand-900">{locationError}</p>}
           <div className="flex-1 relative w-full h-full bg-slate-200">
             <div ref={fullMapContainerRef} className="w-full h-full" />
 

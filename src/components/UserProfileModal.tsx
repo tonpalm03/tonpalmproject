@@ -208,7 +208,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
         <div className="bg-white rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200 border border-gray-150 relative">
           
           {/* Top Banner with Gradient */}
-          <div className="bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 p-6 text-white text-center relative overflow-hidden">
+          <div className="bg-gradient-to-br from-brand-500 via-brand-500 to-brand-600 p-6 text-white text-center relative overflow-hidden">
             {/* Background Decorative Blob */}
             <div className="absolute -right-8 -top-8 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none" />
             <div className="absolute -left-8 -bottom-8 w-28 h-28 bg-black/10 rounded-full blur-xl pointer-events-none" />
@@ -234,10 +234,10 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white hover:bg-amber-50 text-gray-800 shadow-lg flex items-center justify-center border-2 border-amber-500 active:scale-90 transition cursor-pointer"
+                className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white hover:bg-brand-50 text-gray-800 shadow-lg flex items-center justify-center border-2 border-brand-500 active:scale-90 transition cursor-pointer"
                 title="เปลี่ยนรูปโปรไฟล์"
               >
-                <Camera className="w-4 h-4 text-amber-600" />
+                <Camera className="w-4 h-4 text-brand-600" />
               </button>
 
               {/* Delete Icon Button on Avatar if user has custom picture */}
@@ -268,7 +268,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                     <span>ผู้ดูแลระบบ (Super Admin)</span>
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 bg-emerald-600/80 text-white border border-emerald-300/40 text-[11px] font-bold px-3 py-0.5 rounded-full shadow-2xs">
+                  <span className="inline-flex items-center gap-1 bg-brand-600/80 text-white border border-brand-300/40 text-[11px] font-bold px-3 py-0.5 rounded-full shadow-2xs">
                     <Store className="w-3.5 h-3.5" />
                     <span>ร้านค้าชุมชน (Merchant)</span>
                   </span>
@@ -284,9 +284,9 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full py-2.5 px-4 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition active:scale-98 shadow-xs cursor-pointer"
+                className="w-full py-2.5 px-4 bg-brand-50 hover:bg-brand-100 text-brand-900 border border-brand-200 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition active:scale-98 shadow-xs cursor-pointer"
               >
-                <Camera className="w-4 h-4 text-amber-600" />
+                <Camera className="w-4 h-4 text-brand-600" />
                 <span>เปลี่ยนรูปโปรไฟล์</span>
               </button>
 
@@ -314,7 +314,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                     <button
                       type="button"
                       onClick={() => setIsEditingInfo(true)}
-                      className="text-xs font-bold text-amber-600 hover:text-amber-700 flex items-center gap-1"
+                      className="text-xs font-bold text-brand-600 hover:text-brand-700 flex items-center gap-1"
                     >
                       <Edit2 className="w-3 h-3" />
                       <span>แก้ไข</span>
@@ -371,7 +371,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                       type="text"
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
-                      className="w-full px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-medium"
+                      className="w-full px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-brand-500 font-medium"
                       placeholder="เช่น น้องต้นปาล์ม"
                       required
                     />
@@ -385,7 +385,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-medium"
+                      className="w-full px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-brand-500 font-medium"
                       placeholder="08x-xxx-xxxx"
                     />
                   </div>
@@ -393,7 +393,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="w-full py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1 shadow-xs transition"
+                    className="w-full py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1 shadow-xs transition"
                   >
                     <Check className="w-3.5 h-3.5" />
                     <span>{isSaving ? 'กำลังบันทึก...' : 'บันทึกการเปลี่ยนแปลง'}</span>
@@ -403,18 +403,18 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
             </div>
 
             {/* 3. Default Delivery Address & Map Pin Card */}
-            <div className="bg-amber-50/60 rounded-2xl p-4 border border-amber-200/80 space-y-3">
+            <div className="bg-brand-50/60 rounded-2xl p-4 border border-brand-200/80 space-y-3">
               {!isEditingAddress ? (
                 <>
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-amber-600" />
+                    <span className="text-[11px] font-bold text-brand-900 uppercase tracking-wider flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-brand-600" />
                       ที่อยู่จัดส่งและหมุดเริ่มต้น
                     </span>
                     <button
                       type="button"
                       onClick={() => setIsEditingAddress(true)}
-                      className="text-xs font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-amber-200 shadow-2xs transition active:scale-95"
+                      className="text-xs font-bold text-brand-700 hover:text-brand-800 flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-brand-200 shadow-2xs transition active:scale-95"
                     >
                       <Edit2 className="w-3 h-3" />
                       <span>{user.default_address ? 'แก้ไข' : 'ปักหมุด'}</span>
@@ -423,26 +423,26 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
 
                   {user.default_address ? (
                     <div className="space-y-2 text-xs">
-                      <p className="font-semibold text-gray-800 bg-white p-2.5 rounded-xl border border-amber-100 leading-relaxed shadow-2xs">
+                      <p className="font-semibold text-gray-800 bg-white p-2.5 rounded-xl border border-brand-100 leading-relaxed shadow-2xs">
                         {user.default_address}
                       </p>
                       <div className="flex items-center justify-between text-[11px] text-gray-500 pt-0.5">
                         <span className="flex items-center gap-1 text-[10px]">
-                          <Navigation className="w-3 h-3 text-amber-600" />
+                          <Navigation className="w-3 h-3 text-brand-600" />
                           พิกัด: {user.default_location?.lat?.toFixed(4) || defaultLocation.lat.toFixed(4)}, {user.default_location?.lng?.toFixed(4) || defaultLocation.lng.toFixed(4)}
                         </span>
-                        <span className="text-[10px] text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full font-bold">
+                        <span className="text-[10px] text-brand-700 bg-brand-100/80 px-2 py-0.5 rounded-full font-bold">
                           พร้อมใช้สั่งอาหาร
                         </span>
                       </div>
                     </div>
                   ) : (
-                    <div className="text-center py-2 text-xs text-amber-800">
+                    <div className="text-center py-2 text-xs text-brand-800">
                       <p className="text-[11px] text-gray-500 mb-2">ยังไม่ได้บันทึกที่อยู่จัดส่งเริ่มต้น (บันทึกไว้เพื่อความสะดวกรวดเร็วในการสั่งอาหาร)</p>
                       <button
                         type="button"
                         onClick={() => setIsEditingAddress(true)}
-                        className="py-1.5 px-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-xs shadow-xs transition active:scale-95 inline-flex items-center gap-1"
+                        className="py-1.5 px-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold text-xs shadow-xs transition active:scale-95 inline-flex items-center gap-1"
                       >
                         <MapPin className="w-3.5 h-3.5" />
                         <span>ปักหมุดและบันทึกที่อยู่</span>
@@ -452,9 +452,9 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                 </>
               ) : (
                 <form onSubmit={handleSaveAddress} className="space-y-3">
-                  <div className="flex items-center justify-between border-b border-amber-200 pb-1.5">
-                    <span className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-amber-600" />
+                  <div className="flex items-center justify-between border-b border-brand-200 pb-1.5">
+                    <span className="text-xs font-bold text-brand-900 flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-brand-600" />
                       ปักหมุด & บันทึกที่อยู่เริ่มต้น
                     </span>
                     <button
@@ -493,14 +493,14 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                       onChange={(e) => setDefaultAddress(e.target.value)}
                       placeholder="เช่น หอพักพรเทพ ห้อง 204 ซอยข้าง 7-11 หรือ ใต้ตึก 5 คณะครุศาสตร์"
                       required
-                      className="w-full px-3 py-2 text-xs bg-white border border-gray-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-medium resize-none"
+                      className="w-full px-3 py-2 text-xs bg-white border border-gray-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-brand-500 font-medium resize-none"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSavingAddress}
-                    className="w-full py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1 shadow-xs transition active:scale-98"
+                    className="w-full py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1 shadow-xs transition active:scale-98"
                   >
                     <Check className="w-3.5 h-3.5" />
                     <span>{isSavingAddress ? 'กำลังบันทึก...' : 'บันทึกที่อยู่จัดส่ง'}</span>
@@ -517,7 +517,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                   onClose();
                   onOpenOrderHistory();
                 }}
-                className="w-full py-2.5 px-4 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center justify-between transition active:scale-98 shadow-xs"
+                className="w-full py-2.5 px-4 rounded-2xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs flex items-center justify-between transition active:scale-98 shadow-xs"
               >
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4 text-white" />
@@ -531,13 +531,13 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
             <button
               type="button"
               onClick={() => setShowContact(true)}
-              className="w-full py-2.5 px-4 rounded-2xl border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-emerald-900 font-bold text-xs flex items-center justify-between transition active:scale-98"
+              className="w-full py-2.5 px-4 rounded-2xl border border-brand-200 bg-brand-50/70 hover:bg-brand-100 text-brand-900 font-bold text-xs flex items-center justify-between transition active:scale-98"
             >
               <div className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-emerald-700" />
+                <MessageSquare className="w-4 h-4 text-brand-700" />
                 <span>ติดต่อเรา / ฝ่ายบริการ (LINE Official)</span>
               </div>
-              <span className="text-[11px] text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded-full">@887nrlyw</span>
+              <span className="text-[11px] text-brand-700 font-bold bg-brand-100 px-2 py-0.5 rounded-full">@887nrlyw</span>
             </button>
 
             {/* Terms of Service Button */}
@@ -550,7 +550,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                 <FileText className="w-4 h-4 text-gray-500" />
                 <span>ข้อกำหนดและนโยบายการให้บริการ</span>
               </div>
-              <span className="text-[11px] text-amber-600 font-semibold">แตะเพื่อดู</span>
+              <span className="text-[11px] text-brand-600 font-semibold">แตะเพื่อดู</span>
             </button>
 
             {/* Clear Cache & Force Update Button */}
@@ -558,26 +558,26 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
               type="button"
               onClick={handleClearCache}
               disabled={isClearingCache}
-              className="w-full py-2.5 px-4 rounded-2xl border border-amber-300 bg-amber-50/70 hover:bg-amber-100 text-amber-900 font-bold text-xs flex items-center justify-between transition active:scale-98"
+              className="w-full py-2.5 px-4 rounded-2xl border border-brand-300 bg-brand-50/70 hover:bg-brand-100 text-brand-900 font-bold text-xs flex items-center justify-between transition active:scale-98"
             >
               <div className="flex items-center gap-2">
-                <RefreshCw className={`w-3.5 h-3.5 text-amber-600 ${isClearingCache ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-3.5 h-3.5 text-brand-600 ${isClearingCache ? 'animate-spin' : ''}`} />
                 <span>ล้างแคชและอัปเดตข้อมูลล่าสุด</span>
               </div>
-              <span className="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-bold">รีเฟรช</span>
+              <span className="text-[10px] bg-brand-200 text-brand-900 px-2 py-0.5 rounded-full font-bold">รีเฟรช</span>
             </button>
 
             {/* Customers can apply to open a shop later */}
             {role === 'customer' && (
               <a
                 href="/merchant"
-                className="w-full py-2.5 px-4 rounded-2xl border border-orange-200 bg-orange-50/70 hover:bg-orange-100 text-orange-900 font-bold text-xs flex items-center justify-between transition active:scale-98"
+                className="w-full py-2.5 px-4 rounded-2xl border border-brand-200 bg-brand-50/70 hover:bg-brand-100 text-brand-900 font-bold text-xs flex items-center justify-between transition active:scale-98"
               >
                 <div className="flex items-center gap-2">
-                  <Store className="w-3.5 h-3.5 text-orange-500" />
+                  <Store className="w-3.5 h-3.5 text-brand-500" />
                   <span>สมัครเปิดร้านค้ากับ CPRUFood</span>
                 </div>
-                <span className="text-[10px] bg-orange-200 text-orange-900 px-2 py-0.5 rounded-full font-bold">สมัคร</span>
+                <span className="text-[10px] bg-brand-200 text-brand-900 px-2 py-0.5 rounded-full font-bold">สมัคร</span>
               </a>
             )}
 

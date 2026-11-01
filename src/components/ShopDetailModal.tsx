@@ -221,7 +221,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-amber-500 via-orange-500 to-amber-700 flex flex-col items-center justify-center text-white select-none">
+              <div className="w-full h-full bg-gradient-to-br from-brand-500 via-brand-500 to-brand-700 flex flex-col items-center justify-center text-white select-none">
                 <Store className="w-14 h-14 opacity-85 mb-1" />
                 <span className="text-sm font-bold bg-black/25 backdrop-blur-xs px-3 py-1 rounded-full border border-white/20">
                   {shop.name}
@@ -241,17 +241,17 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
             {/* Shop Title Info Overlay */}
             <div className="absolute bottom-3 left-4 right-4 text-white">
               <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isShopOpenAndReady ? 'bg-emerald-500' : 'bg-red-500'}`}>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isShopOpenAndReady ? 'bg-brand-500' : 'bg-red-500'}`}>
                   {isShopOpenAndReady ? 'เปิดรับออเดอร์' : 'ปิดร้านชั่วคราว'}
                 </span>
                 
-                <span className="text-[10px] bg-amber-500/90 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="text-[10px] bg-brand-500/90 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                   <Star className="w-3 h-3 fill-white text-white" />
                   <span>{displayRating.toFixed(1)} ({displayReviewCount})</span>
                 </span>
 
                 {(shop.sales_count ?? 0) > 0 && (
-                  <span className="text-[10px] bg-orange-600/90 font-black px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                  <span className="text-[10px] bg-brand-600/90 font-black px-2 py-0.5 rounded-full flex items-center gap-0.5">
                     <Flame className="w-3 h-3 fill-white" />
                     <span>ขายแล้ว {shop.sales_count}</span>
                   </span>
@@ -264,7 +264,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
               </div>
 
               <h2 className="text-lg md:text-2xl font-black leading-tight drop-shadow-md">{shop.name}</h2>
-              <div className="flex items-center gap-3 text-xs md:text-sm text-amber-100/90 mt-0.5 flex-wrap">
+              <div className="flex items-center gap-3 text-xs md:text-sm text-brand-100/90 mt-0.5 flex-wrap">
                 <a href={`tel:${shop.phone}`} className="flex items-center gap-1 hover:underline">
                   <Phone className="w-3 h-3" /> {shop.phone}
                 </a>
@@ -280,7 +280,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white font-bold px-2 py-0.5 rounded-full border border-white/30 text-[10px] backdrop-blur-xs transition active:scale-95"
                   >
-                    <Navigation className="w-2.5 h-2.5 text-amber-300" />
+                    <Navigation className="w-2.5 h-2.5 text-brand-300" />
                     <span>นำทาง Google Maps</span>
                   </a>
                 )}
@@ -290,11 +290,11 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
 
           {/* Own Shop Notice for Merchant Owner */}
           {isOwnShop && (
-            <div className="mx-4 mt-3 p-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-2.5 text-amber-900 shadow-2xs shrink-0">
-              <Store className="w-5 h-5 text-amber-600 shrink-0" />
+            <div className="mx-4 mt-3 p-3 bg-brand-50 border border-brand-200 rounded-2xl flex items-center gap-2.5 text-brand-900 shadow-2xs shrink-0">
+              <Store className="w-5 h-5 text-brand-600 shrink-0" />
               <div className="text-xs">
                 <p className="font-bold">นี่คือร้านค้าของคุณเอง</p>
-                <p className="text-[11px] text-amber-700 mt-0.5">
+                <p className="text-[11px] text-brand-700 mt-0.5">
                   ระบบไม่อนุญาตให้สั่งอาหารจากร้านของตนเอง แต่คุณยังสามารถสั่งอาหารจากร้านอื่นได้ตามปกติครับ
                 </p>
               </div>
@@ -308,7 +308,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
               onClick={() => setActiveTab('menu')}
               className={`flex-1 py-2 text-xs font-bold border-b-2 transition flex items-center justify-center gap-1.5 ${
                 activeTab === 'menu'
-                  ? 'border-amber-500 text-amber-600'
+                  ? 'border-brand-500 text-brand-600'
                   : 'border-transparent text-gray-400 hover:text-gray-600'
               }`}
             >
@@ -320,7 +320,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
               onClick={() => setActiveTab('reviews')}
               className={`flex-1 py-2 text-xs font-bold border-b-2 transition flex items-center justify-center gap-1 ${
                 activeTab === 'reviews'
-                  ? 'border-amber-500 text-amber-600'
+                  ? 'border-brand-500 text-brand-600'
                   : 'border-transparent text-gray-400 hover:text-gray-600'
               }`}
             >
@@ -337,7 +337,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
               <div className="space-y-3">
                 {/* Guest Notice: Must login to add items */}
                 {!user && (
-                  <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-white rounded-2xl p-3 flex items-center justify-between gap-2 shadow-sm animate-in fade-in">
+                  <div className="bg-gradient-to-r from-brand-500 via-brand-500 to-brand-500 text-white rounded-2xl p-3 flex items-center justify-between gap-2 shadow-sm animate-in fade-in">
                     <div className="flex items-center gap-2 min-w-0">
                       <Lock className="w-4 h-4 shrink-0" />
                       <p className="text-xs font-bold truncate">
@@ -347,7 +347,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                     <button
                       type="button"
                       onClick={onRequireLogin}
-                      className="px-3 py-1.5 bg-white hover:bg-amber-50 text-amber-600 font-black text-xs rounded-xl shadow-xs shrink-0 active:scale-95 whitespace-nowrap"
+                      className="px-3 py-1.5 bg-white hover:bg-brand-50 text-brand-600 font-black text-xs rounded-xl shadow-xs shrink-0 active:scale-95 whitespace-nowrap"
                     >
                       เข้าสู่ระบบ
                     </button>
@@ -360,12 +360,12 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                     onClick={() => setSelectedCategory('all')}
                     className={`py-2 px-1 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 ${
                       selectedCategory === 'all'
-                        ? 'bg-amber-500 text-white shadow-xs'
+                        ? 'bg-brand-500 text-white shadow-xs'
                         : 'text-gray-500 hover:text-gray-800'
                     }`}
                   >
                     <span>ทั้งหมด</span>
-                    <span className={`text-[10px] font-semibold ${selectedCategory === 'all' ? 'text-amber-100' : 'text-gray-400'}`}>
+                    <span className={`text-[10px] font-semibold ${selectedCategory === 'all' ? 'text-brand-100' : 'text-gray-400'}`}>
                       ({menuItems.length})
                     </span>
                   </button>
@@ -375,14 +375,14 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                     onClick={() => setSelectedCategory('food')}
                     className={`py-2 px-1 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 ${
                       selectedCategory === 'food'
-                        ? 'bg-amber-500 text-white shadow-xs'
+                        ? 'bg-brand-500 text-white shadow-xs'
                         : 'text-gray-500 hover:text-gray-800'
                     }`}
                   >
                     <span className="flex items-center gap-1">
                       <UtensilsCrossed className="w-3.5 h-3.5" /> อาหาร
                     </span>
-                    <span className={`text-[10px] font-semibold ${selectedCategory === 'food' ? 'text-amber-100' : 'text-gray-400'}`}>
+                    <span className={`text-[10px] font-semibold ${selectedCategory === 'food' ? 'text-brand-100' : 'text-gray-400'}`}>
                       ({foodItems.length})
                     </span>
                   </button>
@@ -392,14 +392,14 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                     onClick={() => setSelectedCategory('drink_dessert')}
                     className={`py-2 px-1 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 ${
                       selectedCategory === 'drink_dessert'
-                        ? 'bg-amber-500 text-white shadow-xs'
+                        ? 'bg-brand-500 text-white shadow-xs'
                         : 'text-gray-500 hover:text-gray-800'
                     }`}
                   >
                     <span className="flex items-center gap-1 text-center truncate">
                       <CupSoda className="w-3.5 h-3.5 shrink-0" /> น้ำ/ของหวาน
                     </span>
-                    <span className={`text-[10px] font-semibold ${selectedCategory === 'drink_dessert' ? 'text-amber-100' : 'text-gray-400'}`}>
+                    <span className={`text-[10px] font-semibold ${selectedCategory === 'drink_dessert' ? 'text-brand-100' : 'text-gray-400'}`}>
                       ({drinkItems.length})
                     </span>
                   </button>
@@ -414,7 +414,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                       placeholder="ค้นหาชื่อเมนูในร้านนี้..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-8 pr-7 py-2 bg-white border border-gray-200 rounded-xl text-xs focus:outline-hidden focus:ring-2 focus:ring-amber-500 shadow-2xs"
+                      className="w-full pl-8 pr-7 py-2 bg-white border border-gray-200 rounded-xl text-xs focus:outline-hidden focus:ring-2 focus:ring-brand-500 shadow-2xs"
                     />
                     {searchQuery && (
                       <button
@@ -434,7 +434,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                     {filteredFoodItems.length > 0 ? (
                       <div className="space-y-2">
                         <h3 className="text-xs font-black text-gray-600 uppercase tracking-wider flex items-center gap-1.5 pt-1">
-                          <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+                          <span className="w-2 h-2 rounded-full bg-brand-500 inline-block" />
                           <span>เมนูอาหารจานเดียว / ตามสั่ง ({filteredFoodItems.length})</span>
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
@@ -453,22 +453,22 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                                     className="w-16 h-16 rounded-xl object-cover border border-gray-100 shrink-0"
                                   />
                                 ) : (
-                                  <div className="w-16 h-16 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 shrink-0">
+                                  <div className="w-16 h-16 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center border border-brand-100 shrink-0">
                                     <UtensilsCrossed className="w-6 h-6" />
                                   </div>
                                 )}
                                 <div>
                                   <h4 className="font-bold text-sm text-gray-800 leading-tight">{item.name}</h4>
                                   <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                                    <p className="text-xs font-black text-amber-600">{item.price} บาท</p>
+                                    <p className="text-xs font-black text-brand-600">{item.price} บาท</p>
                                     {(item.sales_count ?? 0) > 0 && (
-                                      <span className="text-[10px] bg-orange-50 text-orange-600 font-bold px-1.5 py-0.2 rounded-md border border-orange-200 flex items-center gap-0.5">
+                                      <span className="text-[10px] bg-brand-50 text-brand-600 font-bold px-1.5 py-0.2 rounded-md border border-brand-200 flex items-center gap-0.5">
                                         <Flame className="w-3 h-3" /> ขายแล้ว {item.sales_count} จาน
                                       </span>
                                     )}
                                   </div>
                                   {item.options && item.options.length > 0 && (
-                                    <span className="inline-flex items-center gap-1 mt-1 text-[10px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded-md font-bold border border-amber-200">
+                                    <span className="inline-flex items-center gap-1 mt-1 text-[10px] text-brand-700 bg-brand-50 px-1.5 py-0.5 rounded-md font-bold border border-brand-200">
                                       <Sparkles className="w-2.5 h-2.5" /> ตัวเลือกเสริม ({item.options.length})
                                     </span>
                                   )}
@@ -485,7 +485,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                                 className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1 shadow-xs transition active:scale-95 shrink-0 ${
                                   isOwnShop
                                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                    : 'bg-amber-500 hover:bg-amber-600 disabled:opacity-40 text-white'
+                                    : 'bg-brand-500 hover:bg-brand-600 disabled:opacity-40 text-white'
                                 }`}
                               >
                                 {isOwnShop ? (
@@ -515,7 +515,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                     {filteredDrinkItems.length > 0 ? (
                       <div className="space-y-2">
                         <h3 className="text-xs font-black text-gray-600 uppercase tracking-wider flex items-center gap-1.5 pt-1">
-                          <span className="w-2 h-2 rounded-full bg-orange-500 inline-block" />
+                          <span className="w-2 h-2 rounded-full bg-brand-500 inline-block" />
                           <span>เครื่องดื่ม & ของหวาน ({filteredDrinkItems.length})</span>
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
@@ -534,22 +534,22 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                                     className="w-16 h-16 rounded-xl object-cover border border-gray-100 shrink-0"
                                   />
                                 ) : (
-                                  <div className="w-16 h-16 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center border border-orange-100 shrink-0">
+                                  <div className="w-16 h-16 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center border border-brand-100 shrink-0">
                                     <CupSoda className="w-6 h-6" />
                                   </div>
                                 )}
                                 <div>
                                   <h4 className="font-bold text-sm text-gray-800 leading-tight">{item.name}</h4>
                                   <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                                    <p className="text-xs font-black text-amber-600">{item.price} บาท</p>
+                                    <p className="text-xs font-black text-brand-600">{item.price} บาท</p>
                                     {(item.sales_count ?? 0) > 0 && (
-                                      <span className="text-[10px] bg-orange-50 text-orange-600 font-bold px-1.5 py-0.2 rounded-md border border-orange-200 flex items-center gap-0.5">
+                                      <span className="text-[10px] bg-brand-50 text-brand-600 font-bold px-1.5 py-0.2 rounded-md border border-brand-200 flex items-center gap-0.5">
                                         <Flame className="w-3 h-3" /> ขายแล้ว {item.sales_count} แก้ว
                                       </span>
                                     )}
                                   </div>
                                   {item.options && item.options.length > 0 && (
-                                    <span className="inline-flex items-center gap-1 mt-1 text-[10px] text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded-md font-bold border border-orange-200">
+                                    <span className="inline-flex items-center gap-1 mt-1 text-[10px] text-brand-700 bg-brand-50 px-1.5 py-0.5 rounded-md font-bold border border-brand-200">
                                       <Sparkles className="w-2.5 h-2.5" /> ตัวเลือกเสริม ({item.options.length})
                                     </span>
                                   )}
@@ -566,7 +566,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                                 className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1 shadow-xs transition active:scale-95 shrink-0 ${
                                   isOwnShop
                                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                    : 'bg-amber-500 hover:bg-amber-600 disabled:opacity-40 text-white'
+                                    : 'bg-brand-500 hover:bg-brand-600 disabled:opacity-40 text-white'
                                 }`}
                               >
                                 {isOwnShop ? (
@@ -602,10 +602,10 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
             {activeTab === 'reviews' && (
               <div className="space-y-3">
                 {/* Rating Summary Card */}
-                <div className="bg-amber-50/80 border border-amber-200 rounded-2xl p-4 flex items-center justify-between">
+                <div className="bg-brand-50/80 border border-brand-200 rounded-2xl p-4 flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-3xl font-black text-amber-700">{displayRating.toFixed(1)}</span>
+                      <span className="text-3xl font-black text-brand-700">{displayRating.toFixed(1)}</span>
                       <div>
                         <div className="flex items-center">
                           {[1, 2, 3, 4, 5].map((s) => (
@@ -619,7 +619,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                             />
                           ))}
                         </div>
-                        <span className="text-[11px] text-amber-800 font-bold">
+                        <span className="text-[11px] text-brand-800 font-bold">
                           {displayReviewCount} รีวิวจากลูกค้า
                         </span>
                       </div>
@@ -635,7 +635,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                       }
                       setShowReviewModal(true);
                     }}
-                    className="px-3 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 flex items-center gap-1"
+                    className="px-3 py-2 bg-gradient-to-r from-brand-500 to-brand-500 hover:from-brand-600 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 flex items-center gap-1"
                   >
                     <Star className="w-3.5 h-3.5 fill-white" />
                     <span>เขียนรีวิว</span>
@@ -657,7 +657,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                         }
                         setShowReviewModal(true);
                       }}
-                      className="text-xs text-amber-600 font-bold hover:underline inline-block pt-1"
+                      className="text-xs text-brand-600 font-bold hover:underline inline-block pt-1"
                     >
                       + กดเขียนรีวิวคนแรก
                     </button>
@@ -678,7 +678,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                                 className="w-6 h-6 rounded-full object-cover"
                               />
                             ) : (
-                              <div className="w-6 h-6 rounded-full bg-amber-100 text-amber-800 text-xs flex items-center justify-center font-bold">
+                              <div className="w-6 h-6 rounded-full bg-brand-100 text-brand-800 text-xs flex items-center justify-center font-bold">
                                 {rev.customer_name?.charAt(0) || 'U'}
                               </div>
                             )}
@@ -721,7 +721,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                   onClose();
                   onOpenCart();
                 }}
-                className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-white font-bold text-xs rounded-xl shadow-md transition active:scale-95 flex items-center gap-1"
+                className="px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-500 hover:from-brand-600 text-white font-bold text-xs rounded-xl shadow-md transition active:scale-95 flex items-center gap-1"
               >
                 <span>ดูตะกร้า & สั่งซื้อ</span>
                 <ArrowRight className="w-4 h-4" aria-hidden="true" />
@@ -757,13 +757,13 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                     className="w-12 h-12 rounded-xl object-cover ring-1 ring-gray-200 shrink-0"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 font-bold text-xl flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 font-bold text-xl flex items-center justify-center shrink-0">
                     {customizingItem.category === 'drink_dessert' ? <CupSoda className="w-6 h-6" /> : <UtensilsCrossed className="w-6 h-6" />}
                   </div>
                 )}
                 <div>
                   <h3 className="font-bold text-sm text-gray-900 leading-snug">{customizingItem.name}</h3>
-                  <p className="text-xs font-black text-amber-600 mt-0.5">ราคาเริ่มต้น {customizingItem.price} ฿</p>
+                  <p className="text-xs font-black text-brand-600 mt-0.5">ราคาเริ่มต้น {customizingItem.price} ฿</p>
                 </div>
               </div>
               <button
@@ -796,19 +796,19 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                         key={group.id}
                         className={`p-3 rounded-2xl border transition ${
                           isRequiredAndMissing
-                            ? 'bg-amber-50/40 border-amber-300'
+                            ? 'bg-brand-50/40 border-brand-300'
                             : 'bg-white border-gray-100 shadow-2xs'
                         } space-y-2`}
                       >
                         <div className="flex items-center justify-between flex-wrap gap-1">
                           <span className="text-xs font-black text-gray-900 flex items-center gap-1.5">
-                            <Sparkles className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                            <Sparkles className="w-3.5 h-3.5 text-brand-600 shrink-0" />
                             <span>{group.title}</span>
                           </span>
                           <span
                             className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                               group.required
-                                ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                                ? 'bg-brand-100 text-brand-800 border border-brand-200'
                                 : 'bg-gray-100 text-gray-600'
                             }`}
                           >
@@ -828,7 +828,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                                 onClick={() => selectGroupOption(group, opt)}
                                 className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition active:scale-98 ${
                                   isSelected
-                                    ? 'bg-amber-50 border-amber-400 text-amber-950 font-bold shadow-2xs'
+                                    ? 'bg-brand-50 border-brand-400 text-brand-950 font-bold shadow-2xs'
                                     : 'bg-gray-50/70 border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
                                 }`}
                               >
@@ -838,7 +838,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                                     <div
                                       className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition shrink-0 ${
                                         isSelected
-                                          ? 'border-amber-500 bg-amber-500'
+                                          ? 'border-brand-500 bg-brand-500'
                                           : 'border-gray-300 bg-white'
                                       }`}
                                     >
@@ -849,7 +849,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                                     <div
                                       className={`w-4 h-4 rounded-md border flex items-center justify-center transition shrink-0 ${
                                         isSelected
-                                          ? 'bg-amber-500 border-amber-500 text-white'
+                                          ? 'bg-brand-500 border-brand-500 text-white'
                                           : 'border-gray-300 bg-white'
                                       }`}
                                     >
@@ -860,7 +860,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                                 </div>
                                 <span
                                   className={`text-xs font-bold ${
-                                    isSelected ? 'text-amber-700' : 'text-gray-500'
+                                    isSelected ? 'text-brand-700' : 'text-gray-500'
                                   }`}
                                 >
                                   {opt.price > 0 ? `+${opt.price} ฿` : 'ฟรี'}
@@ -882,7 +882,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-gray-700 flex items-center justify-between">
                       <span className="flex items-center gap-1">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-600" /> เลือกท็อปปิ้ง / ตัวเลือกเสริม:
+                        <Sparkles className="w-3.5 h-3.5 text-brand-600" /> เลือกท็อปปิ้ง / ตัวเลือกเสริม:
                       </span>
                       <span className="text-[10px] text-gray-400 font-normal">เลือกได้หลายอย่าง</span>
                     </label>
@@ -896,21 +896,21 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                             onClick={() => toggleOption(opt)}
                             className={`w-full p-2.5 rounded-2xl border text-left flex items-center justify-between transition active:scale-98 ${
                               isSelected
-                                ? 'bg-amber-50 border-amber-400 text-amber-950 font-bold shadow-2xs'
+                                ? 'bg-brand-50 border-brand-400 text-brand-950 font-bold shadow-2xs'
                                 : 'bg-gray-50/70 border-gray-200 text-gray-700 hover:border-gray-300'
                             }`}
                           >
                             <div className="flex items-center gap-2">
                               <div
                                 className={`w-4 h-4 rounded-md border flex items-center justify-center transition ${
-                                  isSelected ? 'bg-amber-500 border-amber-500 text-white' : 'border-gray-300 bg-white'
+                                  isSelected ? 'bg-brand-500 border-brand-500 text-white' : 'border-gray-300 bg-white'
                                 }`}
                               >
                                 {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
                               </div>
                               <span className="text-xs">{opt.name}</span>
                             </div>
-                            <span className={`text-xs font-bold ${isSelected ? 'text-amber-700' : 'text-gray-500'}`}>
+                            <span className={`text-xs font-bold ${isSelected ? 'text-brand-700' : 'text-gray-500'}`}>
                               {opt.price > 0 ? `+${opt.price} ฿` : 'ฟรี'}
                             </span>
                           </button>
@@ -931,7 +931,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                   placeholder="เช่น ไม่ใส่ผักโรย, เผ็ดน้อย, หวาน 50%"
                   value={customNote}
                   onChange={(e) => setCustomNote(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-medium"
+                  className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-brand-500 font-medium"
                 />
               </div>
 
@@ -951,7 +951,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                   <button
                     type="button"
                     onClick={() => setCustomQuantity((q) => q + 1)}
-                    className="w-6 h-6 rounded-lg bg-amber-500 text-white flex items-center justify-center shadow-2xs hover:bg-amber-600 active:scale-95 transition"
+                    className="w-6 h-6 rounded-lg bg-brand-500 text-white flex items-center justify-center shadow-2xs hover:bg-brand-600 active:scale-95 transition"
                   >
                     <Plus className="w-3 h-3" />
                   </button>
@@ -964,7 +964,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
               <button
                 type="button"
                 onClick={handleConfirmAddToCart}
-                className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-white font-bold text-xs rounded-2xl shadow-md transition active:scale-95 flex items-center justify-between px-4"
+                className="w-full py-3 bg-gradient-to-r from-brand-500 to-brand-500 hover:from-brand-600 text-white font-bold text-xs rounded-2xl shadow-md transition active:scale-95 flex items-center justify-between px-4"
               >
                 <span>ใส่ตะกร้า</span>
                 <span className="text-sm font-black">

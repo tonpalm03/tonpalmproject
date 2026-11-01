@@ -22,10 +22,10 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
 
   return (
     <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-      <div className="bg-white w-full max-w-xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-amber-100 animate-in zoom-in-95 duration-200">
+      <div className="bg-white w-full max-w-xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-brand-100 animate-in zoom-in-95 duration-200">
         
         {/* Modal Header */}
-        <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 p-4 sm:p-5 text-white flex items-center justify-between shadow-md shrink-0">
+        <div className="bg-gradient-to-r from-brand-500 via-brand-500 to-brand-600 p-4 sm:p-5 text-white flex items-center justify-between shadow-md shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center text-xl shrink-0 shadow-inner">
               <FileText className="w-5 h-5 text-white" />
@@ -34,7 +34,7 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
               <h2 className="font-black text-base sm:text-lg leading-tight flex items-center gap-1.5">
                 ข้อกำหนดและนโยบาย
               </h2>
-              <p className="text-xs text-amber-100 font-medium mt-0.5">
+              <p className="text-xs text-brand-100 font-medium mt-0.5">
                 CPRUFood • ชุมชนห้วยชัน - นาฝาย & มรภ. ชัยภูมิ
               </p>
             </div>
@@ -56,7 +56,7 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
             onClick={() => setActiveTab('terms')}
             className={`flex-1 py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition active:scale-95 ${
               activeTab === 'terms'
-                ? 'bg-amber-500 text-white shadow-xs font-black'
+                ? 'bg-brand-500 text-white shadow-xs font-black'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-white/60'
             }`}
           >
@@ -69,7 +69,7 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
             onClick={() => setActiveTab('privacy')}
             className={`flex-1 py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition active:scale-95 ${
               activeTab === 'privacy'
-                ? 'bg-amber-500 text-white shadow-xs font-black'
+                ? 'bg-brand-500 text-white shadow-xs font-black'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-white/60'
             }`}
           >
@@ -86,14 +86,14 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
             <div className="space-y-3 animate-in fade-in duration-150">
               
               {/* Community Purpose Banner */}
-              <div className="rounded-2xl border border-amber-200 bg-amber-50/80 p-3.5 space-y-1.5 shadow-2xs">
+              <div className="rounded-2xl border border-brand-200 bg-brand-50/80 p-3.5 space-y-1.5 shadow-2xs">
                 <div className="flex items-center gap-1.5">
-                  <Store className="w-4 h-4 text-amber-700" />
-                  <h3 className="font-black text-amber-950 text-xs sm:text-sm">
+                  <Store className="w-4 h-4 text-brand-700" />
+                  <h3 className="font-black text-brand-950 text-xs sm:text-sm">
                     พื้นที่กลางเพื่อชุมชน ส่งตรงถึงหน้าบ้านและหอพัก
                   </h3>
                 </div>
-                <p className="text-[11px] text-amber-900 leading-relaxed">
+                <p className="text-[11px] text-brand-900 leading-relaxed">
                   CPRUFood จัดทำขึ้นเพื่อสนับสนุนร้านค้าในชุมชนห้วยชัน-นาฝาย ให้ส่งต่ออาหารอร่อยถึงมือเพื่อนบ้านและนักศึกษา มรภ.ชัยภูมิ อย่างสะดวกและรวดเร็ว
                 </p>
               </div>
@@ -101,9 +101,9 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
               {/* 1. Shop Role */}
               <div className="bg-white border border-gray-200/90 rounded-2xl p-3.5 space-y-1.5 shadow-2xs">
                 <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-black shrink-0">1</span>
+                  <span className="w-6 h-6 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center text-xs font-black shrink-0">1</span>
                   <h4 className="font-bold text-gray-900 text-xs sm:text-sm flex items-center gap-1.5">
-                    <Store className="w-3.5 h-3.5 text-orange-500" />
+                    <Store className="w-3.5 h-3.5 text-brand-500" />
                     <span>ร้านค้าปรุงและจัดส่งด้วยตนเอง</span>
                   </h4>
                 </div>
@@ -115,9 +115,9 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
               {/* 2. Customer Phone & Contact */}
               <div className="bg-white border border-gray-200/90 rounded-2xl p-3.5 space-y-1.5 shadow-2xs">
                 <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-black shrink-0">2</span>
+                  <span className="w-6 h-6 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-black shrink-0">2</span>
                   <h4 className="font-bold text-gray-900 text-xs sm:text-sm flex items-center gap-1.5">
-                    <Phone className="w-3.5 h-3.5 text-amber-500" />
+                    <Phone className="w-3.5 h-3.5 text-brand-500" />
                     <span>เบอร์โทรศัพท์ 10 หลักและที่อยู่รับของ</span>
                   </h4>
                 </div>
@@ -129,9 +129,9 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
               {/* 3. Payment */}
               <div className="bg-white border border-gray-200/90 rounded-2xl p-3.5 space-y-1.5 shadow-2xs">
                 <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-black shrink-0">3</span>
+                  <span className="w-6 h-6 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-black shrink-0">3</span>
                   <h4 className="font-bold text-gray-900 text-xs sm:text-sm flex items-center gap-1.5">
-                    <CreditCard className="w-3.5 h-3.5 text-emerald-600" />
+                    <CreditCard className="w-3.5 h-3.5 text-brand-600" />
                     <span>การชำระเงินผ่านแชทสดก่อนเริ่มปรุงอาหาร</span>
                   </h4>
                 </div>
@@ -169,14 +169,14 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
           {activeTab === 'privacy' && (
             <div className="space-y-3 animate-in fade-in duration-150">
               
-              <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-3.5 space-y-1.5 shadow-2xs">
+              <div className="rounded-2xl border border-brand-200 bg-brand-50/70 p-3.5 space-y-1.5 shadow-2xs">
                 <div className="flex items-center gap-1.5">
-                  <Lock className="w-4 h-4 text-emerald-700" />
-                  <h3 className="font-black text-emerald-950 text-xs sm:text-sm">
+                  <Lock className="w-4 h-4 text-brand-700" />
+                  <h3 className="font-black text-brand-950 text-xs sm:text-sm">
                     เราเคารพและปกป้องข้อมูลส่วนบุคคลของคุณ
                   </h3>
                 </div>
-                <p className="text-[11px] text-emerald-900 leading-relaxed">
+                <p className="text-[11px] text-brand-900 leading-relaxed">
                   CPRUFood จัดเก็บเฉพาะข้อมูลที่จำเป็นเพื่อการจัดส่งอาหารในชุมชนเท่านั้น และไม่มีนโยบายจำหน่ายหรือส่งต่อข้อมูลให้บุคคลภายนอก
                 </p>
               </div>
@@ -184,7 +184,7 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
               {/* 1. Information Collected */}
               <div className="bg-white border border-gray-200/90 rounded-2xl p-3.5 space-y-1.5 shadow-2xs">
                 <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-black shrink-0">1</span>
+                  <span className="w-6 h-6 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-black shrink-0">1</span>
                   <h4 className="font-bold text-gray-900 text-xs sm:text-sm">
                     ข้อมูลที่เราจัดเก็บ
                   </h4>
@@ -199,7 +199,7 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
               {/* 2. Usage Purpose */}
               <div className="bg-white border border-gray-200/90 rounded-2xl p-3.5 space-y-1.5 shadow-2xs">
                 <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-black shrink-0">2</span>
+                  <span className="w-6 h-6 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-black shrink-0">2</span>
                   <h4 className="font-bold text-gray-900 text-xs sm:text-sm">
                     การนำข้อมูลไปใช้งาน
                   </h4>
@@ -237,9 +237,9 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
                   onClose();
                   onOpenContact();
                 }}
-                className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200 transition active:scale-95 flex items-center gap-1 shrink-0"
+                className="px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-800 font-bold text-xs rounded-xl border border-brand-200 transition active:scale-95 flex items-center gap-1 shrink-0"
               >
-                <MessageSquare className="w-3.5 h-3.5 text-emerald-700" />
+                <MessageSquare className="w-3.5 h-3.5 text-brand-700" />
                 <span>ติดต่อเรา</span>
               </button>
             )}
@@ -250,13 +250,13 @@ export default function TermsModal({ isOpen, onClose, defaultTab = 'customer', o
         {/* Modal Footer */}
         <div className="p-3.5 sm:p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between gap-3 shrink-0">
           <p className="text-[11px] text-gray-500 hidden sm:flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <Sparkles className="w-3.5 h-3.5 text-brand-500" />
             <span>CPRUFood ส่งตรงถึงหน้าบ้านและหอพัก</span>
           </p>
           <button
             type="button"
             onClick={onClose}
-            className="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 flex items-center justify-center gap-1.5 ml-auto"
+            className="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-brand-500 to-brand-500 hover:from-brand-600 text-white text-xs font-bold rounded-xl shadow-md transition active:scale-95 flex items-center justify-center gap-1.5 ml-auto"
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>รับทราบและปิดหน้าต่าง</span>

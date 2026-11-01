@@ -46,10 +46,10 @@ export default function SalesDashboard({ orders, shopId }: {
   const invalidRange = !start || !end || start > end;
   const summary = summarizeSales(orders, invalidRange ? '9999' : start, invalidRange ? '0000' : end);
   const card = (title: string, value: number, detail: string, accent = false) => (
-    <div key={title} className={`rounded-2xl border p-4 ${accent ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-gray-100 bg-white text-slate-900'}`}>
-      <p className={`text-xs ${accent ? 'text-emerald-50' : 'text-slate-500'}`}>{title}</p>
+    <div key={title} className={`rounded-2xl border p-4 ${accent ? 'border-brand-600 bg-brand-600 text-white' : 'border-gray-100 bg-white text-slate-900'}`}>
+      <p className={`text-xs ${accent ? 'text-brand-50' : 'text-slate-500'}`}>{title}</p>
       <p className="mt-2 text-2xl font-black tabular-nums">{money(value)} ฿</p>
-      <p className={`mt-2 text-[11px] ${accent ? 'text-emerald-50' : 'text-slate-500'}`}>{detail}</p>
+      <p className={`mt-2 text-[11px] ${accent ? 'text-brand-50' : 'text-slate-500'}`}>{detail}</p>
     </div>
   );
   const ranking = new Map<string, { name: string; value: number; count: number }>();
@@ -66,11 +66,11 @@ export default function SalesDashboard({ orders, shopId }: {
 
   return <section className="space-y-4" aria-label={shopId ? 'รายงานยอดขายร้านค้า' : 'รายงานยอดขายและรายได้แพลตฟอร์ม'}>
     <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-3">
-      <div className="flex flex-wrap gap-2">{periods.map(([value, label]) => <button key={value} type="button" onClick={() => setPeriod(value)} aria-pressed={period === value} className={`rounded-xl px-3 py-2 text-xs font-bold ${period === value ? 'bg-amber-500 text-white' : 'bg-slate-50 text-slate-600'}`}>{label}</button>)}</div>
+      <div className="flex flex-wrap gap-2">{periods.map(([value, label]) => <button key={value} type="button" onClick={() => setPeriod(value)} aria-pressed={period === value} className={`rounded-xl px-3 py-2 text-xs font-bold ${period === value ? 'bg-brand-500 text-white' : 'bg-slate-50 text-slate-600'}`}>{label}</button>)}</div>
       <div className="flex flex-wrap items-center gap-3 text-xs">
         <label className="flex items-center gap-2">{period === 'custom' ? 'ตั้งแต่' : 'วันที่อ้างอิง'}<input aria-label="วันที่เริ่มรายงาน" type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} className="rounded-lg border border-gray-200 p-2" /></label>
         {period === 'custom' && <label className="flex items-center gap-2">ถึง<input aria-label="วันที่สิ้นสุดรายงาน" type="date" value={customEnd} min={selectedDate} onChange={e => setCustomEnd(e.target.value)} className="rounded-lg border border-gray-200 p-2" /></label>}
-        <button type="button" onClick={() => { setSelectedDate(dateKey(new Date())); setCustomEnd(dateKey(new Date())); }} className="font-bold text-amber-700">กลับมาวันนี้</button>
+        <button type="button" onClick={() => { setSelectedDate(dateKey(new Date())); setCustomEnd(dateKey(new Date())); }} className="font-bold text-brand-700">กลับมาวันนี้</button>
       </div>
       <p className="text-[11px] text-slate-500">ช่วง {start} ถึง {end} • นับยอดขายตามวันส่งสำเร็จ เวลาไทย • สำเร็จ {summary.completed.length} บิล • ยกเลิกตามวันสั่ง {summary.cancelled} บิล</p>
       {invalidRange && <p role="alert" className="text-xs text-red-600">กรุณาเลือกช่วงวันที่ให้ถูกต้อง</p>}
@@ -88,7 +88,7 @@ export default function SalesDashboard({ orders, shopId }: {
     <details className="rounded-2xl border border-gray-100 bg-white p-4" open>
       <summary className="cursor-pointer font-bold text-sm flex items-center justify-between">
         <span>บิลส่งสำเร็จ ({summary.completed.length})</span>
-        <span className="text-xs text-amber-700 font-normal">แตะ "ดูรายละเอียด" เพื่อดูข้อมูลแต่ละบิล</span>
+        <span className="text-xs text-brand-700 font-normal">แตะ "ดูรายละเอียด" เพื่อดูข้อมูลแต่ละบิล</span>
       </summary>
       <div className="mt-3 overflow-x-auto">
         <table className="w-full text-left text-xs whitespace-nowrap">
@@ -114,30 +114,30 @@ export default function SalesDashboard({ orders, shopId }: {
               const timeDisplay = formatOrderTime(o.completed_at || o.created_at);
 
               return (
-                <tr key={o.id} className="border-b border-gray-50 hover:bg-amber-50/30 transition">
+                <tr key={o.id} className="border-b border-gray-50 hover:bg-brand-50/30 transition">
                   <td className="p-3">
                     <span className="font-mono font-bold text-slate-900 block">
                       #{formatOrderCode(o)}
                     </span>
                     <span className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5 font-medium">
-                      <Clock className="w-3 h-3 text-amber-500 shrink-0" />
+                      <Clock className="w-3 h-3 text-brand-500 shrink-0" />
                       <span>{timeDisplay}</span>
                     </span>
                   </td>
                   <td className="p-3 font-medium text-slate-800">{o.shop_name}</td>
                   <td className="p-3 text-right font-medium">{money(o.food_subtotal ?? 0)} ฿</td>
                   <td className="p-3 text-right font-medium">{money(o.delivery_fee ?? 0)} ฿</td>
-                  <td className="p-3 text-right font-bold text-emerald-700">
+                  <td className="p-3 text-right font-bold text-brand-700">
                     {money(o.total_amount ?? 0)} ฿
                   </td>
                   <td className="p-3 text-center">
                     <button
                       type="button"
                       onClick={() => setSelectedBillOrder(o)}
-                      className="px-2.5 py-1 text-xs font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl transition shadow-2xs active:scale-95 inline-flex items-center gap-1 cursor-pointer"
+                      className="px-2.5 py-1 text-xs font-bold text-brand-800 bg-brand-50 hover:bg-brand-100 border border-brand-200 rounded-xl transition shadow-2xs active:scale-95 inline-flex items-center gap-1 cursor-pointer"
                       title="กดเพื่อดูรายละเอียดออเดอร์และรายการอาหาร"
                     >
-                      <FileText className="w-3 h-3 text-amber-600" />
+                      <FileText className="w-3 h-3 text-brand-600" />
                       <span>ดูรายละเอียด</span>
                     </button>
                   </td>
@@ -156,13 +156,13 @@ export default function SalesDashboard({ orders, shopId }: {
           {/* Header */}
           <div className="flex items-center justify-between pb-3 border-b border-gray-100">
             <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-150">
+              <div className="w-10 h-10 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center border border-brand-100">
                 <FileText className="w-5 h-5" />
               </div>
               <div>
                 <h3 className="font-black text-base text-gray-900 flex items-center gap-1.5">
                   <span>บิล #{formatOrderCode(selectedBillOrder)}</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-100 text-brand-800">
                     ส่งสำเร็จแล้ว
                   </span>
                 </h3>
@@ -193,11 +193,11 @@ export default function SalesDashboard({ orders, shopId }: {
             </div>
             {selectedBillOrder.completed_at && (
               <div className="flex items-center justify-between">
-                <span className="text-emerald-700 font-medium flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                <span className="text-brand-700 font-medium flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3 text-brand-600" />
                   <span>เวลาส่งสำเร็จ:</span>
                 </span>
-                <span className="font-bold text-emerald-800 font-mono">
+                <span className="font-bold text-brand-800 font-mono">
                   {formatOrderTime(selectedBillOrder.completed_at)}
                 </span>
               </div>
@@ -215,9 +215,9 @@ export default function SalesDashboard({ orders, shopId }: {
                 <span className="text-gray-500 font-medium">เบอร์โทรศัพท์:</span>
                 <a
                   href={`tel:${selectedBillOrder.customer_phone}`}
-                  className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg font-mono font-bold flex items-center gap-1 transition"
+                  className="px-2 py-0.5 bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 rounded-lg font-mono font-bold flex items-center gap-1 transition"
                 >
-                  <Phone className="w-3 h-3 text-emerald-600" />
+                  <Phone className="w-3 h-3 text-brand-600" />
                   <span>{selectedBillOrder.customer_phone}</span>
                 </a>
               </div>
@@ -236,7 +236,7 @@ export default function SalesDashboard({ orders, shopId }: {
           {/* Ordered Food Items List */}
           <div className="space-y-2">
             <span className="text-xs font-bold text-gray-900 flex items-center gap-1">
-              <Utensils className="w-3.5 h-3.5 text-amber-600" />
+              <Utensils className="w-3.5 h-3.5 text-brand-600" />
               <span>รายการอาหารที่สั่ง ({selectedBillOrder.items?.reduce((s, i) => s + i.quantity, 0) || 0} ชิ้น)</span>
             </span>
             <div className="bg-gray-50 rounded-2xl p-3 border border-gray-150 space-y-2 max-h-48 overflow-y-auto">
@@ -244,7 +244,7 @@ export default function SalesDashboard({ orders, shopId }: {
                 <div key={idx} className="flex justify-between items-start text-xs border-b border-gray-100 pb-1.5 last:border-b-0 last:pb-0">
                   <div className="flex-1 pr-2">
                     <p className="font-bold text-gray-800">
-                      <span className="text-amber-600 font-black">{item.quantity}x</span> {item.name}
+                      <span className="text-brand-600 font-black">{item.quantity}x</span> {item.name}
                     </p>
                     {item.selected_options && item.selected_options.length > 0 && (
                       <p className="text-[10px] text-gray-500 mt-0.5">
@@ -252,7 +252,7 @@ export default function SalesDashboard({ orders, shopId }: {
                       </p>
                     )}
                     {item.note && (
-                      <p className="text-[10px] text-amber-700 italic mt-0.5 flex items-center gap-1">
+                      <p className="text-[10px] text-brand-700 italic mt-0.5 flex items-center gap-1">
                         <FileEdit className="w-2.5 h-2.5 shrink-0" />
                         <span>{item.note}</span>
                       </p>
@@ -267,7 +267,7 @@ export default function SalesDashboard({ orders, shopId }: {
           </div>
 
           {/* Financial Calculation Breakdown */}
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50/40 p-3.5 rounded-2xl border border-amber-200 text-xs space-y-1.5">
+          <div className="bg-gradient-to-br from-brand-50 to-brand-50/40 p-3.5 rounded-2xl border border-brand-200 text-xs space-y-1.5">
             <div className="flex justify-between text-gray-700">
               <span>ยอดรวมค่าอาหาร:</span>
               <span className="font-medium">{money(selectedBillOrder.food_subtotal ?? 0)} ฿</span>
@@ -276,11 +276,11 @@ export default function SalesDashboard({ orders, shopId }: {
               <span>ค่าจัดส่ง:</span>
               <span className="font-medium">{money(selectedBillOrder.delivery_fee ?? 0)} ฿</span>
             </div>
-            <div className="flex justify-between text-gray-900 font-black pt-1 border-t border-amber-200/80 text-sm">
+            <div className="flex justify-between text-gray-900 font-black pt-1 border-t border-brand-200/80 text-sm">
               <span>ยอดรวมที่รับจากลูกค้า:</span>
-              <span className="text-orange-600">{money(selectedBillOrder.total_amount ?? 0)} ฿</span>
+              <span className="text-brand-600">{money(selectedBillOrder.total_amount ?? 0)} ฿</span>
             </div>
-            <div className="flex justify-between text-gray-500 text-[11px] pt-1 border-t border-dashed border-amber-200/60">
+            <div className="flex justify-between text-gray-500 text-[11px] pt-1 border-t border-dashed border-brand-200/60">
               <span>วิธีชำระเงิน:</span>
               <span className="font-bold text-gray-700">
                 {selectedBillOrder.payment_method === 'cash' ? 'เงินสดปลายทาง' : 'สแกน QR ร้านปลายทาง'}

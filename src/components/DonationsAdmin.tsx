@@ -115,7 +115,7 @@ export default function DonationsAdmin({ users }: DonationsAdminProps) {
           </h3>
           <button
             onClick={() => setNotifyOnApprove(v => !v)}
-            className={`text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 border ${notifyOnApprove ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-gray-500 border-gray-200'}`}
+            className={`text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 border ${notifyOnApprove ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-500 border-gray-200'}`}
           >
             {notifyOnApprove ? <Bell className="w-3 h-3" /> : <BellOff className="w-3 h-3" />}
             {notifyOnApprove ? 'เด้งแจ้งเตือนเมื่ออนุมัติ' : 'ไม่เด้งแจ้งเตือน'}
@@ -144,7 +144,7 @@ export default function DonationsAdmin({ users }: DonationsAdminProps) {
                   onChange={e => setAmountEdits(prev => ({ ...prev, [r.id]: e.target.value }))}
                   className="w-20 border border-gray-200 rounded-lg px-2 py-1 font-bold text-sm"
                 />
-                <button disabled={busyId === r.id} onClick={() => approve(r)} className="ml-auto bg-emerald-600 text-white rounded-lg px-2.5 py-1.5 font-bold flex items-center gap-1 disabled:opacity-50">
+                <button disabled={busyId === r.id} onClick={() => approve(r)} className="ml-auto bg-brand-600 text-white rounded-lg px-2.5 py-1.5 font-bold flex items-center gap-1 disabled:opacity-50">
                   <Check className="w-3.5 h-3.5" /> อนุมัติ
                 </button>
                 <button disabled={busyId === r.id} onClick={() => reject(r)} className="bg-gray-100 text-gray-600 rounded-lg px-2.5 py-1.5 font-bold flex items-center gap-1 disabled:opacity-50">
@@ -160,7 +160,7 @@ export default function DonationsAdmin({ users }: DonationsAdminProps) {
       <section className="bg-white border border-gray-200 rounded-2xl p-3 space-y-2">
         <div className="flex items-center justify-between">
           <h3 className="font-black text-sm text-gray-900">รายการ donate ทั้งหมด ({donations.length})</h3>
-          <button onClick={() => setShowAdd(true)} className="bg-emerald-600 text-white text-xs font-bold rounded-lg px-3 py-1.5 flex items-center gap-1">
+          <button onClick={() => setShowAdd(true)} className="bg-brand-600 text-white text-xs font-bold rounded-lg px-3 py-1.5 flex items-center gap-1">
             <Plus className="w-3.5 h-3.5" /> เพิ่ม donate
           </button>
         </div>
@@ -168,13 +168,13 @@ export default function DonationsAdmin({ users }: DonationsAdminProps) {
         <div className="divide-y divide-gray-100">
           {donations.map(d => (
             <div key={d.id} className="py-2 flex items-start gap-2.5 text-xs">
-              <div className="w-9 h-9 rounded-full overflow-hidden bg-emerald-50 shrink-0">
+              <div className="w-9 h-9 rounded-full overflow-hidden bg-brand-50 shrink-0">
                 <UserAvatar src={d.avatar_url} alt={d.display_name} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-gray-900 truncate">
                   {d.display_name}
-                  <span className="ml-1.5 text-emerald-700">{d.amount === null ? 'ซ่อนยอด' : formatBaht(d.amount)}</span>
+                  <span className="ml-1.5 text-brand-700">{d.amount === null ? 'ซ่อนยอด' : formatBaht(d.amount)}</span>
                 </p>
                 {d.message && (
                   <p className={`line-clamp-2 ${d.message_hidden ? 'text-gray-300 line-through' : 'text-gray-600'}`}>{d.message}</p>
@@ -266,8 +266,8 @@ function PromptPaySettings() {
   return (
     <section className="bg-white border border-gray-200 rounded-2xl p-3">
       <button onClick={() => setOpen(o => !o)} className="w-full flex items-center justify-between text-sm font-black text-gray-900">
-        <span className="flex items-center gap-1.5"><QrCode className="w-4 h-4 text-emerald-600" /> พร้อมเพย์รับ donate</span>
-        <span className={`text-[11px] font-bold ${configured ? 'text-emerald-600' : 'text-orange-500'}`}>
+        <span className="flex items-center gap-1.5"><QrCode className="w-4 h-4 text-brand-600" /> พร้อมเพย์รับ donate</span>
+        <span className={`text-[11px] font-bold ${configured ? 'text-brand-600' : 'text-brand-500'}`}>
           {configured ? 'ตั้งค่าแล้ว' : 'ยังไม่ได้อัปโหลด QR'}
         </span>
       </button>
@@ -290,7 +290,7 @@ function PromptPaySettings() {
               <input type="file" accept="image/*" className="hidden" onChange={e => pickQr(e.target.files?.[0])} />
             </label>
           </div>
-          <button disabled={saving} onClick={save} className="w-full bg-emerald-600 text-white rounded-lg py-2 font-bold flex items-center justify-center gap-1 disabled:opacity-50">
+          <button disabled={saving} onClick={save} className="w-full bg-brand-600 text-white rounded-lg py-2 font-bold flex items-center justify-center gap-1 disabled:opacity-50">
             <Save className="w-3.5 h-3.5" /> บันทึก
           </button>
         </div>
@@ -363,7 +363,7 @@ function DonationEditor({ users, donation, onClose }: { users: UserProfile[]; do
 
         {!isEdit && !anonymous && (
           selectedUser ? (
-            <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl p-2">
+            <div className="flex items-center gap-2 bg-brand-50 border border-brand-200 rounded-xl p-2">
               <div className="w-9 h-9 rounded-full overflow-hidden"><UserAvatar src={selectedUser.picture_url} /></div>
               <p className="flex-1 font-bold text-sm truncate">{selectedUser.display_name}</p>
               <button onClick={() => setSelectedUser(null)} className="text-xs text-gray-500 font-bold">เปลี่ยน</button>
@@ -398,7 +398,7 @@ function DonationEditor({ users, donation, onClose }: { users: UserProfile[]; do
           {!isEdit && <Toggle label="เด้งแจ้งเตือนบนหน้าแอป" value={notify} onChange={setNotify} />}
         </div>
 
-        <button disabled={saving} onClick={save} className="w-full bg-emerald-600 text-white rounded-xl py-2.5 font-bold disabled:opacity-50">
+        <button disabled={saving} onClick={save} className="w-full bg-brand-600 text-white rounded-xl py-2.5 font-bold disabled:opacity-50">
           {saving ? 'กำลังบันทึก...' : 'บันทึก'}
         </button>
       </div>

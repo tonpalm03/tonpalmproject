@@ -4,7 +4,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 
 export const viewport: Viewport = {
-  themeColor: "#f59e0b",
+  themeColor: "#E1F5EE",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -22,12 +22,12 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon.ico?v=8', sizes: 'any' },
-      { url: '/icon-192.png?v=8', sizes: '192x192', type: 'image/png' },
-      { url: '/logo.png?v=8', sizes: '512x512', type: 'image/png' },
+      { url: '/favicon.ico?v=9', sizes: 'any' },
+      { url: '/icon-192.png?v=9', sizes: '192x192', type: 'image/png' },
+      { url: '/logo.png?v=9', sizes: '512x512', type: 'image/png' },
     ],
     apple: [
-      { url: '/apple-icon.png?v=8', sizes: '180x180', type: 'image/png' },
+      { url: '/apple-icon.png?v=9', sizes: '180x180', type: 'image/png' },
     ],
   },
 };
@@ -43,9 +43,9 @@ export default function RootLayout({
         <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
         <meta httpEquiv="Pragma" content="no-cache" />
         <meta httpEquiv="Expires" content="0" />
-        <link rel="icon" type="image/x-icon" href="/favicon.ico?v=8" />
-        <link rel="shortcut icon" href="/favicon.ico?v=8" />
-        <link rel="apple-touch-icon" href="/apple-icon.png?v=8" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico?v=9" />
+        <link rel="shortcut icon" href="/favicon.ico?v=9" />
+        <link rel="apple-touch-icon" href="/apple-icon.png?v=9" />
       </head>
       <body className="bg-slate-50 text-gray-800 antialiased font-sans">
         <AuthProvider>

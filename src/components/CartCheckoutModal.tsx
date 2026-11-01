@@ -160,7 +160,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
     return (
       <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl p-6 text-center max-w-sm w-full space-y-4 shadow-2xl animate-in zoom-in-95">
-          <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto shadow-inner">
+          <div className="w-14 h-14 rounded-2xl bg-brand-100 text-brand-600 flex items-center justify-center mx-auto shadow-inner">
             <Lock className="w-6 h-6" />
           </div>
           <div>
@@ -176,7 +176,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                 onClose();
                 onRequireAuth?.();
               }}
-              className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-white rounded-2xl font-bold text-xs shadow-md active:scale-95 transition"
+              className="w-full py-3 bg-gradient-to-r from-brand-500 to-brand-500 hover:from-brand-600 text-white rounded-2xl font-bold text-xs shadow-md active:scale-95 transition"
             >
               เข้าสู่ระบบ / สมัครสมาชิก
             </button>
@@ -198,14 +198,14 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
     return (
       <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl p-6 text-center max-w-sm w-full space-y-3 shadow-xl">
-          <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
+          <div className="w-12 h-12 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center mx-auto">
             <ShoppingCart className="w-6 h-6" />
           </div>
           <h3 className="font-bold text-gray-800">ตะกร้าของคุณว่างเปล่า</h3>
           <p className="text-xs text-gray-500">เลือกอาหารหรือเครื่องดื่มเพื่อเริ่มสั่งซื้อ</p>
           <button
             onClick={onClose}
-            className="w-full py-2.5 bg-amber-500 text-white rounded-2xl font-bold text-sm"
+            className="w-full py-2.5 bg-brand-500 text-white rounded-2xl font-bold text-sm"
           >
             ไปดูเมนู
           </button>
@@ -379,12 +379,12 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
       <div className="bg-white w-full max-w-md md:max-w-2xl max-h-[92vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
         
         {/* Header */}
-        <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-4 text-white flex items-center justify-between shadow-sm">
+        <div className="bg-gradient-to-r from-brand-500 to-brand-500 p-4 text-white flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <Store className="w-5 h-5 text-amber-100" />
+            <Store className="w-5 h-5 text-brand-100" />
             <div>
               <h2 className="font-bold text-base leading-tight">ตะกร้าสั่งอาหาร</h2>
-              <p className="text-xs text-amber-100">
+              <p className="text-xs text-brand-100">
                 {shopCount === 1 ? shopsInCart[0]?.name : `${shopCount} ร้านค้า (ร้านแยกกันส่ง)`}
               </p>
             </div>
@@ -409,11 +409,11 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
 
           {/* Multi-shop Delivery Notice */}
           {shopCount > 1 && (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-2.5 text-xs text-amber-900">
-              <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <div className="p-3 bg-brand-50 border border-brand-200 rounded-2xl flex items-start gap-2.5 text-xs text-brand-900">
+              <Info className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
               <div>
                 <span className="font-bold block">คุณกำลังสั่งอาหารจาก {shopCount} ร้านค้า</span>
-                <span className="text-[11px] text-amber-800">
+                <span className="text-[11px] text-brand-800">
                   เนื่องจากแต่ละร้านเป็นผู้จัดส่งเอง แต่ละร้านจะแยกกันส่งถึงมือ คิดค่าจัดส่งตามแต่ละร้านกำหนดครับ
                 </span>
               </div>
@@ -452,7 +452,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                   {/* Shop Group Header */}
                   <div className="flex items-center justify-between pb-2 border-b border-gray-100">
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-xs font-bold">
+                      <div className="w-6 h-6 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-bold">
                         <Store className="w-3.5 h-3.5" />
                       </div>
                       <div>
@@ -466,8 +466,8 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                     </div>
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                       group.deliveryFee === 0
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                        : 'bg-amber-50 text-amber-800 border-amber-200'
+                        ? 'bg-brand-50 text-brand-700 border-brand-200'
+                        : 'bg-brand-50 text-brand-800 border-brand-200'
                     }`}>
                       {group.deliveryFee === 0 ? 'ส่งฟรี' : `+ ค่าส่ง ${group.deliveryFee} บ.`}
                     </span>
@@ -479,11 +479,11 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                     <div key={item.cart_item_id || item.menu_id} className="py-2 flex items-center justify-between gap-2">
                       <div className="flex-1">
                         <p className="text-xs font-semibold text-gray-800 leading-tight">{item.name}</p>
-                        <p className="text-xs text-amber-600 font-bold mt-0.5">
+                        <p className="text-xs text-brand-600 font-bold mt-0.5">
                           {item.unit_price ?? item.price} ฿
                         </p>
                         {item.selected_options && item.selected_options.length > 0 && (
-                          <div className="text-[10px] text-amber-800/90 pl-1 space-y-0.5 mt-0.5">
+                          <div className="text-[10px] text-brand-800/90 pl-1 space-y-0.5 mt-0.5">
                             {item.selected_options.map((opt, oIdx) => (
                               <div key={oIdx}>↳ + {opt.name} {opt.price > 0 ? `(+${opt.price} ฿)` : '(ฟรี)'}</div>
                             ))}
@@ -508,7 +508,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                         <button
                           type="button"
                           onClick={() => updateQuantity(item.cart_item_id || item.menu_id, 1)}
-                          className="w-5 h-5 rounded-md bg-amber-500 text-white flex items-center justify-center hover:bg-amber-600 active:scale-95 transition"
+                          className="w-5 h-5 rounded-md bg-brand-500 text-white flex items-center justify-center hover:bg-brand-600 active:scale-95 transition"
                         >
                           <Plus className="w-3.5 h-3.5" />
                         </button>
@@ -533,9 +533,9 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
               </div>
               <div className="flex justify-between text-gray-600">
                 <span>ค่าส่งรวม ({shopCount} ร้าน)</span>
-                <span className="text-emerald-600 font-bold">{deliveryFee === 0 ? 'ส่งฟรี (0 ฿)' : `${deliveryFee} ฿`}</span>
+                <span className="text-brand-600 font-bold">{deliveryFee === 0 ? 'ส่งฟรี (0 ฿)' : `${deliveryFee} ฿`}</span>
               </div>
-              <div className="flex justify-between text-base font-black text-amber-600 pt-2 border-t border-gray-200">
+              <div className="flex justify-between text-base font-black text-brand-600 pt-2 border-t border-gray-200">
                 <span>ยอดรวมที่ต้องชำระ</span>
                 <span>{total} ฿</span>
               </div>
@@ -557,7 +557,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                   placeholder="เช่น น้องต้น"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-brand-500"
                 />
               </div>
               <div>
@@ -568,7 +568,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                   placeholder="08x-xxx-xxxx"
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-brand-500"
                 />
               </div>
             </div>
@@ -585,11 +585,11 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                   }}
                   className={`flex-1 py-1.5 px-2 rounded-xl font-bold transition flex items-center justify-center gap-1 ${
                     addressMode === 'profile'
-                      ? 'bg-white text-amber-700 shadow-xs border border-amber-200/60'
+                      ? 'bg-white text-brand-700 shadow-xs border border-brand-200/60'
                       : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
-                  <Home className="w-3.5 h-3.5 text-amber-600" />
+                  <Home className="w-3.5 h-3.5 text-brand-600" />
                   <span>ที่อยู่โปรไฟล์</span>
                 </button>
               ) : null}
@@ -599,11 +599,11 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                 disabled={isLocatingGPS}
                 className={`flex-1 py-1.5 px-2 rounded-xl font-bold transition flex items-center justify-center gap-1 ${
                   addressMode === 'current'
-                    ? 'bg-white text-amber-700 shadow-xs border border-amber-200/60'
+                    ? 'bg-white text-brand-700 shadow-xs border border-brand-200/60'
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                <Navigation className="w-3.5 h-3.5 text-amber-600" />
+                <Navigation className="w-3.5 h-3.5 text-brand-600" />
                 <span>{isLocatingGPS ? 'กำลังค้นหา...' : 'GPS ปัจจุบัน'}</span>
               </button>
               <button
@@ -611,11 +611,11 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                 onClick={() => setAddressMode('custom')}
                 className={`flex-1 py-1.5 px-2 rounded-xl font-bold transition flex items-center justify-center gap-1 ${
                   addressMode === 'custom'
-                    ? 'bg-white text-amber-700 shadow-xs border border-amber-200/60'
+                    ? 'bg-white text-brand-700 shadow-xs border border-brand-200/60'
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                <MapPin className="w-3.5 h-3.5 text-amber-600" />
+                <MapPin className="w-3.5 h-3.5 text-brand-600" />
                 <span>ระบุเอง / ปรับหมุด</span>
               </button>
             </div>
@@ -639,7 +639,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                   สถานที่ส่ง / จุดนัดรับ (พิมพ์เองอิสระ)
                 </label>
                 {addressMode === 'profile' && (
-                  <span className="text-[10px] text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full font-bold">
+                  <span className="text-[10px] text-brand-700 bg-brand-100 px-2 py-0.5 rounded-full font-bold">
                     ใช้ที่อยู่จากโปรไฟล์
                   </span>
                 )}
@@ -653,18 +653,18 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                   setDeliveryAddress(e.target.value);
                   if (addressMode === 'profile') setAddressMode('custom');
                 }}
-                className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-500 resize-none"
+                className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-brand-500 resize-none"
               />
 
               {/* Save to Profile Checkbox */}
-              <label className="mt-2.5 flex items-center gap-2 cursor-pointer select-none text-xs text-gray-600 bg-amber-50/60 p-2 rounded-xl border border-amber-200/50">
+              <label className="mt-2.5 flex items-center gap-2 cursor-pointer select-none text-xs text-gray-600 bg-brand-50/60 p-2 rounded-xl border border-brand-200/50">
                 <input
                   type="checkbox"
                   checked={saveToProfile}
                   onChange={(e) => setSaveToProfile(e.target.checked)}
-                  className="rounded-sm text-amber-500 focus:ring-amber-400 w-4 h-4 cursor-pointer accent-amber-500"
+                  className="rounded-sm text-brand-500 focus:ring-brand-400 w-4 h-4 cursor-pointer accent-brand-500"
                 />
-                <span className="font-medium text-amber-950">บันทึกที่อยู่นี้และหมุดนี้เป็นค่าเริ่มต้นในโปรไฟล์ด้วย</span>
+                <span className="font-medium text-brand-950">บันทึกที่อยู่นี้และหมุดนี้เป็นค่าเริ่มต้นในโปรไฟล์ด้วย</span>
               </label>
             </div>
           </div>
@@ -699,19 +699,19 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
               <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider">
                 วิธีชำระเงิน (โอนผ่านแชทก่อนเริ่มทำอาหาร)
               </h3>
-              <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">
+              <span className="text-[10px] bg-brand-100 text-brand-800 font-bold px-2 py-0.5 rounded-full">
                 ร้านค้าส่งตรง
               </span>
             </div>
 
-            <div className="flex items-start gap-3 p-3.5 rounded-2xl border border-amber-500 bg-amber-50/70 shadow-xs ring-1 ring-amber-400">
-              <div className="p-2.5 rounded-xl shrink-0 bg-amber-500 text-white shadow-xs">
+            <div className="flex items-start gap-3 p-3.5 rounded-2xl border border-brand-500 bg-brand-50/70 shadow-xs ring-1 ring-brand-400">
+              <div className="p-2.5 rounded-xl shrink-0 bg-brand-500 text-white shadow-xs">
                 <MessageCircle className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <p className="text-xs font-bold text-gray-900">โอนเงินผ่านแชทสดกับร้านค้า</p>
-                  <span className="bg-emerald-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-full">
+                  <span className="bg-brand-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-full">
                     แนะนำ
                   </span>
                 </div>
@@ -733,7 +733,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
               <button
                 type="button"
                 onClick={() => setShowTerms(true)}
-                className="text-amber-600 hover:text-amber-700 underline font-bold inline-flex items-center"
+                className="text-brand-600 hover:text-brand-700 underline font-bold inline-flex items-center"
               >
                 ข้อกำหนดการใช้บริการ
               </button>
@@ -744,7 +744,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
               className={`w-full py-3.5 rounded-2xl font-bold text-sm sm:text-base shadow-lg flex items-center justify-center gap-2 active:scale-98 transition ${
                 hasOwnShopItems || isDeliveryOutOfRange
                   ? 'bg-gray-300 shadow-none cursor-not-allowed text-gray-600'
-                  : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-orange-500/25'
+                  : 'bg-gradient-to-r from-brand-500 to-brand-500 hover:from-brand-600 hover:to-brand-600 text-white shadow-brand-500/25'
               }`}
             >
               <span>

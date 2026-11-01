@@ -12,6 +12,21 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Brand green (พุงเด้ง pastel). Use brand-* instead of orange/amber/emerald. */
+@theme {
+  --color-brand-50: #EEF9F4;
+  --color-brand-100: #E1F5EE;
+  --color-brand-200: #C3EBDC;
+  --color-brand-300: #9FE1CB;
+  --color-brand-400: #5DCAA5;
+  --color-brand-500: #1D9E75;
+  --color-brand-600: #178A66;
+  --color-brand-700: #0F6E56;
+  --color-brand-800: #085041;
+  --color-brand-900: #04342C;
+  --color-brand-950: #022720;
+}
+
 body {
   background: #f8fafc;
   color: #1e293b;
@@ -27,7 +42,7 @@ body {
 .bg-gradient-to-tr,
 .bg-gradient-to-l,
 .bg-gradient-to-b {
-  background-color: #f97316;
+  background-color: #1D9E75;
 }
 
 button {

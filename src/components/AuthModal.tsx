@@ -47,7 +47,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
                   </svg>
-                  <div className="absolute inset-0 rounded-2xl border-2 border-amber-500 border-t-transparent animate-spin" />
+                  <div className="absolute inset-0 rounded-2xl border-2 border-brand-500 border-t-transparent animate-spin" />
                 </>
               )}
             </div>
@@ -68,7 +68,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
             <h3 className="font-black text-lg text-gray-900">
               เข้าสู่ระบบ
             </h3>
-            <p className="text-xs text-amber-600 font-semibold">CPRUFood • มรภ. ชัยภูมิ</p>
+            <p className="text-xs text-brand-600 font-semibold">CPRUFood • มรภ. ชัยภูมิ</p>
           </div>
           <button
             type="button"
@@ -89,7 +89,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
         {/* 1. Customer Section (LINE & Google Login) */}
         <div className="mt-4 space-y-2.5">
           <div className="text-center">
-            <span className="inline-block px-2.5 py-0.5 bg-emerald-50 text-emerald-700 font-bold text-[11px] rounded-full border border-emerald-200">
+            <span className="inline-block px-2.5 py-0.5 bg-brand-50 text-brand-700 font-bold text-[11px] rounded-full border border-brand-200">
               สำหรับลูกค้าสั่งอาหาร
             </span>
             <p className="text-xs text-gray-500 mt-1">เลือกเข้าสู่ระบบด้วย LINE หรือ Google ได้ทันที</p>
@@ -169,14 +169,14 @@ export default function AuthModal({ onClose }: AuthModalProps) {
           </button>
 
           {/* LINE Login Tip & Direct Visual Guide */}
-          <div className="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-2.5 text-left transition-all">
+          <div className="bg-brand-50/70 border border-brand-100 rounded-2xl p-2.5 text-left transition-all">
             <div className="flex items-start gap-2 mb-2">
-              <Smartphone className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <Smartphone className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
               <div className="flex-1 text-[11px] text-gray-600 leading-relaxed">
-                <p className="font-bold text-emerald-800">ทริค: ไม่ต้องจำรหัสผ่าน</p>
+                <p className="font-bold text-brand-800">ทริค: ไม่ต้องจำรหัสผ่าน</p>
                 <p className="mt-0.5">
                   เมื่อหน้า LINE ขึ้นมา ให้เลื่อนลงล่างสุด แล้วกดปุ่ม{' '}
-                  <span className="font-bold text-emerald-900 bg-white/90 px-1 py-0.5 rounded border border-emerald-200 inline-block">
+                  <span className="font-bold text-brand-900 bg-white/90 px-1 py-0.5 rounded border border-brand-200 inline-block">
                     "เข้าสู่ระบบด้วยแอป LINE"
                   </span>
                 </p>
@@ -186,7 +186,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
             {/* Direct Image Preview with Zoom on Click */}
             <div
               onClick={() => setShowFullImageModal(true)}
-              className="relative overflow-hidden rounded-xl border border-emerald-200 bg-white p-1 cursor-pointer group hover:border-emerald-400 transition"
+              className="relative overflow-hidden rounded-xl border border-brand-200 bg-white p-1 cursor-pointer group hover:border-brand-400 transition"
             >
               <img
                 src="/line-login-guide.png"
@@ -209,13 +209,13 @@ export default function AuthModal({ onClose }: AuthModalProps) {
         <div className="mt-4 pt-3 border-t border-gray-100">
           <a
             href="/merchant"
-            className="w-full py-2.5 px-3 bg-amber-50 hover:bg-amber-100 text-amber-900 rounded-2xl border border-amber-200 flex items-center justify-between text-xs font-bold transition"
+            className="w-full py-2.5 px-3 bg-brand-50 hover:bg-brand-100 text-brand-900 rounded-2xl border border-brand-200 flex items-center justify-between text-xs font-bold transition"
           >
             <span className="flex items-center gap-2">
-              <Store className="w-4 h-4 text-amber-500" />
+              <Store className="w-4 h-4 text-brand-500" />
               <span>เจ้าของร้าน / สมัครเปิดร้านค้า</span>
             </span>
-            <ArrowRight className="w-4 h-4 text-amber-500" />
+            <ArrowRight className="w-4 h-4 text-brand-500" />
           </a>
           <p className="text-[11px] text-gray-400 text-center mt-1.5">
             ร้านค้าและแอดมินเข้าสู่ระบบด้วย LINE หรือ Google ด้านบนได้เลย
@@ -227,7 +227,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
           <button
             type="button"
             onClick={() => setShowTerms(true)}
-            className="text-[11px] text-amber-600 hover:text-amber-700 underline font-semibold cursor-pointer"
+            className="text-[11px] text-brand-600 hover:text-brand-700 underline font-semibold cursor-pointer"
           >
             ข้อกำหนดการใช้บริการ
           </button>
@@ -254,7 +254,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
           >
             <div className="w-full flex items-center justify-between pb-2 border-b border-gray-100 mb-3">
               <div className="flex items-center gap-1.5">
-                <Smartphone className="w-4 h-4 text-emerald-600" />
+                <Smartphone className="w-4 h-4 text-brand-600" />
                 <span className="text-xs font-bold text-gray-900">วิธีเข้าสู่ระบบผ่านแอป LINE</span>
               </div>
               <button
@@ -274,8 +274,8 @@ export default function AuthModal({ onClose }: AuthModalProps) {
               />
             </div>
 
-            <div className="w-full mt-3 bg-emerald-50 rounded-xl p-2.5 text-center border border-emerald-100">
-              <p className="text-xs font-bold text-emerald-800">
+            <div className="w-full mt-3 bg-brand-50 rounded-xl p-2.5 text-center border border-brand-100">
+              <p className="text-xs font-bold text-brand-800">
                 เลื่อนลงล่างสุด แล้วกดปุ่มในวงกลมสีแดง
               </p>
               <p className="text-[11px] text-gray-600 mt-0.5">

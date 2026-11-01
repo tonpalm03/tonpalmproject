@@ -90,11 +90,11 @@ export default function ReviewModal({
 
         {/* Header */}
         <div className="text-center pt-2">
-          <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto shadow-inner mb-2">
+          <div className="w-14 h-14 rounded-2xl bg-brand-100 text-brand-600 flex items-center justify-center mx-auto shadow-inner mb-2">
             <Star className="w-7 h-7 fill-amber-500 text-amber-500" />
           </div>
           <h3 className="font-black text-lg text-gray-900">ให้คะแนนร้านค้า</h3>
-          <p className="text-xs text-amber-600 font-bold mt-0.5">ร้าน {shopName}</p>
+          <p className="text-xs text-brand-600 font-bold mt-0.5">ร้าน {shopName}</p>
           <p className="text-[11px] text-gray-400 mt-1">
             ความพึงพอใจในรสชาติอาหารและการจัดส่ง
           </p>
@@ -124,7 +124,7 @@ export default function ReviewModal({
           </div>
 
           <div className="text-center">
-            <span className="text-xs font-black text-amber-600 px-3 py-1 bg-amber-50 rounded-full inline-flex items-center gap-1">
+            <span className="text-xs font-black text-brand-600 px-3 py-1 bg-brand-50 rounded-full inline-flex items-center gap-1">
               {rating === 5 && 'ยอดเยี่ยมมาก ประทับใจสุดๆ'}
               {rating === 4 && 'ดีมาก อร่อยถูกปาก'}
               {rating === 3 && 'พอใช้ได้ ทานได้เรื่อยๆ'}
@@ -142,7 +142,7 @@ export default function ReviewModal({
                   key={tag}
                   type="button"
                   onClick={() => handleTagClick(tag)}
-                  className="text-[10px] px-2.5 py-1 rounded-xl bg-gray-50 hover:bg-amber-100 hover:text-amber-800 text-gray-700 border border-gray-200 transition font-medium"
+                  className="text-[10px] px-2.5 py-1 rounded-xl bg-gray-50 hover:bg-brand-100 hover:text-brand-800 text-gray-700 border border-gray-200 transition font-medium"
                 >
                   {tag}
                 </button>
@@ -160,7 +160,7 @@ export default function ReviewModal({
               placeholder="เช่น กะเพราหมูกรอบอร่อยมาก กรอบสะใจ ไข่ดาวเยิ้มๆ คนส่งสุภาพ ขอบคุณครับ..."
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-2xl focus:outline-hidden focus:ring-2 focus:ring-amber-500 resize-none"
+              className="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-2xl focus:outline-hidden focus:ring-2 focus:ring-brand-500 resize-none"
             />
           </div>
 
@@ -176,7 +176,7 @@ export default function ReviewModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-2 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-white rounded-2xl text-xs font-black shadow-md transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1.5"
+              className="flex-2 py-2.5 bg-gradient-to-r from-brand-500 to-brand-500 hover:from-brand-600 text-white rounded-2xl text-xs font-black shadow-md transition active:scale-95 disabled:opacity-50 flex items-center justify-center gap-1.5"
             >
               <Check className="w-4 h-4" />
               <span>{isSubmitting ? 'กำลังส่งรีวิว...' : 'ส่งคะแนนรีวิว'}</span>

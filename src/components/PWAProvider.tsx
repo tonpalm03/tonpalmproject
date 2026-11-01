@@ -180,15 +180,15 @@ export default function PWAProvider() {
       {/* Floating Bottom Install Banner */}
       {showInstallBanner && (
         <div className="fixed bottom-20 left-3 right-3 sm:left-auto sm:right-5 sm:max-w-md z-40 animate-in slide-in-from-bottom-5 duration-300">
-          <div className="bg-slate-900/95 backdrop-blur-md text-white p-3.5 rounded-2xl shadow-2xl border border-amber-500/30 flex items-center justify-between gap-3">
+          <div className="bg-slate-900/95 backdrop-blur-md text-white p-3.5 rounded-2xl shadow-2xl border border-brand-500/30 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-xl shadow-md shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center text-xl shadow-md shrink-0">
                 <Smartphone className="w-5 h-5 text-slate-950" />
               </div>
               <div className="text-left">
                 <p className="font-bold text-xs leading-tight text-white flex items-center gap-1">
                   ติดตั้งแอปลงมือถือ
-                  <span className="bg-amber-500 text-[9px] font-black px-1.5 py-0.5 rounded-full text-slate-900">
+                  <span className="bg-brand-500 text-[9px] font-black px-1.5 py-0.5 rounded-full text-slate-900">
                     แนะนำ
                   </span>
                 </p>
@@ -202,7 +202,7 @@ export default function PWAProvider() {
               <button
                 type="button"
                 onClick={handleInstallClick}
-                className="py-1.5 px-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-slate-950 font-black text-xs rounded-xl shadow-md transition active:scale-95 flex items-center gap-1"
+                className="py-1.5 px-3 bg-gradient-to-r from-brand-500 to-brand-500 hover:from-brand-600 text-slate-950 font-black text-xs rounded-xl shadow-md transition active:scale-95 flex items-center gap-1"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>ติดตั้ง</span>
@@ -230,8 +230,8 @@ export default function PWAProvider() {
             className="bg-white rounded-3xl p-5 max-w-sm w-full text-center space-y-4 shadow-2xl animate-in slide-in-from-bottom-5"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto shadow-xs">
-              <Smartphone className="w-6 h-6 text-amber-700" />
+            <div className="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center mx-auto shadow-xs">
+              <Smartphone className="w-6 h-6 text-brand-700" />
             </div>
             <div>
               <h3 className="font-black text-base text-gray-900">วิธีติดตั้งบน iPhone (iOS)</h3>
@@ -242,7 +242,7 @@ export default function PWAProvider() {
 
             <div className="bg-gray-50 p-3.5 rounded-2xl border border-gray-200 text-left space-y-2.5 text-xs">
               <div className="flex items-start gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-amber-500 text-white font-black flex items-center justify-center text-[10px] shrink-0 mt-0.5">
+                <span className="w-5 h-5 rounded-full bg-brand-500 text-white font-black flex items-center justify-center text-[10px] shrink-0 mt-0.5">
                   1
                 </span>
                 <p className="text-gray-700">
@@ -250,7 +250,7 @@ export default function PWAProvider() {
                 </p>
               </div>
               <div className="flex items-start gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-amber-500 text-white font-black flex items-center justify-center text-[10px] shrink-0 mt-0.5">
+                <span className="w-5 h-5 rounded-full bg-brand-500 text-white font-black flex items-center justify-center text-[10px] shrink-0 mt-0.5">
                   2
                 </span>
                 <p className="text-gray-700">
@@ -262,7 +262,7 @@ export default function PWAProvider() {
             <button
               type="button"
               onClick={() => setShowIOSGuide(false)}
-              className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-md transition active:scale-95"
+              className="w-full py-2.5 bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs rounded-xl shadow-md transition active:scale-95"
             >
               เข้าใจแล้ว
             </button>

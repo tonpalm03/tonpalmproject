@@ -182,8 +182,8 @@ export default function OrderHistoryModal({
     switch (status) {
       case 'completed':
         return (
-          <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
-            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+          <span className="inline-flex items-center gap-1 bg-brand-100 text-brand-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-brand-200">
+            <CheckCircle2 className="w-3 h-3 text-brand-600" />
             <span>จัดส่งสำเร็จแล้ว</span>
           </span>
         );
@@ -196,8 +196,8 @@ export default function OrderHistoryModal({
         );
       case 'cooking':
         return (
-          <span className="inline-flex items-center gap-1 bg-orange-100 text-orange-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-orange-200">
-            <Utensils className="w-3 h-3 text-orange-600" />
+          <span className="inline-flex items-center gap-1 bg-violet-100 text-violet-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-violet-200">
+            <Utensils className="w-3 h-3 text-violet-600" />
             <span>ร้านกำลังทำอาหาร</span>
           </span>
         );
@@ -240,17 +240,17 @@ export default function OrderHistoryModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-150">
-      <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 border border-amber-100">
+      <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150 border border-brand-100">
         
         {/* Modal Header */}
-        <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 px-5 py-4 text-white flex items-center justify-between shadow-xs">
+        <div className="bg-gradient-to-r from-brand-500 via-brand-500 to-brand-600 px-5 py-4 text-white flex items-center justify-between shadow-xs">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-xl shadow-inner">
               <FileText className="w-5 h-5 text-white" />
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-black tracking-tight">ประวัติการสั่งซื้อของคุณ</h2>
-              <p className="text-[11px] sm:text-xs text-amber-100">
+              <p className="text-[11px] sm:text-xs text-brand-100">
                 รายการออเดอร์ทั้งหมด {orders.length} รายการ
               </p>
             </div>
@@ -271,7 +271,7 @@ export default function OrderHistoryModal({
             onClick={() => setFilterTab('all')}
             className={`px-3 py-1.5 rounded-xl transition whitespace-nowrap ${
               filterTab === 'all'
-                ? 'bg-amber-500 text-white shadow-xs'
+                ? 'bg-brand-500 text-white shadow-xs'
                 : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
             }`}
           >
@@ -282,7 +282,7 @@ export default function OrderHistoryModal({
             onClick={() => setFilterTab('active')}
             className={`px-3 py-1.5 rounded-xl transition whitespace-nowrap ${
               filterTab === 'active'
-                ? 'bg-amber-500 text-white shadow-xs'
+                ? 'bg-brand-500 text-white shadow-xs'
                 : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
             }`}
           >
@@ -293,7 +293,7 @@ export default function OrderHistoryModal({
             onClick={() => setFilterTab('completed')}
             className={`px-3 py-1.5 rounded-xl transition whitespace-nowrap ${
               filterTab === 'completed'
-                ? 'bg-amber-500 text-white shadow-xs'
+                ? 'bg-brand-500 text-white shadow-xs'
                 : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
             }`}
           >
@@ -304,7 +304,7 @@ export default function OrderHistoryModal({
             onClick={() => setFilterTab('cancelled')}
             className={`px-3 py-1.5 rounded-xl transition whitespace-nowrap ${
               filterTab === 'cancelled'
-                ? 'bg-amber-500 text-white shadow-xs'
+                ? 'bg-brand-500 text-white shadow-xs'
                 : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
             }`}
           >
@@ -316,13 +316,13 @@ export default function OrderHistoryModal({
         <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-slate-50/50">
           {loading ? (
             <div className="py-16 text-center space-y-3">
-              <div className="w-8 h-8 border-3 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto" />
+              <div className="w-8 h-8 border-3 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto" />
               <p className="text-xs text-gray-500 font-medium">กำลังโหลดประวัติการสั่งซื้อ...</p>
             </div>
           ) : filteredOrders.length === 0 ? (
             <div className="py-14 px-4 text-center space-y-3 bg-white rounded-2xl border border-gray-150">
-              <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center mx-auto text-2xl">
-                <Utensils className="w-7 h-7 text-amber-500" />
+              <div className="w-14 h-14 rounded-2xl bg-brand-50 text-brand-500 flex items-center justify-center mx-auto text-2xl">
+                <Utensils className="w-7 h-7 text-brand-500" />
               </div>
               <div>
                 <h4 className="font-bold text-gray-800 text-sm">ไม่พบรายการสั่งซื้อ</h4>
@@ -335,7 +335,7 @@ export default function OrderHistoryModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="py-2 px-4 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95"
+                className="py-2 px-4 bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95"
               >
                 ดูร้านอาหารและเริ่มสั่งเลย
               </button>
@@ -356,7 +356,7 @@ export default function OrderHistoryModal({
                   <div className="flex items-start justify-between gap-2 border-b border-gray-100 pb-2.5">
                     <div>
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-mono text-xs font-black text-amber-700 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200">
+                        <span className="font-mono text-xs font-black text-brand-700 bg-brand-50 px-2 py-0.5 rounded-lg border border-brand-200">
                           {formatOrderCode(order)}
                         </span>
                         <h3 className="font-black text-sm text-gray-900 flex items-center gap-1.5">
@@ -364,18 +364,18 @@ export default function OrderHistoryModal({
                             <img
                               src={shopInfo.image_url}
                               alt={shopInfo.name}
-                              className="w-4.5 h-4.5 rounded-full object-cover border border-amber-200 shrink-0"
+                              className="w-4.5 h-4.5 rounded-full object-cover border border-brand-200 shrink-0"
                             />
                           ) : (
-                            <Store className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                            <Store className="w-3.5 h-3.5 text-brand-600 shrink-0" />
                           )}
                           <span>{order.shop_name || shopInfo?.name || 'ร้านค้า'}</span>
                         </h3>
                         {/* Live Shop Open/Closed Status Badge */}
                         {shopInfo ? (
                           isShopOpen ? (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
-                              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-brand-700 bg-brand-50 border border-brand-200 px-2 py-0.5 rounded-md">
+                              <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
                               ร้านเปิดอยู่
                             </span>
                           ) : (
@@ -411,7 +411,7 @@ export default function OrderHistoryModal({
                         <div key={idx} className="flex items-center justify-between gap-2.5 py-1">
                           <div className="flex items-center gap-2.5 min-w-0 flex-1">
                             {/* Menu Thumbnail */}
-                            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-150/70 overflow-hidden shrink-0 flex items-center justify-center shadow-2xs">
+                            <div className="w-10 h-10 rounded-xl bg-brand-50 border border-brand-100/70 overflow-hidden shrink-0 flex items-center justify-center shadow-2xs">
                               {itemImageUrl ? (
                                 <img
                                   src={itemImageUrl}
@@ -422,14 +422,14 @@ export default function OrderHistoryModal({
                                   }}
                                 />
                               ) : (
-                                <Utensils className="w-4 h-4 text-amber-500" />
+                                <Utensils className="w-4 h-4 text-brand-500" />
                               )}
                             </div>
 
                             {/* Menu Name, Options & Note */}
                             <div className="min-w-0 flex-1">
                               <p className="font-bold text-gray-800 leading-snug">
-                                <span className="text-amber-600 font-black mr-1">{item.quantity}x</span>
+                                <span className="text-brand-600 font-black mr-1">{item.quantity}x</span>
                                 {item.name}
                               </p>
                               {item.selected_options && item.selected_options.length > 0 && (
@@ -438,7 +438,7 @@ export default function OrderHistoryModal({
                                 </p>
                               )}
                               {item.note && (
-                                <p className="text-[10px] text-amber-600 italic mt-0.5 flex items-center gap-1">
+                                <p className="text-[10px] text-brand-600 italic mt-0.5 flex items-center gap-1">
                                   <FileEdit className="w-2.5 h-2.5 shrink-0" />
                                   <span>&ldquo;{item.note}&rdquo;</span>
                                 </p>
@@ -462,7 +462,7 @@ export default function OrderHistoryModal({
                         <span>ค่าจัดส่ง:</span>
                         <strong className="text-gray-700">
                           {(order.delivery_fee ?? 0) === 0 ? (
-                            <span className="text-emerald-600 font-bold">ส่งฟรี (0 บ.)</span>
+                            <span className="text-brand-600 font-bold">ส่งฟรี (0 บ.)</span>
                           ) : (
                             `${order.delivery_fee} บ.`
                           )}
@@ -479,7 +479,7 @@ export default function OrderHistoryModal({
 
                     <div className="text-right">
                       <span className="text-[10px] text-gray-400 block">ยอดรวมทั้งสิ้น</span>
-                      <span className="text-base font-black text-amber-600">
+                      <span className="text-base font-black text-brand-600">
                         ฿{order.total_amount}
                       </span>
                     </div>
@@ -491,8 +491,8 @@ export default function OrderHistoryModal({
                     <div className="text-[11px] font-semibold flex items-center gap-1.5">
                       {shopInfo ? (
                         isShopOpen ? (
-                          <span className="text-emerald-600 flex items-center gap-1 bg-emerald-50/80 px-2 py-0.5 rounded-lg border border-emerald-100">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                          <span className="text-brand-600 flex items-center gap-1 bg-brand-50/80 px-2 py-0.5 rounded-lg border border-brand-100">
+                            <span className="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
                             ร้านเปิดอยู่ • สั่งได้ทันที
                           </span>
                         ) : (
@@ -531,7 +531,7 @@ export default function OrderHistoryModal({
                             type="button"
                             disabled={isReordering}
                             onClick={() => handleReorder(order)}
-                            className="py-1.5 px-3.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
+                            className="py-1.5 px-3.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
                             title="นำเมนูเข้าตะกร้าเพื่อสั่งอีกครั้ง"
                           >
                             <RotateCw className={`w-3.5 h-3.5 ${isReordering ? 'animate-spin' : ''}`} />
@@ -569,7 +569,7 @@ export default function OrderHistoryModal({
         {/* Modal Footer */}
         <div className="p-3 bg-white border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
           <span className="flex items-center gap-1.5">
-            <Info className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+            <Info className="w-3.5 h-3.5 text-brand-600 shrink-0" />
             <span>สามารถกด <b>&ldquo;สั่งอีกครั้ง&rdquo;</b> เพื่อสั่งเมนูเดิมได้อย่างสะดวกรวดเร็ว</span>
           </span>
           <button

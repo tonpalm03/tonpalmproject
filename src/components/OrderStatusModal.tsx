@@ -125,7 +125,7 @@ export default function OrderStatusModal({
         <div className="bg-white w-full max-w-md md:max-w-xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
           
           {/* Header */}
-          <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 p-4 text-white flex items-center justify-between shadow-sm">
+          <div className="bg-gradient-to-r from-brand-500 via-brand-500 to-brand-600 p-4 text-white flex items-center justify-between shadow-sm">
             <div>
               <span className="text-[11px] bg-white/20 px-2 py-0.5 rounded-full font-medium">
                 {ordersList.length > 1 ? `สั่งอาหาร ${ordersList.length} ร้านค้า` : `ออเดอร์ #${formatOrderCode(activeOrder)}`}
@@ -142,7 +142,7 @@ export default function OrderStatusModal({
 
           {/* Multi-Shop Order Tabs (if customer ordered from multiple shops) */}
           {ordersList.length > 1 && (
-            <div className="bg-amber-50/90 border-b border-amber-200/70 px-3 py-2 flex gap-2 overflow-x-auto shrink-0">
+            <div className="bg-brand-50/90 border-b border-brand-200/70 px-3 py-2 flex gap-2 overflow-x-auto shrink-0">
               {ordersList.map((o) => {
                 const isSelected = o.id === selectedOrderId;
                 return (
@@ -152,7 +152,7 @@ export default function OrderStatusModal({
                     onClick={() => setSelectedOrderId(o.id)}
                     className={`px-3 py-2 rounded-xl text-xs font-bold shrink-0 transition flex items-center gap-1.5 shadow-2xs ${
                       isSelected
-                        ? 'bg-amber-500 text-white shadow-sm ring-2 ring-amber-300'
+                        ? 'bg-brand-500 text-white shadow-sm ring-2 ring-brand-300'
                         : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
                     }`}
                   >
@@ -163,10 +163,10 @@ export default function OrderStatusModal({
                         isSelected
                           ? 'bg-white/25 text-white'
                           : o.status === 'completed'
-                          ? 'bg-emerald-100 text-emerald-800'
+                          ? 'bg-brand-100 text-brand-800'
                           : o.status === 'delivering'
-                          ? 'bg-orange-100 text-orange-800'
-                          : 'bg-amber-100 text-amber-800'
+                          ? 'bg-brand-100 text-brand-800'
+                          : 'bg-brand-100 text-brand-800'
                       }`}
                     >
                       {o.status === 'completed'
@@ -194,13 +194,13 @@ export default function OrderStatusModal({
                 <p className="text-xs text-red-600 mt-0.5">ร้านค้าไม่สะดวกรับออเดอร์ หรือวัตถุดิบหมด</p>
               </div>
             ) : (
-              <div className="bg-amber-50/70 border border-amber-200 rounded-2xl p-4">
+              <div className="bg-brand-50/70 border border-brand-200 rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-amber-900 flex items-center gap-1">
-                    <Store className="w-3.5 h-3.5 text-amber-600" />
+                  <span className="text-xs font-bold text-brand-900 flex items-center gap-1">
+                    <Store className="w-3.5 h-3.5 text-brand-600" />
                     ร้าน {activeOrder.shop_name || 'ร้านค้าชุมชน'}
                   </span>
-                  <span className="text-[10px] bg-white px-2 py-0.5 rounded-full text-amber-800 font-bold border border-amber-200 flex items-center gap-1">
+                  <span className="text-[10px] bg-white px-2 py-0.5 rounded-full text-brand-800 font-bold border border-brand-200 flex items-center gap-1">
                     <Bike className="w-3 h-3" />
                     <span>{(activeOrder.delivery_fee ?? 0) === 0 ? 'ร้านส่งฟรี' : `ร้านส่งเอง (${activeOrder.delivery_fee} บ.)`}</span>
                   </span>
@@ -217,15 +217,15 @@ export default function OrderStatusModal({
                         <div
                           className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
                             isCurrent
-                              ? 'bg-amber-500 text-white shadow-lg ring-4 ring-amber-200 animate-pulse'
+                              ? 'bg-brand-500 text-white shadow-lg ring-4 ring-brand-200 animate-pulse'
                               : isPassed
-                              ? 'bg-emerald-500 text-white'
+                              ? 'bg-brand-500 text-white'
                               : 'bg-gray-200 text-gray-400'
                           }`}
                         >
                           <Icon className="w-5 h-5" />
                         </div>
-                        <span className={`text-[11px] font-bold mt-1.5 ${isCurrent ? 'text-amber-700 font-extrabold' : isPassed ? 'text-emerald-700' : 'text-gray-400'}`}>
+                        <span className={`text-[11px] font-bold mt-1.5 ${isCurrent ? 'text-brand-700 font-extrabold' : isPassed ? 'text-brand-700' : 'text-gray-400'}`}>
                           {s.label}
                         </span>
                       </div>
@@ -233,8 +233,8 @@ export default function OrderStatusModal({
                   })}
                 </div>
 
-                <div className="mt-3 text-center bg-white/80 py-1.5 px-3 rounded-xl border border-amber-100">
-                  <p className="text-xs font-semibold text-amber-900">
+                <div className="mt-3 text-center bg-white/80 py-1.5 px-3 rounded-xl border border-brand-100">
+                  <p className="text-xs font-semibold text-brand-900">
                     {steps[currentStep]?.desc || 'กำลังดำเนินการ'}
                   </p>
                 </div>
@@ -243,7 +243,7 @@ export default function OrderStatusModal({
 
             {/* Pending Pre-payment Banner */}
             {activeOrder.status === 'pending' && (
-              <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-2xl p-3.5 text-white shadow-md space-y-2.5 border border-amber-300 animate-in fade-in">
+              <div className="bg-gradient-to-r from-brand-500 via-brand-500 to-brand-600 rounded-2xl p-3.5 text-white shadow-md space-y-2.5 border border-brand-300 animate-in fade-in">
                 <div className="flex items-start gap-2.5">
                   <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0 shadow-inner">
                     <CreditCard className="w-5 h-5 text-white" />
@@ -252,7 +252,7 @@ export default function OrderStatusModal({
                     <h4 className="font-black text-xs sm:text-sm leading-tight">
                       กรุณาโอนเงินผ่านแชทเพื่อเริ่มทำอาหาร
                     </h4>
-                    <p className="text-[11px] text-amber-100 mt-0.5 leading-snug">
+                    <p className="text-[11px] text-brand-100 mt-0.5 leading-snug">
                       ร้านค้าจะส่ง QR พร้อมเพย์ / บัญชีในแชทสด โอนแล้วแนบสลิปยืนยัน ร้านจะเริ่มทำอาหารทันทีหลังได้รับยอดครับ
                     </p>
                   </div>
@@ -260,7 +260,7 @@ export default function OrderStatusModal({
                 <button
                   type="button"
                   onClick={() => setShowChat(true)}
-                  className="w-full py-2.5 bg-white text-orange-600 hover:bg-amber-50 font-black rounded-xl text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5"
+                  className="w-full py-2.5 bg-white text-brand-600 hover:bg-brand-50 font-black rounded-xl text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5"
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>เปิดแชทเพื่อโอนเงิน & ส่งสลิปทันที</span>
@@ -271,18 +271,18 @@ export default function OrderStatusModal({
 
             {/* If active order is completed, show review card */}
             {activeOrder.status === 'completed' && (
-              <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-3.5 text-white shadow-md flex items-center justify-between gap-2 animate-in fade-in">
+              <div className="bg-gradient-to-r from-brand-500 to-brand-500 rounded-2xl p-3.5 text-white shadow-md flex items-center justify-between gap-2 animate-in fade-in">
                 <div>
                   <p className="font-bold text-xs flex items-center gap-1">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-300 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-brand-300 shrink-0" />
                     <span>อาหารร้านนี้ส่งถึงมือแล้ว!</span>
                   </p>
-                  <p className="text-[11px] text-amber-100">ช่วยให้คะแนนและรีวิวเพื่อเป็นกำลังใจให้ร้านค้า</p>
+                  <p className="text-[11px] text-brand-100">ช่วยให้คะแนนและรีวิวเพื่อเป็นกำลังใจให้ร้านค้า</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowReviewModal(true)}
-                  className="px-3.5 py-2 bg-white text-amber-600 hover:bg-amber-50 font-black rounded-xl text-xs shadow-sm transition active:scale-95 shrink-0 flex items-center gap-1.5"
+                  className="px-3.5 py-2 bg-white text-brand-600 hover:bg-brand-50 font-black rounded-xl text-xs shadow-sm transition active:scale-95 shrink-0 flex items-center gap-1.5"
                 >
                   <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                   <span>ให้คะแนนร้าน</span>
@@ -296,13 +296,13 @@ export default function OrderStatusModal({
                 href={`tel:${activeOrder.shop_phone || '0898765432'}`}
                 className="flex items-center justify-center gap-2 py-2.5 px-3 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold rounded-2xl text-xs shadow-xs active:scale-95 transition"
               >
-                <Phone className="w-4 h-4 text-emerald-600" />
+                <Phone className="w-4 h-4 text-brand-600" />
                 โทรหาร้านนี้
               </a>
               <button
                 type="button"
                 onClick={() => setShowChat(true)}
-                className="flex items-center justify-center gap-2 py-2.5 px-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-2xl text-xs shadow-md active:scale-95 transition"
+                className="flex items-center justify-center gap-2 py-2.5 px-3 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-2xl text-xs shadow-md active:scale-95 transition"
               >
                 <MessageSquare className="w-4 h-4" />
                 {activeOrder.status === 'completed' ? 'แชทหลังส่งอาหาร' : 'แชทกับร้านนี้'}
@@ -335,7 +335,7 @@ export default function OrderStatusModal({
                       return next;
                     });
                   }}
-                  className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-black text-xs sm:text-sm rounded-2xl shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 transition active:scale-95"
+                  className="w-full py-3 px-4 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-black text-xs sm:text-sm rounded-2xl shadow-md shadow-brand-600/20 flex items-center justify-center gap-2 transition active:scale-95"
                 >
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span>ได้รับอาหารเรียบร้อยแล้ว (ปิดการติดตามออเดอร์นี้)</span>
@@ -395,14 +395,14 @@ export default function OrderStatusModal({
                       <span className="font-semibold text-gray-800">{item.name}</span>
                       <span className="text-xs text-gray-500 ml-1.5">x{item.quantity}</span>
                       {item.selected_options && item.selected_options.length > 0 && (
-                        <div className="text-[11px] text-amber-800/90 pl-1 space-y-0.5 mt-0.5">
+                        <div className="text-[11px] text-brand-800/90 pl-1 space-y-0.5 mt-0.5">
                           {item.selected_options.map((opt, oIdx) => (
                             <div key={oIdx}>↳ + {opt.name} {opt.price > 0 ? `(+${opt.price} ฿)` : '(ฟรี)'}</div>
                           ))}
                         </div>
                       )}
                       {item.note && (
-                        <p className="text-[11px] text-amber-700 mt-0.5">({item.note})</p>
+                        <p className="text-[11px] text-brand-700 mt-0.5">({item.note})</p>
                       )}
                     </div>
                     <span className="font-bold text-gray-700 shrink-0">
@@ -419,9 +419,9 @@ export default function OrderStatusModal({
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>ค่าส่งเหมา (ร้านส่งเอง)</span>
-                  <span className="text-emerald-600 font-bold">{activeOrder.delivery_fee} ฿</span>
+                  <span className="text-brand-600 font-bold">{activeOrder.delivery_fee} ฿</span>
                 </div>
-                <div className="flex justify-between text-base font-black text-amber-600 pt-1 border-t border-gray-200">
+                <div className="flex justify-between text-base font-black text-brand-600 pt-1 border-t border-gray-200">
                   <span>ยอดที่ต้องจ่ายให้ร้านนี้</span>
                   <span>{activeOrder.total_amount} ฿</span>
                 </div>
@@ -452,7 +452,7 @@ export default function OrderStatusModal({
                     : 'สแกนจ่ายกับคนส่ง'}
                 </span>
                 {activeOrder.cash_change_note && (
-                  <span className="text-amber-700 block">
+                  <span className="text-brand-700 block">
                     ({activeOrder.cash_change_note})
                   </span>
                 )}

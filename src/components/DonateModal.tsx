@@ -98,7 +98,7 @@ export default function DonateModal({ settings, user, onRequireLogin, onClose }:
         {step === 'qr' && (
           <div className="px-4 pb-5 space-y-3 text-center">
             <p className="text-xs text-gray-500">แอปนี้ใช้ฟรีทุกคน ทั้งลูกค้าและร้านค้า ยอดสนับสนุนจะนำไปเป็นค่าเซิร์ฟเวอร์และพัฒนาแอปต่อ</p>
-            <div className="mx-auto w-60 rounded-2xl border-2 border-emerald-100 bg-white p-3">
+            <div className="mx-auto w-60 rounded-2xl border-2 border-brand-100 bg-white p-3">
               {settings?.donate_qr_url ? (
                 <img src={settings.donate_qr_url} alt="QR พร้อมเพย์" className="w-full aspect-square object-contain" />
               ) : (
@@ -110,13 +110,13 @@ export default function DonateModal({ settings, user, onRequireLogin, onClose }:
             </div>
             {settings?.donate_promptpay_name && <p className="text-sm font-bold text-gray-800">{settings.donate_promptpay_name}</p>}
             {number && (
-              <button onClick={copyNumber} className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-700 bg-emerald-50 rounded-full px-3 py-1.5">
+              <button onClick={copyNumber} className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-700 bg-brand-50 rounded-full px-3 py-1.5">
                 พร้อมเพย์ {number}
                 {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
               </button>
             )}
             <p className="text-[11px] text-gray-400">สแกนจ่ายด้วยแอปธนาคาร แล้วกด &ldquo;แจ้งโอน&rdquo; เพื่อขึ้นชื่อในรายชื่อผู้สนับสนุน</p>
-            <button onClick={goToForm} className="w-full bg-emerald-600 text-white rounded-2xl py-3 font-black">
+            <button onClick={goToForm} className="w-full bg-brand-600 text-white rounded-2xl py-3 font-black">
               แจ้งโอน
             </button>
           </div>
@@ -144,7 +144,7 @@ export default function DonateModal({ settings, user, onRequireLogin, onClose }:
               <Toggle label="ไม่ระบุชื่อ (แสดงเป็น ผู้ใจดี)" value={anonymous} onChange={setAnonymous} />
               <Toggle label="ไม่แสดงยอดเงิน" value={hideAmount} onChange={setHideAmount} />
             </div>
-            <button disabled={busy} onClick={submit} className="w-full bg-emerald-600 text-white rounded-2xl py-3 font-black disabled:opacity-50">
+            <button disabled={busy} onClick={submit} className="w-full bg-brand-600 text-white rounded-2xl py-3 font-black disabled:opacity-50">
               {busy ? 'กำลังส่ง...' : 'ส่งให้แอดมินตรวจ'}
             </button>
           </div>
@@ -155,7 +155,7 @@ export default function DonateModal({ settings, user, onRequireLogin, onClose }:
             <img src={MASCOT_AVATAR} alt="" className="w-28 mx-auto" />
             <p className="font-black text-lg text-gray-900">ขอบคุณมากครับ</p>
             <p className="text-sm text-gray-500">แอดมินจะตรวจสลิปและขึ้นชื่อของคุณในรายชื่อผู้สนับสนุนเร็ว ๆ นี้</p>
-            <button onClick={onClose} className="w-full bg-emerald-600 text-white rounded-2xl py-3 font-black">ปิด</button>
+            <button onClick={onClose} className="w-full bg-brand-600 text-white rounded-2xl py-3 font-black">ปิด</button>
           </div>
         )}
       </div>

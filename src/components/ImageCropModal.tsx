@@ -164,7 +164,7 @@ export default function ImageCropModal({
         {/* Header */}
         <div className="p-4 border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Crop className="w-5 h-5 text-amber-500" />
+            <Crop className="w-5 h-5 text-brand-500" />
             <div>
               <h3 className="font-bold text-sm leading-tight">{title}</h3>
               <p className="text-[10px] text-gray-400">ลากเพื่อย้าย • เลื่อนเพื่อซูม</p>
@@ -191,7 +191,7 @@ export default function ImageCropModal({
               }}
               className={`px-3 py-1 rounded-xl text-xs font-bold transition ${
                 aspectRatio === ratio
-                  ? 'bg-amber-500 text-white shadow-xs'
+                  ? 'bg-brand-500 text-white shadow-xs'
                   : 'bg-slate-800 text-gray-400 hover:text-white'
               }`}
             >
@@ -243,7 +243,7 @@ export default function ImageCropModal({
                 height: cropBox.height,
                 boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.65)',
               }}
-              className="border-2 border-amber-400 rounded-2xl relative shadow-lg"
+              className="border-2 border-brand-400 rounded-2xl relative shadow-lg"
             >
               {/* Rule-of-thirds grid */}
               <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 pointer-events-none opacity-25">
@@ -259,10 +259,10 @@ export default function ImageCropModal({
               </div>
 
               {/* Corner indicators */}
-              <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-amber-400"></div>
-              <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-amber-400"></div>
-              <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-amber-400"></div>
-              <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-amber-400"></div>
+              <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-brand-400"></div>
+              <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-brand-400"></div>
+              <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-brand-400"></div>
+              <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-brand-400"></div>
 
               <div className="absolute bottom-2 left-0 right-0 text-center pointer-events-none">
                 <span className="text-[10px] bg-black/60 px-2 py-0.5 rounded-full text-white/80 font-medium">
@@ -276,7 +276,7 @@ export default function ImageCropModal({
         {/* Controls Toolbar: Zoom, Rotate */}
         <div className="p-3.5 bg-slate-950 border-t border-slate-800 space-y-3">
           {error && <p role="alert" className="text-sm text-red-300">{error}</p>}
-          {isSaving && <p role="status" className="text-sm text-amber-300">กำลังบันทึกรูปภาพ…</p>}
+          {isSaving && <p role="status" className="text-sm text-brand-300">กำลังบันทึกรูปภาพ…</p>}
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -293,7 +293,7 @@ export default function ImageCropModal({
               step="0.05"
               value={zoom}
               onChange={(e) => setZoom(parseFloat(e.target.value))}
-              className="flex-1 accent-amber-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
+              className="flex-1 accent-brand-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
             />
             <button
               type="button"
@@ -310,7 +310,7 @@ export default function ImageCropModal({
               className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-gray-300 font-bold flex items-center gap-1 active:scale-95 transition"
               title="หมุนรูปภาพ 90 องศา"
             >
-              <RotateCw className="w-3.5 h-3.5 text-amber-400" />
+              <RotateCw className="w-3.5 h-3.5 text-brand-400" />
               <span>หมุน</span>
             </button>
           </div>
@@ -328,7 +328,7 @@ export default function ImageCropModal({
               type="button"
               onClick={handleApplyCrop}
               disabled={!imageReady || isSaving}
-              className="flex-2 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-white font-black text-xs rounded-xl shadow-lg flex items-center justify-center gap-1.5 active:scale-95 transition"
+              className="flex-2 py-2.5 bg-gradient-to-r from-brand-500 to-brand-500 hover:from-brand-600 text-white font-black text-xs rounded-xl shadow-lg flex items-center justify-center gap-1.5 active:scale-95 transition"
             >
               <Check className="w-4 h-4" />
               <span>{isSaving ? 'กำลังบันทึก…' : 'ตัดขอบ & ใช้รูปนี้'}</span>

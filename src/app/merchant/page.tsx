@@ -34,8 +34,8 @@ export default function MerchantAppPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4 text-white">
-        <div className="w-16 h-16 rounded-3xl bg-orange-500/20 flex items-center justify-center animate-bounce mb-4">
-          <ChefHat className="w-8 h-8 text-orange-500" />
+        <div className="w-16 h-16 rounded-3xl bg-brand-500/20 flex items-center justify-center animate-bounce mb-4">
+          <ChefHat className="w-8 h-8 text-brand-500" />
         </div>
         <p className="text-sm font-bold text-gray-300 animate-pulse">กำลังโหลดระบบร้านค้า...</p>
       </div>
@@ -45,21 +45,21 @@ export default function MerchantAppPage() {
   // Not logged in or not a merchant/admin
   if (!user || (role !== 'merchant' && role !== 'admin')) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-amber-950/40 flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-brand-950/40 flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 sm:p-8 space-y-6 border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
           
           {/* Header */}
           <div className="text-center space-y-2">
             <div
-              style={{ backgroundColor: '#f97316' }}
-              className="w-16 h-16 rounded-2xl bg-orange-500 bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center mx-auto shadow-lg shadow-orange-500/30"
+              style={{ backgroundColor: '#1D9E75' }}
+              className="w-16 h-16 rounded-2xl bg-brand-500 bg-gradient-to-tr from-brand-500 to-brand-500 text-white flex items-center justify-center mx-auto shadow-lg shadow-brand-500/30"
             >
               <ChefHat className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-xl font-black text-gray-900">
               CPRUFood
             </h1>
-            <p className="text-xs font-bold text-orange-600 bg-orange-50 inline-block px-3 py-1 rounded-full border border-orange-200">
+            <p className="text-xs font-bold text-brand-600 bg-brand-50 inline-block px-3 py-1 rounded-full border border-brand-200">
               แอปพลิเคชันสำหรับร้านค้า (Merchant App)
             </p>
           </div>
@@ -129,7 +129,7 @@ export default function MerchantAppPage() {
           <div className="pt-2 border-t border-gray-100 text-center space-y-2">
             <a
               href="/"
-              className="w-full py-2.5 px-4 bg-orange-50 hover:bg-orange-100 text-orange-900 border border-orange-200 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 block text-center"
+              className="w-full py-2.5 px-4 bg-brand-50 hover:bg-brand-100 text-brand-900 border border-brand-200 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 block text-center"
             >
               <Home className="w-4 h-4" />
               <span>ไปที่หน้าหลัก (สั่งอาหาร / ร้านค้าทั้งหมด)</span>
@@ -141,7 +141,7 @@ export default function MerchantAppPage() {
             <button
               type="button"
               onClick={() => setShowTerms(true)}
-              className="text-[11px] text-amber-700 hover:text-amber-800 underline font-semibold inline-flex items-center gap-1"
+              className="text-[11px] text-brand-700 hover:text-brand-800 underline font-semibold inline-flex items-center gap-1"
             >
               <FileText className="w-3.5 h-3.5" />
               <span>อ่านข้อกำหนดและเงื่อนไขสำหรับร้านค้า (GP 5%)</span>
@@ -170,12 +170,12 @@ export default function MerchantAppPage() {
       <header className="bg-slate-900 text-white sticky top-0 z-30 shadow-md border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-orange-500 flex items-center justify-center shadow-sm">
+            <div className="w-8 h-8 rounded-xl bg-brand-500 flex items-center justify-center shadow-sm">
               <ChefHat className="w-4 h-4 text-white" />
             </div>
             <div>
               <h2 className="text-xs font-black text-white leading-none">CPRUFood</h2>
-              <p className="text-[10px] text-amber-400 font-semibold mt-0.5">
+              <p className="text-[10px] text-brand-400 font-semibold mt-0.5">
                 {user.shop_id ? 'ระบบจัดการร้านค้า' : 'แผงควบคุมร้านค้า'}
               </p>
             </div>
@@ -185,7 +185,7 @@ export default function MerchantAppPage() {
             <button
               type="button"
               onClick={() => setShowTerms(true)}
-              className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 flex items-center gap-1 transition active:scale-95"
+              className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-brand-300 border border-slate-700 flex items-center gap-1 transition active:scale-95"
               title="ข้อกำหนดร้านค้า"
             >
               <FileText className="w-3.5 h-3.5" />

@@ -497,7 +497,7 @@ export default function ChatModal({
       <div className="bg-white w-full max-w-md h-[88vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
         
         {/* Header */}
-        <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-4 text-white flex items-center justify-between shadow-md shrink-0">
+        <div className="bg-gradient-to-r from-brand-500 to-brand-500 p-4 text-white flex items-center justify-between shadow-md shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/60 shadow-md shrink-0 bg-slate-200">
               <UserAvatar
@@ -516,7 +516,7 @@ export default function ChatModal({
                   </span>
                 )}
               </div>
-              <p className="text-xs text-amber-100">
+              <p className="text-xs text-brand-100">
                 ออเดอร์ #{orderCode || orderId.slice(0, 6)} • สั่งส่งตรงถึงหอพัก
               </p>
             </div>
@@ -531,9 +531,9 @@ export default function ChatModal({
         </div>
 
         {/* Top Sticky Payment Instructions Banner */}
-        <div className="bg-amber-50 border-b border-amber-200 px-3.5 py-2 flex items-center justify-between text-xs text-amber-950 shrink-0 shadow-2xs">
+        <div className="bg-brand-50 border-b border-brand-200 px-3.5 py-2 flex items-center justify-between text-xs text-brand-950 shrink-0 shadow-2xs">
           <div className="flex items-center gap-2 min-w-0">
-            <CreditCard className="w-4 h-4 text-amber-600 shrink-0" />
+            <CreditCard className="w-4 h-4 text-brand-600 shrink-0" />
             <span className="truncate text-[11px] font-medium">
               {currentUser.role === 'merchant'
                 ? 'กดปุ่ม "ส่ง QR รับเงิน" ด้านล่าง เพื่อส่งยอดและบัญชีให้ลูกค้าโอนจ่าย'
@@ -541,7 +541,7 @@ export default function ChatModal({
             </span>
           </div>
           {liveOrderTotal && (
-            <span className="font-black text-amber-700 bg-white px-2 py-0.5 rounded-md border border-amber-300 text-[11px] shrink-0 ml-2 shadow-2xs">
+            <span className="font-black text-brand-700 bg-white px-2 py-0.5 rounded-md border border-brand-300 text-[11px] shrink-0 ml-2 shadow-2xs">
               ฿{liveOrderTotal}
             </span>
           )}
@@ -556,7 +556,7 @@ export default function ChatModal({
             if (isAdmin && msg.sender_uid === 'system') {
               return (
                 <div key={msg.id} className="text-center my-2">
-                  <span className="text-[11px] leading-relaxed bg-amber-100/90 text-amber-900 px-3.5 py-1.5 rounded-2xl border border-amber-200 inline-block max-w-[90%] shadow-2xs">
+                  <span className="text-[11px] leading-relaxed bg-brand-100/90 text-brand-900 px-3.5 py-1.5 rounded-2xl border border-brand-200 inline-block max-w-[90%] shadow-2xs">
                     {msg.text}
                   </span>
                 </div>
@@ -576,7 +576,7 @@ export default function ChatModal({
                         <UserAvatar src={msg.sender_avatar} alt={msg.sender_name} />
                       </div>
                     ) : msg.sender_role === 'merchant' ? (
-                      <Store className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+                      <Store className="w-3.5 h-3.5 text-brand-500 shrink-0" />
                     ) : msg.sender_role === 'admin' ? (
                       <ShieldCheck className="w-3.5 h-3.5 text-rose-500 shrink-0" />
                     ) : (
@@ -593,7 +593,7 @@ export default function ChatModal({
                 <div
                   className={`max-w-[85%] p-3 rounded-2xl text-sm shadow-xs break-words ${
                     isMe
-                      ? 'bg-amber-500 text-white rounded-br-xs'
+                      ? 'bg-brand-500 text-white rounded-br-xs'
                       : isAdmin
                       ? 'bg-rose-50 border border-rose-200 text-rose-900 rounded-bl-xs'
                       : 'bg-white border border-gray-200 text-gray-800 rounded-bl-xs'
@@ -624,8 +624,8 @@ export default function ChatModal({
                         onClick={() => handleDownloadImage(msg.image_url!, `qr_payment_${orderCode || orderId.slice(0, 6)}.jpg`)}
                         className={`w-full py-1.5 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95 border shadow-xs ${
                           isMe
-                            ? 'bg-amber-600 hover:bg-amber-700 text-white border-amber-400'
-                            : 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-500'
+                            ? 'bg-brand-600 hover:bg-brand-700 text-white border-brand-400'
+                            : 'bg-brand-600 hover:bg-brand-700 text-white border-brand-500'
                         }`}
                       >
                         <Download className="w-3.5 h-3.5" />
@@ -656,11 +656,11 @@ export default function ChatModal({
                             onClick={() => handleCopyText(accMatch[1].replace(/[^0-9]/g, ''), `acc_${msg.id}`)}
                             className={`text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-2xs flex items-center gap-1 transition active:scale-95 border ${
                               isMe
-                                ? 'bg-amber-600 hover:bg-amber-700 text-white border-amber-400'
-                                : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+                                ? 'bg-brand-600 hover:bg-brand-700 text-white border-brand-400'
+                                : 'bg-brand-50 hover:bg-brand-100 text-brand-800 border-brand-200'
                             }`}
                           >
-                            {copiedKey === `acc_${msg.id}` ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                            {copiedKey === `acc_${msg.id}` ? <Check className="w-3 h-3 text-brand-600" /> : <Copy className="w-3 h-3" />}
                             <span>{copiedKey === `acc_${msg.id}` ? 'คัดลอกเลขบัญชีแล้ว' : 'คัดลอกเลขบัญชี'}</span>
                           </button>
                         )}
@@ -670,11 +670,11 @@ export default function ChatModal({
                             onClick={() => handleCopyText(ppMatch[1].replace(/[^0-9]/g, ''), `pp_${msg.id}`)}
                             className={`text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-2xs flex items-center gap-1 transition active:scale-95 border ${
                               isMe
-                                ? 'bg-amber-600 hover:bg-amber-700 text-white border-amber-400'
-                                : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+                                ? 'bg-brand-600 hover:bg-brand-700 text-white border-brand-400'
+                                : 'bg-brand-50 hover:bg-brand-100 text-brand-800 border-brand-200'
                             }`}
                           >
-                            {copiedKey === `pp_${msg.id}` ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                            {copiedKey === `pp_${msg.id}` ? <Check className="w-3 h-3 text-brand-600" /> : <Copy className="w-3 h-3" />}
                             <span>{copiedKey === `pp_${msg.id}` ? 'คัดลอกพร้อมเพย์แล้ว' : 'คัดลอกพร้อมเพย์'}</span>
                           </button>
                         )}
@@ -712,7 +712,7 @@ export default function ChatModal({
         <div className="px-3 py-2 bg-white border-t border-gray-100 shrink-0">
           <div className="flex items-center justify-between gap-1.5 mb-1.5">
             <div className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+              <Sparkles className="w-3.5 h-3.5 text-brand-600" />
               <span className="text-[11px] font-semibold text-gray-500">
                 {currentUser.role === 'merchant' ? 'ส่งด่วนร้านค้า:' : 'ตัวช่วยด่วนลูกค้า:'}
               </span>
@@ -722,7 +722,7 @@ export default function ChatModal({
                 type="button"
                 disabled={isSending}
                 onClick={handleSendPaymentInfo}
-                className="py-1 px-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg text-xs font-bold flex items-center gap-1 shadow-xs transition active:scale-95 cursor-pointer disabled:opacity-50"
+                className="py-1 px-2.5 bg-gradient-to-r from-brand-600 to-teal-600 hover:from-brand-700 hover:to-teal-700 text-white rounded-lg text-xs font-bold flex items-center gap-1 shadow-xs transition active:scale-95 cursor-pointer disabled:opacity-50"
               >
                 <QrCode className="w-3.5 h-3.5" />
                 <span>ส่ง QR / บัญชีรับเงิน</span>
@@ -731,7 +731,7 @@ export default function ChatModal({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="py-1 px-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 text-white rounded-lg text-xs font-bold flex items-center gap-1 shadow-xs transition active:scale-95 cursor-pointer"
+                className="py-1 px-2.5 bg-gradient-to-r from-brand-500 to-brand-500 hover:from-brand-600 text-white rounded-lg text-xs font-bold flex items-center gap-1 shadow-xs transition active:scale-95 cursor-pointer"
               >
                 <Receipt className="w-3.5 h-3.5" />
                 <span>แนบสลิปโอนเงิน</span>
@@ -745,7 +745,7 @@ export default function ChatModal({
                 key={idx}
                 type="button"
                 onClick={() => setInputText(reply)}
-                className="text-xs px-2.5 py-1 bg-amber-50 hover:bg-amber-100 active:bg-amber-200 text-amber-900 rounded-xl transition border border-amber-200/80 active:scale-95 font-medium shadow-2xs"
+                className="text-xs px-2.5 py-1 bg-brand-50 hover:bg-brand-100 active:bg-brand-200 text-brand-900 rounded-xl transition border border-brand-200/80 active:scale-95 font-medium shadow-2xs"
               >
                 {reply}
               </button>
@@ -755,16 +755,16 @@ export default function ChatModal({
 
         {/* Pending Image Attachment Preview */}
         {selectedImage && (
-          <div className="px-3 py-2 bg-amber-50/90 border-t border-amber-200 flex items-center justify-between shrink-0 animate-in fade-in">
+          <div className="px-3 py-2 bg-brand-50/90 border-t border-brand-200 flex items-center justify-between shrink-0 animate-in fade-in">
             <div className="flex items-center gap-3">
-              <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-amber-400 shadow-sm shrink-0 bg-white">
+              <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-brand-400 shadow-sm shrink-0 bg-white">
                 <img src={selectedImage} alt="Preview" className="w-full h-full object-cover" />
               </div>
               <div>
-                <p className="text-xs font-bold text-amber-900 flex items-center gap-1">
+                <p className="text-xs font-bold text-brand-900 flex items-center gap-1">
                   <ImageIcon className="w-3.5 h-3.5" /> แนบรูปภาพแล้ว
                 </p>
-                <p className="text-[11px] text-amber-700">สามารถพิมพ์ข้อความกำกับ หรือกดส่งรูปได้ทันทีครับ</p>
+                <p className="text-[11px] text-brand-700">สามารถพิมพ์ข้อความกำกับ หรือกดส่งรูปได้ทันทีครับ</p>
               </div>
             </div>
             <button
@@ -797,11 +797,11 @@ export default function ChatModal({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isCompressing || isSending}
-            className="w-10 h-10 rounded-2xl bg-gray-100 hover:bg-amber-100 text-gray-600 hover:text-amber-700 flex items-center justify-center transition active:scale-95 border border-gray-200 shrink-0"
+            className="w-10 h-10 rounded-2xl bg-gray-100 hover:bg-brand-100 text-gray-600 hover:text-brand-700 flex items-center justify-center transition active:scale-95 border border-gray-200 shrink-0"
             title="ถ่ายรูปหรือส่งรูปภาพ (สลิปโอนเงิน / จุดวางอาหาร)"
           >
             {isCompressing ? (
-              <Loader2 className="w-4 h-4 animate-spin text-amber-600" />
+              <Loader2 className="w-4 h-4 animate-spin text-brand-600" />
             ) : (
               <Camera className="w-5 h-5" />
             )}
@@ -818,13 +818,13 @@ export default function ChatModal({
             }
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            className="flex-1 px-4 py-2.5 bg-gray-100 rounded-2xl text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-500 border border-transparent"
+            className="flex-1 px-4 py-2.5 bg-gray-100 rounded-2xl text-sm focus:outline-hidden focus:ring-2 focus:ring-brand-500 border border-transparent"
           />
 
           <button
             type="submit"
             disabled={(!inputText.trim() && !selectedImage) || isSending || isCompressing}
-            className="w-10 h-10 rounded-2xl bg-amber-500 hover:bg-amber-600 disabled:opacity-40 text-white flex items-center justify-center transition active:scale-95 shadow-md shrink-0"
+            className="w-10 h-10 rounded-2xl bg-brand-500 hover:bg-brand-600 disabled:opacity-40 text-white flex items-center justify-center transition active:scale-95 shadow-md shrink-0"
             title="ส่งข้อความ"
           >
             {isSending ? (
@@ -853,7 +853,7 @@ export default function ChatModal({
                     e.stopPropagation();
                     handleDownloadImage(selectedImageForView, `cprufood_image_${Date.now()}.jpg`);
                   }}
-                  className="px-3 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 text-xs font-bold transition active:scale-95 shadow-md"
+                  className="px-3 py-1.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white flex items-center gap-1.5 text-xs font-bold transition active:scale-95 shadow-md"
                 >
                   <Download className="w-4 h-4" />
                   <span>บันทึกรูป</span>
@@ -879,7 +879,7 @@ export default function ChatModal({
                   e.stopPropagation();
                   handleDownloadImage(selectedImageForView, `cprufood_image_${Date.now()}.jpg`);
                 }}
-                className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 text-white rounded-2xl text-xs font-bold flex items-center gap-2 shadow-lg transition active:scale-95 cursor-pointer"
+                className="px-5 py-2.5 bg-gradient-to-r from-brand-600 to-teal-600 hover:from-brand-700 text-white rounded-2xl text-xs font-bold flex items-center gap-2 shadow-lg transition active:scale-95 cursor-pointer"
               >
                 <Download className="w-4 h-4" />
                 <span>บันทึกรูปภาพนี้ลงในเครื่อง / อัลบั้ม</span>

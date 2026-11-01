@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  X, Camera, User, Phone, ShieldCheck, Store, Bike, LogOut, Check, Edit2, Sparkles, Image as ImageIcon, MapPin, Navigation, Trash2, RefreshCw, FileText, MessageSquare
+  X, Camera, User, Phone, ShieldCheck, Store, Bike, LogOut, Check, Edit2, Sparkles, Image as ImageIcon, MapPin, Navigation, Trash2, FileText, MessageSquare
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import ImageCropModal from './ImageCropModal';
@@ -173,32 +173,6 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
     if (confirm('คุณต้องการออกจากระบบหรือไม่?')) {
       onClose();
       await logout();
-    }
-  };
-
-  const [isClearingCache, setIsClearingCache] = useState(false);
-  const handleClearCache = async () => {
-    if (confirm('คุณต้องการล้างแคชและรีโหลดข้อมูลล่าสุดใช่หรือไม่? (ช่วยแก้ปัญหาภาพหรือข้อมูลไม่อัปเดต)')) {
-      try {
-        setIsClearingCache(true);
-        if (typeof window !== 'undefined') {
-          if ('caches' in window) {
-            const keys = await caches.keys();
-            await Promise.all(keys.map((k) => caches.delete(k)));
-          }
-          if ('serviceWorker' in navigator) {
-            const regs = await navigator.serviceWorker.getRegistrations();
-            for (const r of regs) {
-              await r.unregister();
-            }
-          }
-          localStorage.removeItem('cprufood_build_version');
-          window.location.reload();
-        }
-      } catch (err) {
-        console.error('Clear cache error:', err);
-        window.location.reload();
-      }
     }
   };
 
@@ -551,20 +525,6 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                 <span>ข้อกำหนดและนโยบายการให้บริการ</span>
               </div>
               <span className="text-[11px] text-brand-600 font-semibold">แตะเพื่อดู</span>
-            </button>
-
-            {/* Clear Cache & Force Update Button */}
-            <button
-              type="button"
-              onClick={handleClearCache}
-              disabled={isClearingCache}
-              className="w-full py-2.5 px-4 rounded-2xl border border-brand-300 bg-brand-50/70 hover:bg-brand-100 text-brand-900 font-bold text-xs flex items-center justify-between transition active:scale-98"
-            >
-              <div className="flex items-center gap-2">
-                <RefreshCw className={`w-3.5 h-3.5 text-brand-600 ${isClearingCache ? 'animate-spin' : ''}`} />
-                <span>ล้างแคชและอัปเดตข้อมูลล่าสุด</span>
-              </div>
-              <span className="text-[10px] bg-brand-200 text-brand-900 px-2 py-0.5 rounded-full font-bold">รีเฟรช</span>
             </button>
 
             {/* Customers can apply to open a shop later */}

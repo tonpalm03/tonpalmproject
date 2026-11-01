@@ -45,7 +45,8 @@ export default function MapPicker({
 
   // Real-time distance calculation from center (shop / campus centroid)
   const distanceKm = getDistanceKm(defaultLat, defaultLng, currentLat, currentLng);
-  const isWithinRadius = distanceKm <= (maxRadiusKm + 0.05); // slight float tolerance
+  // Without a delivery radius (e.g. a home address before any shop is picked) every spot is fine.
+  const isWithinRadius = !showRadiusCircle || distanceKm <= (maxRadiusKm + 0.05); // slight float tolerance
 
   useEffect(() => {
     onRadiusStatusChange?.(isWithinRadius, distanceKm);
@@ -255,7 +256,7 @@ export default function MapPicker({
       onChange({ lat, lng });
       inlineMapInstanceRef.current?.flyTo([lat, lng], 17, { animate: true });
       fullMapInstanceRef.current?.flyTo([lat, lng], 17, { animate: true });
-      if (dist > maxRadiusKm) {
+      if (showRadiusCircle && dist > maxRadiusKm) {
         setLocationError(`ตำแหน่ง GPS ของคุณ (${formatDistance(dist)}) อยู่นอกรัศมีบริการ ${maxRadiusKm} กม. กรุณาเลื่อนหมุดมาอยู่ในเขตบริการ`);
       }
     } catch (error) {
@@ -370,7 +371,7 @@ export default function MapPicker({
                     </span>
                   )}
                 </div>
-                <p className="text-[10px] text-gray-400">แตะจุดที่ต้องการ หรือลากหมุดไปยังหน้าตึก/หอพักของคุณ (วงกลมสีส้มคือรัศมี {maxRadiusKm} กม.)</p>
+                <p className="text-[10px] text-gray-400">แตะจุดที่ต้องการ หรือลากหมุดไปยังหน้าตึก/หอพักของคุณ{showRadiusCircle ? ` (วงกลมสีส้มคือรัศมี ${maxRadiusKm} กม.)` : ''}</p>
               </div>
             </div>
 

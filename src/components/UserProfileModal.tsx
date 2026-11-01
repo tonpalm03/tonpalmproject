@@ -454,6 +454,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                       location={defaultLocation}
                       onChange={setDefaultLocation}
                       title="หมุดที่อยู่ประจำของคุณ"
+                      showRadiusCircle={false}
                     />
                   </div>
 

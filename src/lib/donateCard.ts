@@ -36,7 +36,7 @@ export async function renderDonateCard(input: { qrUrl: string; name?: string; nu
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('เบราว์เซอร์นี้สร้างรูปไม่ได้');
 
-  ctx.fillStyle = '#E1F5EE';
+  ctx.fillStyle = '#E3F5D9';
   ctx.fillRect(0, 0, W, H);
 
   // Soft wave lines, like the app's headers.
@@ -51,10 +51,10 @@ export async function renderDonateCard(input: { qrUrl: string; name?: string; nu
   }
 
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#0F6E56';
+  ctx.fillStyle = '#177A34';
   ctx.font = `700 40px ${font}`;
   ctx.fillText('CPRUFood', W / 2, 110);
-  ctx.fillStyle = '#04342C';
+  ctx.fillStyle = '#14361C';
   ctx.font = `900 64px ${font}`;
   ctx.fillText('ช่วยให้น้องพุงเด้งได้ไปต่อ', W / 2, 200);
 
@@ -68,13 +68,13 @@ export async function renderDonateCard(input: { qrUrl: string; name?: string; nu
 
   let y = qrY + qrBox + 80;
   if (input.name) {
-    ctx.fillStyle = '#04342C';
+    ctx.fillStyle = '#14361C';
     ctx.font = `800 48px ${font}`;
     ctx.fillText(input.name, W / 2, y);
     y += 64;
   }
   if (input.number) {
-    ctx.fillStyle = '#0F6E56';
+    ctx.fillStyle = '#177A34';
     ctx.font = `700 42px ${font}`;
     ctx.fillText(`พร้อมเพย์ ${input.number}`, W / 2, y);
   }
@@ -82,7 +82,7 @@ export async function renderDonateCard(input: { qrUrl: string; name?: string; nu
   const mascotSize = 330;
   drawContained(ctx, mascot, W - mascotSize - 40, H - mascotSize - 30, mascotSize, mascotSize);
   ctx.textAlign = 'left';
-  ctx.fillStyle = '#085041';
+  ctx.fillStyle = '#11592A';
   ctx.font = `700 44px ${font}`;
   ctx.fillText('ขอบคุณผู้ใจดี', 80, H - 170);
   ctx.fillText('ที่ช่วยให้น้องพุงเด้งได้ไปต่อ', 80, H - 105);

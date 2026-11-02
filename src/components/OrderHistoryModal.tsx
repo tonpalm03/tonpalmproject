@@ -246,15 +246,15 @@ export default function OrderHistoryModal({
         <MascotWatermark page="history" />
         
         {/* Modal Header */}
-        <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] border-b border-[#9FE1CB] px-5 py-4 text-[#04342C] flex items-center justify-between gap-2 shrink-0 shadow-xs relative overflow-hidden isolate">
+        <div className="bg-gradient-to-br from-[#E3F5D9] to-[#D3F0C2] border-b border-[#B0E294] px-5 py-4 text-[#14361C] flex items-center justify-between gap-2 shrink-0 shadow-xs relative overflow-hidden isolate">
           <WavePattern className="text-white/90 -z-10" />
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-10 h-10 shrink-0 rounded-2xl bg-white border border-[#9FE1CB] flex items-center justify-center text-xl shadow-inner">
-              <FileText className="w-5 h-5 text-[#1D9E75]" />
+            <div className="w-10 h-10 shrink-0 rounded-2xl bg-white border border-[#B0E294] flex items-center justify-center text-xl shadow-inner">
+              <FileText className="w-5 h-5 text-[#22A447]" />
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-black tracking-tight">ประวัติการสั่งซื้อของคุณ</h2>
-              <p className="text-xs sm:text-xs text-[#0F6E56]">
+              <p className="text-xs sm:text-xs text-[#177A34]">
                 รายการออเดอร์ทั้งหมด {orders.length} รายการ
               </p>
             </div>
@@ -262,7 +262,7 @@ export default function OrderHistoryModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white hover:bg-brand-50 text-[#0F6E56] border border-[#9FE1CB] flex items-center justify-center transition active:scale-95"
+            className="w-8 h-8 rounded-full bg-white hover:bg-brand-50 text-[#177A34] border border-[#B0E294] flex items-center justify-center transition active:scale-95"
           >
             <X className="w-5 h-5" />
           </button>

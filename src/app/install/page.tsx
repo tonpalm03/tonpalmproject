@@ -31,11 +31,11 @@ export default function InstallPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex justify-center p-4">
       <div className="w-full max-w-md space-y-4">
-        <div className="relative overflow-hidden isolate rounded-3xl bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] p-5 text-center">
+        <div className="relative overflow-hidden isolate rounded-3xl bg-gradient-to-br from-[#E3F5D9] to-[#D3F0C2] p-5 text-center">
           <WavePattern className="text-white/90 -z-10" />
           <img src="/mascots/pung-deng-hello.webp" alt="น้องพุงเด้งโบกมือ" className="w-28 mx-auto select-none drop-shadow-sm" />
-          <h1 className="mt-2 text-xl font-black text-[#04342C]">แอป CPRUFood สำหรับ Android</h1>
-          <p className="mt-1 text-xs font-bold text-[#0F6E56]">
+          <h1 className="mt-2 text-xl font-black text-[#14361C]">แอป CPRUFood สำหรับ Android</h1>
+          <p className="mt-1 text-xs font-bold text-[#177A34]">
             {version ? `เวอร์ชัน ${version.versionName}` : 'เวอร์ชันล่าสุด'}
           </p>
         </div>
@@ -83,7 +83,7 @@ export default function InstallPage() {
             <ol className="space-y-2.5">
               {STEPS.map((step, i) => (
                 <li key={i} className="flex gap-2.5 text-xs text-gray-600 leading-relaxed">
-                  <span className="w-5 h-5 rounded-full bg-[#E1F5EE] text-[#085041] text-xs font-black flex items-center justify-center shrink-0">{i + 1}</span>
+                  <span className="w-5 h-5 rounded-full bg-[#E3F5D9] text-[#11592A] text-xs font-black flex items-center justify-center shrink-0">{i + 1}</span>
                   <span>{step}</span>
                 </li>
               ))}

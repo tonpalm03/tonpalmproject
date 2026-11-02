@@ -391,7 +391,7 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
         <MascotWatermark page="cart" />
         
         {/* Header */}
-        <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] border-b border-[#9FE1CB] p-4 text-[#04342C] flex items-center justify-between shadow-sm relative overflow-hidden isolate">
+        <div className="bg-gradient-to-br from-[#E3F5D9] to-[#D3F0C2] border-b border-[#B0E294] p-4 text-[#14361C] flex items-center justify-between shadow-sm relative overflow-hidden isolate">
           <WavePattern className="text-white/90 -z-10" />
           <div className="flex items-center gap-2 min-w-0">
             {step === 'delivery' ? (
@@ -399,25 +399,25 @@ export default function CartCheckoutModal({ onClose, onRequireAuth, onOrderSucce
                 type="button"
                 onClick={() => goToStep('cart')}
                 aria-label="กลับไปตะกร้า"
-                className="w-9 h-9 -ml-1 rounded-full bg-white hover:bg-brand-50 border border-[#9FE1CB] flex items-center justify-center transition active:scale-95 shrink-0"
+                className="w-9 h-9 -ml-1 rounded-full bg-white hover:bg-brand-50 border border-[#B0E294] flex items-center justify-center transition active:scale-95 shrink-0"
               >
-                <ArrowLeft className="w-5 h-5 text-[#0F6E56]" />
+                <ArrowLeft className="w-5 h-5 text-[#177A34]" />
               </button>
             ) : (
-              <Store className="w-5 h-5 text-[#0F6E56] shrink-0" />
+              <Store className="w-5 h-5 text-[#177A34] shrink-0" />
             )}
             <div className="min-w-0">
               <h2 className="font-bold text-base leading-tight">{step === 'cart' ? 'ตะกร้าสั่งอาหาร' : 'ที่อยู่จัดส่ง'}</h2>
-              <p className="text-xs text-[#0F6E56] truncate">
+              <p className="text-xs text-[#177A34] truncate">
                 ขั้นที่ {step === 'cart' ? 1 : 2}/2 · {shopCount === 1 ? shopsInCart[0]?.name : `${shopCount} ร้านค้า (ร้านแยกกันส่ง)`}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-white hover:bg-brand-50 border border-[#9FE1CB] flex items-center justify-center transition active:scale-95"
+            className="w-9 h-9 rounded-full bg-white hover:bg-brand-50 border border-[#B0E294] flex items-center justify-center transition active:scale-95"
           >
-            <X className="w-5 h-5 text-[#0F6E56]" />
+            <X className="w-5 h-5 text-[#177A34]" />
           </button>
         </div>
 

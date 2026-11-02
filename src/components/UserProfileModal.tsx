@@ -9,7 +9,6 @@ import ImageCropModal from './ImageCropModal';
 import MapPicker from './MapPicker';
 import { DEFAULT_CAMPUS_LOCATION } from '@/lib/geolocation';
 import AndroidInstallLink from './AndroidInstallLink';
-import FontSizeControl from './FontSizeControl';
 import TermsModal from './TermsModal';
 import ContactModal from './ContactModal';
 import UserAvatar, { getUserCode, isCustomAvatar } from './UserAvatar';
@@ -185,14 +184,14 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
           <MascotWatermark page="profile" />
           
           {/* Top Banner with Gradient */}
-          <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] border-b border-[#9FE1CB] p-6 text-[#04342C] text-center relative overflow-hidden isolate">
+          <div className="bg-gradient-to-br from-[#E3F5D9] to-[#D3F0C2] border-b border-[#B0E294] p-6 text-[#14361C] text-center relative overflow-hidden isolate">
             <WavePattern className="text-white/90 -z-10" />
 
             {/* Close Button */}
             <button
               type="button"
               onClick={onClose}
-              className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-white hover:bg-brand-50 border border-[#9FE1CB] flex items-center justify-center text-[#0F6E56] transition active:scale-95"
+              className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-white hover:bg-brand-50 border border-[#B0E294] flex items-center justify-center text-[#177A34] transition active:scale-95"
             >
               <X className="w-4 h-4" />
             </button>
@@ -230,7 +229,7 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
             </div>
 
             {/* User Name */}
-            <h3 className="text-xl font-black text-[#04342C] truncate">
+            <h3 className="text-xl font-black text-[#14361C] truncate">
               {user.display_name}
             </h3>
 
@@ -238,12 +237,12 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
             {(role === 'admin' || role === 'merchant') && (
               <div className="mt-1.5 flex items-center justify-center gap-1.5">
                 {role === 'admin' ? (
-                  <span className="inline-flex items-center gap-1 bg-white text-[#0F6E56] border border-[#9FE1CB] text-xs font-bold px-3 py-0.5 rounded-full shadow-2xs">
+                  <span className="inline-flex items-center gap-1 bg-white text-[#177A34] border border-[#B0E294] text-xs font-bold px-3 py-0.5 rounded-full shadow-2xs">
                     <ShieldCheck className="w-3.5 h-3.5" />
                     <span>ผู้ดูแลระบบ (Super Admin)</span>
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 bg-white text-[#0F6E56] border border-[#9FE1CB] text-xs font-bold px-3 py-0.5 rounded-full shadow-2xs">
+                  <span className="inline-flex items-center gap-1 bg-white text-[#177A34] border border-[#B0E294] text-xs font-bold px-3 py-0.5 rounded-full shadow-2xs">
                     <Store className="w-3.5 h-3.5" />
                     <span>ร้านค้าชุมชน (Merchant)</span>
                   </span>
@@ -543,8 +542,6 @@ export default function UserProfileModal({ isOpen, onClose, onOpenOrderHistory }
                 <span className="shrink-0 whitespace-nowrap ml-2 text-xs bg-brand-200 text-brand-900 px-2 py-0.5 rounded-full font-bold">สมัคร</span>
               </a>
             )}
-
-            <FontSizeControl />
 
             <AndroidInstallLink variant="row" />
 

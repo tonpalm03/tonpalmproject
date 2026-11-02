@@ -129,19 +129,19 @@ export default function OrderStatusModal({
           <MascotWatermark page="tracking" />
           
           {/* Header */}
-          <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] border-b border-[#9FE1CB] p-4 text-[#04342C] flex items-center justify-between shadow-sm relative overflow-hidden isolate">
+          <div className="bg-gradient-to-br from-[#E3F5D9] to-[#D3F0C2] border-b border-[#B0E294] p-4 text-[#14361C] flex items-center justify-between shadow-sm relative overflow-hidden isolate">
             <WavePattern className="text-white/90 -z-10" />
             <div>
-              <span className="text-xs bg-white text-[#0F6E56] border border-[#9FE1CB] px-2 py-0.5 rounded-full font-medium">
+              <span className="text-xs bg-white text-[#177A34] border border-[#B0E294] px-2 py-0.5 rounded-full font-medium">
                 {ordersList.length > 1 ? `สั่งอาหาร ${ordersList.length} ร้านค้า` : `ออเดอร์ #${formatOrderCode(activeOrder)}`}
               </span>
               <h2 className="font-black text-lg mt-0.5">สถานะการจัดส่ง</h2>
             </div>
             <button
               onClick={onClose}
-              className="w-9 h-9 rounded-full bg-white hover:bg-brand-50 border border-[#9FE1CB] flex items-center justify-center transition active:scale-95"
+              className="w-9 h-9 rounded-full bg-white hover:bg-brand-50 border border-[#B0E294] flex items-center justify-center transition active:scale-95"
             >
-              <X className="w-5 h-5 text-[#0F6E56]" />
+              <X className="w-5 h-5 text-[#177A34]" />
             </button>
           </div>
 
@@ -226,7 +226,7 @@ export default function OrderStatusModal({
                             alt={mascot.alt}
                             className={`object-contain pointer-events-none select-none transition-all ${
                               isCurrent
-                                ? 'w-16 h-16 drop-shadow-[0_4px_6px_rgba(29,158,117,0.35)]'
+                                ? 'w-16 h-16 drop-shadow-[0_4px_6px_rgba(34,164,71,0.35)]'
                                 : isPassed
                                 ? 'w-12 h-12'
                                 : 'w-12 h-12 grayscale opacity-35'

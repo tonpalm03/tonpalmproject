@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
+  --background: #FFF9F1;
   --foreground: #1e293b;
 }
 
@@ -12,23 +12,31 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Brand green (พุงเด้ง pastel). Use brand-* instead of orange/amber/emerald. */
+/* Brand leaf green (matches น้องพุงเด้ง). Use brand-* for green and accent-* for the warm orange. */
 @theme {
-  --color-brand-50: #EEF9F4;
-  --color-brand-100: #E1F5EE;
-  --color-brand-200: #C3EBDC;
-  --color-brand-300: #9FE1CB;
-  --color-brand-400: #5DCAA5;
-  --color-brand-500: #1D9E75;
-  --color-brand-600: #178A66;
-  --color-brand-700: #0F6E56;
-  --color-brand-800: #085041;
-  --color-brand-900: #04342C;
-  --color-brand-950: #022720;
+  --color-brand-50: #F1FAEC;
+  --color-brand-100: #E3F5D9;
+  --color-brand-200: #D3F0C2;
+  --color-brand-300: #B0E294;
+  --color-brand-400: #6CC655;
+  --color-brand-500: #22A447;
+  --color-brand-600: #1B8E3D;
+  --color-brand-700: #177A34;
+  --color-brand-800: #11592A;
+  --color-brand-900: #14361C;
+  --color-brand-950: #0C2412;
+  /* Warm orange for prices, add buttons and deal tags, so food reads as appetising. */
+  --color-accent-50: #FFF4E8;
+  --color-accent-100: #FFE6CC;
+  --color-accent-500: #F97316;
+  --color-accent-600: #EA6A0C;
+  --color-accent-700: #C2550A;
+  /* Warm page background instead of cool grey. */
+  --color-cream: #FFF9F1;
 }
 
 body {
-  background: #f8fafc;
+  background: #FFF9F1;
   color: #1e293b;
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
@@ -42,7 +50,7 @@ body {
 .bg-gradient-to-tr,
 .bg-gradient-to-l,
 .bg-gradient-to-b {
-  background-color: #1D9E75;
+  background-color: #22A447;
 }
 
 button {

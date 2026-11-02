@@ -3,20 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import MerchantDashboard from '@/components/MerchantDashboard';
-import { LogOut, AlertCircle, FileText, Home, Type } from 'lucide-react';
+import { LogOut, AlertCircle, FileText, Home } from 'lucide-react';
 import WavePattern from '@/components/WavePattern';
 import { soundAlert } from '@/lib/soundAlert';
 import TermsModal from '@/components/TermsModal';
 import MerchantApplicationPanel from '@/components/MerchantApplicationPanel';
 import AndroidInstallLink from '@/components/AndroidInstallLink';
-import FontSizeControl from '@/components/FontSizeControl';
 
 export default function MerchantAppPage() {
   const { user, role, isLoading, loginWithLine, loginWithGoogle, logout } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showTerms, setShowTerms] = useState(false);
-  const [showFontSize, setShowFontSize] = useState(false);
 
   // Unlock sound on mount or click
   useEffect(() => {
@@ -52,7 +50,7 @@ export default function MerchantAppPage() {
           
           {/* Header */}
           <div className="text-center space-y-2">
-            <div className="relative overflow-hidden isolate -mx-6 -mt-6 sm:-mx-8 sm:-mt-8 mb-1 rounded-t-3xl bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] pt-5 pb-1">
+            <div className="relative overflow-hidden isolate -mx-6 -mt-6 sm:-mx-8 sm:-mt-8 mb-1 rounded-t-3xl bg-gradient-to-br from-[#E3F5D9] to-[#D3F0C2] pt-5 pb-1">
               <WavePattern className="text-white/90 -z-10" />
               <img src="/mascots/bg/merchant.webp" alt="น้องพุงเด้งในชุดเชฟ" className="w-36 mx-auto select-none drop-shadow-sm" />
             </div>
@@ -125,8 +123,6 @@ export default function MerchantAppPage() {
             </div>
           )}
 
-          <FontSizeControl />
-
           <AndroidInstallLink variant="merchant" />
 
           {/* Navigation */}
@@ -174,7 +170,7 @@ export default function MerchantAppPage() {
       <header className="bg-slate-900 text-white sticky top-0 z-30 shadow-md border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">
-            <img src="/logo.png?v=9" alt="CPRUFood" className="w-8 h-8 object-contain shrink-0" />
+            <img src="/logo.png?v=10" alt="CPRUFood" className="w-8 h-8 object-contain shrink-0" />
             <div className="min-w-0">
               <h2 className="text-xs font-black text-white leading-none">CPRUFood</h2>
               <p className="text-xs text-brand-400 font-semibold mt-0.5 truncate">
@@ -184,16 +180,6 @@ export default function MerchantAppPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setShowFontSize(v => !v)}
-              aria-expanded={showFontSize}
-              className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-brand-300 border border-slate-700 flex items-center gap-1 transition active:scale-95"
-              title="ขนาดตัวอักษร"
-            >
-              <Type className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">ขนาดตัวอักษร</span>
-            </button>
             <button
               type="button"
               onClick={() => setShowTerms(true)}
@@ -221,7 +207,6 @@ export default function MerchantAppPage() {
 
       {/* Main Merchant Content */}
       <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 space-y-3">
-        {showFontSize && <FontSizeControl />}
         <AndroidInstallLink variant="merchant" />
         <MerchantDashboard currentUser={user} />
       </main>

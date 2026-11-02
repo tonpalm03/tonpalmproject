@@ -500,7 +500,7 @@ export default function ChatModal({
         <MascotWatermark page="chat" />
         
         {/* Header */}
-        <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] border-b border-[#9FE1CB] p-4 text-[#04342C] flex items-center justify-between shadow-md shrink-0 relative overflow-hidden isolate">
+        <div className="bg-gradient-to-br from-[#E3F5D9] to-[#D3F0C2] border-b border-[#B0E294] p-4 text-[#14361C] flex items-center justify-between shadow-md shrink-0 relative overflow-hidden isolate">
           <WavePattern className="text-white/90 -z-10" />
           <div className="flex items-center gap-2.5">
             <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white shadow-md shrink-0 bg-slate-200">
@@ -520,17 +520,17 @@ export default function ChatModal({
                   </span>
                 )}
               </div>
-              <p className="text-xs text-[#0F6E56]">
+              <p className="text-xs text-[#177A34]">
                 ออเดอร์ #{orderCode || orderId.slice(0, 6)} • สั่งส่งตรงถึงหอพัก
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-white hover:bg-brand-50 border border-[#9FE1CB] flex items-center justify-center transition active:scale-95"
+            className="w-9 h-9 rounded-full bg-white hover:bg-brand-50 border border-[#B0E294] flex items-center justify-center transition active:scale-95"
             title="ปิดหน้าต่างแชท"
           >
-            <X className="w-5 h-5 text-[#0F6E56]" />
+            <X className="w-5 h-5 text-[#177A34]" />
           </button>
         </div>
 

@@ -143,14 +143,14 @@ export default function DonateModal({ settings, user, onRequireLogin, onClose }:
       <div className="relative bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
         {/* Outside the scrolling area, so the close button stays put while reading */}
         {step === 'qr' && (
-          <button onClick={onClose} aria-label="ปิด" className="absolute right-3 top-3 z-20 w-8 h-8 rounded-full bg-white/90 text-[#0F6E56] shadow-md flex items-center justify-center"><X className="w-4 h-4" /></button>
+          <button onClick={onClose} aria-label="ปิด" className="absolute right-3 top-3 z-20 w-8 h-8 rounded-full bg-white/90 text-[#177A34] shadow-md flex items-center justify-center"><X className="w-4 h-4" /></button>
         )}
         <div className="overflow-y-auto">
         {step === 'qr' ? (
-          <div className="relative overflow-hidden isolate bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] px-4 pt-4 pb-5">
+          <div className="relative overflow-hidden isolate bg-gradient-to-br from-[#E3F5D9] to-[#D3F0C2] px-4 pt-4 pb-5">
             <WavePattern className="text-white/90 -z-10" />
-            <p className="text-xs font-bold text-[#0F6E56] flex items-center gap-1"><Heart className="w-3.5 h-3.5 text-pink-500 fill-pink-500" /> สนับสนุนแอป</p>
-            <h3 className="mt-1 text-xl font-black text-[#04342C] leading-snug pr-28">ช่วยให้น้องพุงเด้ง<br />ได้ไปต่อ</h3>
+            <p className="text-xs font-bold text-[#177A34] flex items-center gap-1"><Heart className="w-3.5 h-3.5 text-pink-500 fill-pink-500" /> สนับสนุนแอป</p>
+            <h3 className="mt-1 text-xl font-black text-[#14361C] leading-snug pr-28">ช่วยให้น้องพุงเด้ง<br />ได้ไปต่อ</h3>
             <img src="/mascots/bg/donate.webp" alt="น้องพุงเด้งถือกระปุกออมสิน" className="absolute right-12 -bottom-2 w-24 pointer-events-none select-none drop-shadow-sm" />
           </div>
         ) : (
@@ -172,7 +172,7 @@ export default function DonateModal({ settings, user, onRequireLogin, onClose }:
               <p>แต่ถ้าวันหนึ่งมีคนใช้มากขึ้น ค่าดูแลเซิร์ฟเวอร์ก็จะมากขึ้นตามไปด้วย จนเราอาจแบกไว้ไม่ไหว จึงเปิดช่องทางนี้ไว้สำหรับผู้ใจดีที่อยากช่วยให้แอปอยู่ต่อไปได้ ทุกบาทจะใช้ดูแลระบบให้ทุกคนได้ใช้งานต่อไปครับ</p>
             </div>
 
-            <div className="relative !mt-8 rounded-2xl border-2 border-dashed border-[#5DCAA5] bg-[#E1F5EE]/40 p-3 text-center">
+            <div className="relative !mt-8 rounded-2xl border-2 border-dashed border-[#6CC655] bg-[#E3F5D9]/40 p-3 text-center">
               <img src="/mascots/pung-deng-hello.webp" alt="" aria-hidden="true" className="absolute -left-2 -top-8 w-14 pointer-events-none select-none" />
               <div className="mx-auto w-52 rounded-xl bg-white p-2.5">
                 {settings?.donate_qr_url ? (
@@ -184,9 +184,9 @@ export default function DonateModal({ settings, user, onRequireLogin, onClose }:
                   </div>
                 )}
               </div>
-              {settings?.donate_promptpay_name && <p className="mt-2 text-sm font-black text-[#04342C]">{settings.donate_promptpay_name}</p>}
+              {settings?.donate_promptpay_name && <p className="mt-2 text-sm font-black text-[#14361C]">{settings.donate_promptpay_name}</p>}
               {number && (
-                <button onClick={copyNumber} className="mt-1 inline-flex items-center gap-1.5 text-sm font-bold text-[#0F6E56] bg-white rounded-full px-3 py-1">
+                <button onClick={copyNumber} className="mt-1 inline-flex items-center gap-1.5 text-sm font-bold text-[#177A34] bg-white rounded-full px-3 py-1">
                   พร้อมเพย์ {number}
                   {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                 </button>
@@ -195,11 +195,11 @@ export default function DonateModal({ settings, user, onRequireLogin, onClose }:
 
             {settings?.donate_qr_url && (
               <div className="grid grid-cols-2 gap-2">
-                <button onClick={saveCard} disabled={cardState === 'busy'} className="py-2.5 rounded-xl border border-[#5DCAA5] text-[#0F6E56] text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition disabled:opacity-50">
+                <button onClick={saveCard} disabled={cardState === 'busy'} className="py-2.5 rounded-xl border border-[#6CC655] text-[#177A34] text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition disabled:opacity-50">
                   {cardState === 'saved' ? <Check className="w-4 h-4" /> : <Download className="w-4 h-4" />}
                   {cardState === 'saved' ? 'บันทึกแล้ว' : 'บันทึกรูป QR'}
                 </button>
-                <button onClick={copyCard} disabled={cardState === 'busy'} className="py-2.5 rounded-xl border border-[#5DCAA5] text-[#0F6E56] text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition disabled:opacity-50">
+                <button onClick={copyCard} disabled={cardState === 'busy'} className="py-2.5 rounded-xl border border-[#6CC655] text-[#177A34] text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition disabled:opacity-50">
                   {cardState === 'copied' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   {cardState === 'copied' ? 'คัดลอกแล้ว' : 'คัดลอก QR'}
                 </button>
@@ -207,7 +207,7 @@ export default function DonateModal({ settings, user, onRequireLogin, onClose }:
             )}
 
             <p className="text-xs text-gray-500 text-center">โอนแล้วกด &ldquo;แจ้งโอน&rdquo; พร้อมแนบสลิป ชื่อของคุณจะขึ้นในรายชื่อผู้ใจดี</p>
-            <button onClick={goToForm} className="w-full bg-brand-600 text-white rounded-2xl py-3 font-black shadow-[0_6px_16px_-6px_rgba(15,110,86,0.45)] active:scale-95 transition">
+            <button onClick={goToForm} className="w-full bg-brand-600 text-white rounded-2xl py-3 font-black shadow-[0_6px_16px_-6px_rgba(23,122,52,0.45)] active:scale-95 transition">
               แจ้งโอน
             </button>
           </div>

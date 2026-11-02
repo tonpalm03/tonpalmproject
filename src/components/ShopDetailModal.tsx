@@ -239,7 +239,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
         <div className="p-2.5 flex-1 flex flex-col">
           <h4 className="font-bold text-base text-gray-900 leading-tight line-clamp-2">{item.name}</h4>
           <div className="mt-auto pt-1.5 flex items-center justify-between gap-1">
-            <span className="text-base font-black text-brand-700 whitespace-nowrap">{item.price} บ.</span>
+            <span className="text-base font-black text-accent-600 whitespace-nowrap">{item.price} บ.</span>
             {isOwnShop ? (
               <span className="text-xs font-bold text-gray-400 whitespace-nowrap">ร้านของคุณ</span>
             ) : (
@@ -251,7 +251,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                 }}
                 disabled={!isShopOpenAndReady || soldOut}
                 aria-label={`ใส่ ${item.name} ลงตะกร้า`}
-                className="w-8 h-8 shrink-0 rounded-full bg-brand-600 hover:bg-brand-700 disabled:bg-gray-300 text-white flex items-center justify-center shadow-xs active:scale-90 transition"
+                className="w-8 h-8 shrink-0 rounded-full bg-accent-500 hover:bg-accent-600 disabled:bg-gray-300 text-white flex items-center justify-center shadow-xs active:scale-90 transition"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -313,7 +313,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
                   <span>{displayReviewCount > 0 ? `${displayRating.toFixed(1)} (${formatReviewCount(displayReviewCount)})` : 'ยังไม่มีรีวิว'}</span>
                 </span>
 
-                <span className="text-xs bg-white/20 backdrop-blur-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 ${(shop.delivery_fee ?? 0) === 0 ? 'bg-accent-500 font-bold' : 'bg-white/20 backdrop-blur-xs'}`}>
                   <Bike className="w-3 h-3" />
                   <span>{(shop.delivery_fee ?? 0) === 0 ? 'ส่งฟรี' : `ค่าส่ง ${shop.delivery_fee} บ.`}</span>
                 </span>
@@ -386,7 +386,7 @@ export default function ShopDetailModal({ shop, menuItems, onClose, onOpenCart, 
           </div>
 
           {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-cream">
             
             {/* TAB 1: MENU ITEMS */}
             {activeTab === 'menu' && (

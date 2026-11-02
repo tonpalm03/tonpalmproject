@@ -39,16 +39,16 @@ export default function AndroidInstallLink({ variant }: { variant: Variant }) {
   return (
     <a
       href={INSTALL_PAGE_URL}
-      className="w-full p-3 rounded-2xl bg-[#E1F5EE] border border-[#9FE1CB] flex items-center gap-3 active:scale-98 transition"
+      className="w-full p-3 rounded-2xl bg-[#E3F5D9] border border-[#B0E294] flex items-center gap-3 active:scale-98 transition"
     >
       <span className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shrink-0">
-        <Smartphone className="w-5 h-5 text-[#0F6E56]" />
+        <Smartphone className="w-5 h-5 text-[#177A34]" />
       </span>
       <span className="min-w-0 flex-1 text-left">
-        <span className="block text-xs font-black text-[#04342C]">ติดตั้งแอปเพื่อไม่พลาดออเดอร์</span>
-        <span className="block text-xs text-[#0F6E56]">มีเสียงแจ้งเตือนแม้ปิดหน้าจอ และนำทางส่งอาหารได้</span>
+        <span className="block text-xs font-black text-[#14361C]">ติดตั้งแอปเพื่อไม่พลาดออเดอร์</span>
+        <span className="block text-xs text-[#177A34]">มีเสียงแจ้งเตือนแม้ปิดหน้าจอ และนำทางส่งอาหารได้</span>
       </span>
-      <Download className="w-4 h-4 text-[#0F6E56] shrink-0" />
+      <Download className="w-4 h-4 text-[#177A34] shrink-0" />
     </a>
   );
 }

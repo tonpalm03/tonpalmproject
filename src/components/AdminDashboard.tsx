@@ -962,17 +962,17 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
     <div className="space-y-4">
       <MascotWatermark page="admin" fixed />
       {/* Admin Header */}
-      <div className="bg-[#E1F5EE] border border-[#9FE1CB] rounded-3xl p-5 text-[#04342C] flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-[#E3F5D9] border border-[#B0E294] rounded-3xl p-5 text-[#14361C] flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-white text-[#1D9E75] flex items-center justify-center border border-[#9FE1CB] shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-white text-[#22A447] flex items-center justify-center border border-[#B0E294] shrink-0">
             <ShieldCheck className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-[0.625rem] bg-[#1D9E75] text-white px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+            <span className="text-[0.625rem] bg-[#22A447] text-white px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
               Super Admin Panel
             </span>
             <h1 className="text-xl font-black mt-0.5">CPRUFood • หลังบ้าน</h1>
-            <p className="text-xs text-[#0F6E56]">ดูแลร้านค้า ติดตามออเดอร์ และจัดการผู้สนับสนุน</p>
+            <p className="text-xs text-[#177A34]">ดูแลร้านค้า ติดตามออเดอร์ และจัดการผู้สนับสนุน</p>
           </div>
         </div>
       </div>

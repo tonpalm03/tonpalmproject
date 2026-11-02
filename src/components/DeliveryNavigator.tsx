@@ -120,7 +120,7 @@ export default function DeliveryNavigator({
     if (!L || !map || !route) return;
     routeLineRef.current?.remove();
     routeLineRef.current = L.polyline(route.path.map(p => [p.lat, p.lng]), {
-      color: '#1D9E75', weight: 6, opacity: 0.85, dashArray: route.onRoads ? undefined : '8 10',
+      color: '#22A447', weight: 6, opacity: 0.85, dashArray: route.onRoads ? undefined : '8 10',
     }).addTo(map);
     // The map can be laid out after it was created, so measure it again before fitting.
     map.invalidateSize();
@@ -153,13 +153,13 @@ export default function DeliveryNavigator({
 
   return (
     <div className="fixed inset-0 z-[300] bg-white flex flex-col">
-      <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] px-4 pt-3 pb-3 flex items-start gap-3 shadow-sm z-10">
+      <div className="bg-gradient-to-br from-[#E3F5D9] to-[#D3F0C2] px-4 pt-3 pb-3 flex items-start gap-3 shadow-sm z-10">
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-bold text-[#0F6E56]">ไปส่งที่</p>
-          <p className="text-base font-black text-[#04342C] truncate">{customerName}</p>
-          {address && <p className="text-xs text-[#085041] line-clamp-2">{address}</p>}
+          <p className="text-xs font-bold text-[#177A34]">ไปส่งที่</p>
+          <p className="text-base font-black text-[#14361C] truncate">{customerName}</p>
+          {address && <p className="text-xs text-[#11592A] line-clamp-2">{address}</p>}
         </div>
-        <button onClick={onClose} aria-label="ปิดการนำทาง" className="w-9 h-9 rounded-full bg-white/80 text-[#0F6E56] flex items-center justify-center shrink-0">
+        <button onClick={onClose} aria-label="ปิดการนำทาง" className="w-9 h-9 rounded-full bg-white/80 text-[#177A34] flex items-center justify-center shrink-0">
           <X className="w-5 h-5" />
         </button>
       </div>
@@ -179,7 +179,7 @@ export default function DeliveryNavigator({
         {!following && here && (
           <button
             onClick={() => setFollowing(true)}
-            className="absolute right-3 bottom-14 z-[500] h-10 px-3 rounded-full bg-white shadow-lg text-[#0F6E56] text-xs font-bold flex items-center gap-1.5"
+            className="absolute right-3 bottom-14 z-[500] h-10 px-3 rounded-full bg-white shadow-lg text-[#177A34] text-xs font-bold flex items-center gap-1.5"
           >
             <LocateFixed className="w-4 h-4" /> กลับมาที่ฉัน
           </button>
@@ -189,7 +189,7 @@ export default function DeliveryNavigator({
       <div className="px-4 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] border-t border-gray-100 space-y-2.5 bg-white z-10">
         <div className="flex items-baseline gap-2">
           {arrived ? (
-            <p className="text-lg font-black text-[#1D9E75] flex items-center gap-1.5"><MapPin className="w-5 h-5" /> ถึงที่หมายแล้ว</p>
+            <p className="text-lg font-black text-[#22A447] flex items-center gap-1.5"><MapPin className="w-5 h-5" /> ถึงที่หมายแล้ว</p>
           ) : remainingM !== null ? (
             <>
               <p className="text-2xl font-black text-gray-900">{formatMeters(remainingM)}</p>
@@ -203,7 +203,7 @@ export default function DeliveryNavigator({
           {customerPhone && (
             <a
               href={`tel:${customerPhone}`}
-              className="flex-1 py-3 rounded-2xl border border-[#5DCAA5] text-[#0F6E56] font-bold text-sm flex items-center justify-center gap-1.5 active:scale-95 transition"
+              className="flex-1 py-3 rounded-2xl border border-[#6CC655] text-[#177A34] font-bold text-sm flex items-center justify-center gap-1.5 active:scale-95 transition"
             >
               <Phone className="w-4 h-4" /> โทรหาลูกค้า
             </a>
@@ -211,7 +211,7 @@ export default function DeliveryNavigator({
           {onDelivered && (
             <button
               onClick={onDelivered}
-              className="flex-1 py-3 rounded-2xl bg-brand-600 text-white font-black text-sm flex items-center justify-center gap-1.5 shadow-[0_6px_16px_-6px_rgba(15,110,86,0.45)] active:scale-95 transition"
+              className="flex-1 py-3 rounded-2xl bg-brand-600 text-white font-black text-sm flex items-center justify-center gap-1.5 shadow-[0_6px_16px_-6px_rgba(23,122,52,0.45)] active:scale-95 transition"
             >
               <CheckCircle2 className="w-4 h-4" /> ส่งถึงแล้ว
             </button>

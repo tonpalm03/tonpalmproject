@@ -72,8 +72,7 @@ export default function HomePage() {
   useEffect(() => {
     const el = heroRef.current;
     if (!el) return;
-    // The header covers the top 3.625rem (58px at normal text size), so count the card as
-    // gone once it slides under it.
+    // The header covers the top 3.625rem (58px), so count the card as gone once it slides under it.
     const headerPx = 3.625 * parseFloat(getComputedStyle(document.documentElement).fontSize);
     const observer = new IntersectionObserver(
       ([entry]) => setHeroHidden(!entry.isIntersecting),
@@ -547,22 +546,22 @@ export default function HomePage() {
   }, [rankedDrinks, searchQuery]);
 
   return (
-    <main className="min-h-screen bg-slate-50 pb-24 text-gray-800">
+    <main className="min-h-screen bg-cream pb-24 text-gray-800">
       
       {/* Top Header Bar */}
       {/* Customer header: brand, delivery area, quick actions and search */}
       {viewMode === 'customer' && (
-        <header className="sticky top-0 z-30 bg-[#E1F5EE] border-b border-[#9FE1CB]/60">
+        <header className="sticky top-0 z-30 bg-[#E3F5D9] border-b border-[#B0E294]/60">
           <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-2.5 pb-3">
             <div className="flex items-center gap-2">
-              <img src="/logo.png?v=9" alt="CPRUFood" className="w-9 h-9 object-contain shrink-0 drop-shadow-sm" />
-              <h1 className="flex-1 min-w-0 truncate text-lg font-black tracking-tight text-[#085041] leading-tight">CPRUFood</h1>
+              <img src="/logo.png?v=10" alt="CPRUFood" className="w-9 h-9 object-contain shrink-0 drop-shadow-sm" />
+              <h1 className="flex-1 min-w-0 truncate text-lg font-black tracking-tight text-[#11592A] leading-tight">CPRUFood</h1>
 
               {(role === 'merchant' || role === 'admin') && (
                 <button
                   type="button"
                   onClick={() => setViewMode(role === 'admin' ? 'admin' : 'merchant')}
-                  className="w-9 h-9 rounded-full bg-white hover:bg-brand-50 text-[#0F6E56] shadow-2xs flex items-center justify-center shrink-0 active:scale-95 transition"
+                  className="w-9 h-9 rounded-full bg-white hover:bg-brand-50 text-[#177A34] shadow-2xs flex items-center justify-center shrink-0 active:scale-95 transition"
                   title={role === 'admin' ? 'จัดการหลังบ้าน' : 'จัดการร้านค้า'}
                   aria-label={role === 'admin' ? 'จัดการหลังบ้าน' : 'จัดการร้านค้า'}
                 >
@@ -573,13 +572,13 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={handleOpenCart}
-                className="relative w-9 h-9 rounded-full bg-white hover:bg-brand-50 text-[#0F6E56] shadow-[0_6px_16px_-6px_rgba(15,110,86,0.3)] flex items-center justify-center shrink-0 active:scale-95 transition"
+                className="relative w-9 h-9 rounded-full bg-white hover:bg-brand-50 text-[#177A34] shadow-[0_6px_16px_-6px_rgba(23,122,52,0.3)] flex items-center justify-center shrink-0 active:scale-95 transition"
                 title="ตะกร้าสินค้า"
                 aria-label="ตะกร้าสินค้า"
               >
                 <ShoppingCart className="w-5 h-5" strokeWidth={2.4} />
                 {itemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-xs font-black min-w-4 h-4 px-1 rounded-full flex items-center justify-center ring-2 ring-[#E1F5EE]">
+                  <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-xs font-black min-w-4 h-4 px-1 rounded-full flex items-center justify-center ring-2 ring-[#E3F5D9]">
                     {itemCount}
                   </span>
                 )}
@@ -589,7 +588,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => setShowProfileModal(true)}
-                  className="w-9 h-9 rounded-full overflow-hidden bg-[#1D9E75] ring-2 ring-[#1D9E75] shrink-0 active:scale-95 transition"
+                  className="w-9 h-9 rounded-full overflow-hidden bg-[#22A447] ring-2 ring-[#22A447] shrink-0 active:scale-95 transition"
                   title="โปรไฟล์"
                   aria-label="โปรไฟล์"
                 >
@@ -599,7 +598,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => setShowAuthModal(true)}
-                  className="h-9 px-3 rounded-full bg-gradient-to-br from-[#2BB585] to-[#178A66] text-white shadow-[0_6px_14px_-4px_rgba(15,110,86,0.55)] text-xs font-black flex items-center gap-1 shrink-0 active:scale-95 transition"
+                  className="h-9 px-3 rounded-full bg-gradient-to-br from-[#34B456] to-[#1B8E3D] text-white shadow-[0_6px_14px_-4px_rgba(23,122,52,0.55)] text-xs font-black flex items-center gap-1 shrink-0 active:scale-95 transition"
                 >
                   <UserCheck className="w-3.5 h-3.5" /> เข้าสู่ระบบ
                 </button>
@@ -616,7 +615,7 @@ export default function HomePage() {
           {/* Logo & Brand Name */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0 min-w-0">
             <img
-              src="/logo.png?v=9"
+              src="/logo.png?v=10"
               alt="CPRUFood"
               className="w-9 h-9 sm:w-11 sm:h-11 object-contain hover:scale-105 active:scale-95 transition shrink-0 drop-shadow-sm"
             />
@@ -726,7 +725,7 @@ export default function HomePage() {
             </div>
 
             {/* Search and category chips stay pinned under the header while scrolling */}
-            <div className="sticky top-[3.625rem] z-20 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 -mt-2 pt-2 pb-2 bg-slate-50/95 backdrop-blur-md space-y-3">
+            <div className="sticky top-[3.625rem] z-20 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 -mt-2 pt-2 pb-2 bg-cream/95 backdrop-blur-md space-y-3">
             {heroHidden && (
               <HomeHeroCompact
                 supporters={supporters}
@@ -737,13 +736,13 @@ export default function HomePage() {
               />
             )}
             <div className="relative">
-              <Search className="w-4 h-4 text-[#0F6E56] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-[#177A34] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="ค้นหาร้านค้า, เมนูอาหาร, ชานม..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#C3EBDC] rounded-2xl shadow-[0_6px_16px_-6px_rgba(15,110,86,0.3)] text-sm focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-300"
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#D3F0C2] rounded-2xl shadow-[0_6px_16px_-6px_rgba(23,122,52,0.3)] text-sm focus:outline-hidden focus:border-brand-500 focus:ring-2 focus:ring-brand-300"
               />
             </div>
 
@@ -753,7 +752,7 @@ export default function HomePage() {
                   type="button"
                   onClick={() => setCustomerTab('food')}
                   className={`px-3.5 py-2 rounded-full text-xs md:text-sm font-bold flex items-center gap-1.5 whitespace-nowrap border transition ${
-                    customerTab === 'food' ? 'bg-[#1D9E75] text-white border-[#1D9E75] shadow-[0_6px_14px_-4px_rgba(15,110,86,0.5)]' : 'bg-white text-gray-600 border-[#E1F5EE] shadow-[0_4px_10px_-4px_rgba(15,110,86,0.25)]'
+                    customerTab === 'food' ? 'bg-[#22A447] text-white border-[#22A447] shadow-[0_6px_14px_-4px_rgba(23,122,52,0.5)]' : 'bg-white text-gray-600 border-[#E3F5D9] shadow-[0_4px_10px_-4px_rgba(23,122,52,0.25)]'
                   }`}
                 >
                   <UtensilsCrossed className="w-4 h-4" /> อาหาร <span className="opacity-70">({filteredFoods.length})</span>
@@ -762,7 +761,7 @@ export default function HomePage() {
                   type="button"
                   onClick={() => setCustomerTab('drink_dessert')}
                   className={`px-3.5 py-2 rounded-full text-xs md:text-sm font-bold flex items-center gap-1.5 whitespace-nowrap border transition ${
-                    customerTab === 'drink_dessert' ? 'bg-[#1D9E75] text-white border-[#1D9E75] shadow-[0_6px_14px_-4px_rgba(15,110,86,0.5)]' : 'bg-white text-gray-600 border-[#E1F5EE] shadow-[0_4px_10px_-4px_rgba(15,110,86,0.25)]'
+                    customerTab === 'drink_dessert' ? 'bg-[#22A447] text-white border-[#22A447] shadow-[0_6px_14px_-4px_rgba(23,122,52,0.5)]' : 'bg-white text-gray-600 border-[#E3F5D9] shadow-[0_4px_10px_-4px_rgba(23,122,52,0.25)]'
                   }`}
                 >
                   <CupSoda className="w-4 h-4" /> ของหวาน/น้ำ <span className="opacity-70">({filteredDrinks.length})</span>
@@ -771,7 +770,7 @@ export default function HomePage() {
                   type="button"
                   onClick={() => setCustomerTab('shops')}
                   className={`px-3.5 py-2 rounded-full text-xs md:text-sm font-bold flex items-center gap-1.5 whitespace-nowrap border transition ${
-                    customerTab === 'shops' ? 'bg-[#1D9E75] text-white border-[#1D9E75] shadow-[0_6px_14px_-4px_rgba(15,110,86,0.5)]' : 'bg-white text-gray-600 border-[#E1F5EE] shadow-[0_4px_10px_-4px_rgba(15,110,86,0.25)]'
+                    customerTab === 'shops' ? 'bg-[#22A447] text-white border-[#22A447] shadow-[0_6px_14px_-4px_rgba(23,122,52,0.5)]' : 'bg-white text-gray-600 border-[#E3F5D9] shadow-[0_4px_10px_-4px_rgba(23,122,52,0.25)]'
                   }`}
                 >
                   <Store className="w-4 h-4" /> ร้านค้า <span className="opacity-70">({filteredShops.length})</span>
@@ -829,7 +828,7 @@ export default function HomePage() {
                           )}
                           <span className="text-gray-300">•</span>
                           {(shop.delivery_fee ?? 0) === 0
-                            ? <span className="text-brand-600 font-bold">ส่งฟรี</span>
+                            ? <span className="text-accent-600 font-bold">ส่งฟรี</span>
                             : <span className="truncate">ค่าส่ง {shop.delivery_fee} บ.</span>}
                         </div>
                       </div>
@@ -871,13 +870,13 @@ export default function HomePage() {
                         <h4 className="font-bold text-base text-gray-900 leading-tight line-clamp-2">{item.name}</h4>
                         <p className="text-xs text-gray-400 mt-0.5 truncate">{shop?.name || 'ร้านค้าชุมชน'}</p>
                         <div className="mt-auto pt-1.5 flex items-center justify-between">
-                          <span className="text-base font-black text-brand-700">{item.price} บ.</span>
+                          <span className="text-base font-black text-accent-600">{item.price} บ.</span>
                           <button
                             type="button"
                             onClick={() => handleAddItemFromFeed(item)}
                             disabled={!canOrder}
                             aria-label={`ใส่ ${item.name} ลงตะกร้า`}
-                            className="w-8 h-8 rounded-full bg-brand-600 hover:bg-brand-700 disabled:bg-gray-300 text-white flex items-center justify-center shadow-xs active:scale-90 transition"
+                            className="w-8 h-8 rounded-full bg-accent-500 hover:bg-accent-600 disabled:bg-gray-300 text-white flex items-center justify-center shadow-xs active:scale-90 transition"
                           >
                             <Plus className="w-4 h-4" />
                           </button>

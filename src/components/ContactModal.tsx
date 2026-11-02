@@ -19,17 +19,17 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
         <MascotWatermark page="contact" />
         
         {/* Modal Header */}
-        <div className="bg-gradient-to-br from-[#E1F5EE] to-[#C3EBDC] border-b border-[#9FE1CB] p-4 sm:p-5 text-[#04342C] flex items-center justify-between shadow-md shrink-0 relative overflow-hidden isolate">
+        <div className="bg-gradient-to-br from-[#E3F5D9] to-[#D3F0C2] border-b border-[#B0E294] p-4 sm:p-5 text-[#14361C] flex items-center justify-between shadow-md shrink-0 relative overflow-hidden isolate">
           <WavePattern className="text-white/90 -z-10" />
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-white border border-[#9FE1CB] flex items-center justify-center text-xl shrink-0 shadow-inner">
-              <MessageSquare className="w-5 h-5 text-[#1D9E75]" />
+            <div className="w-10 h-10 rounded-2xl bg-white border border-[#B0E294] flex items-center justify-center text-xl shrink-0 shadow-inner">
+              <MessageSquare className="w-5 h-5 text-[#22A447]" />
             </div>
             <div>
               <h2 className="font-black text-base sm:text-lg leading-tight flex items-center gap-1.5">
                 ติดต่อเรา & ฝ่ายบริการ
               </h2>
-              <p className="text-xs text-[#0F6E56] font-medium mt-0.5">
+              <p className="text-xs text-[#177A34] font-medium mt-0.5">
                 CPRUFood • ชุมชนห้วยชัน - นาฝาย & มรภ. ชัยภูมิ
               </p>
             </div>
@@ -37,7 +37,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white hover:bg-brand-50 text-[#0F6E56] border border-[#9FE1CB] flex items-center justify-center transition active:scale-95 shrink-0"
+            className="w-8 h-8 rounded-full bg-white hover:bg-brand-50 text-[#177A34] border border-[#B0E294] flex items-center justify-center transition active:scale-95 shrink-0"
             title="ปิด"
           >
             <X className="w-4 h-4" />

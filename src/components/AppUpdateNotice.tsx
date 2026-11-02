@@ -44,13 +44,13 @@ export default function AppUpdateNotice() {
   };
 
   return (
-    <div className="fixed inset-x-3 bottom-3 z-[60] max-w-md mx-auto bg-white rounded-2xl border border-[#9FE1CB] shadow-xl p-3.5 animate-in fade-in slide-in-from-bottom-3">
+    <div className="fixed inset-x-3 bottom-3 z-[60] max-w-md mx-auto bg-white rounded-2xl border border-[#B0E294] shadow-xl p-3.5 animate-in fade-in slide-in-from-bottom-3">
       <button type="button" onClick={dismiss} aria-label="ปิด" className="absolute top-2 right-2 w-7 h-7 rounded-full hover:bg-gray-100 flex items-center justify-center">
         <X className="w-4 h-4 text-gray-400" />
       </button>
       <div className="flex gap-3 pr-6">
-        <span className="w-9 h-9 rounded-xl bg-[#E1F5EE] flex items-center justify-center shrink-0">
-          <Download className="w-5 h-5 text-[#0F6E56]" />
+        <span className="w-9 h-9 rounded-xl bg-[#E3F5D9] flex items-center justify-center shrink-0">
+          <Download className="w-5 h-5 text-[#177A34]" />
         </span>
         <div className="min-w-0">
           <p className="text-sm font-black text-gray-900">มีแอปเวอร์ชันใหม่ {latest.versionName}</p>

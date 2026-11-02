@@ -66,7 +66,7 @@ export default function MapPicker({
 
   // Helper to create custom HTML Pin
   const createPinIcon = (L: any, label: string, isOutOfRange: boolean = false) => {
-    const pinColor = isOutOfRange ? '#e11d48' : '#1D9E75';
+    const pinColor = isOutOfRange ? '#e11d48' : '#22A447';
     return L.divIcon({
       className: 'custom-map-pin',
       html: `
@@ -111,7 +111,7 @@ export default function MapPicker({
       if (showRadiusCircle) {
         const circle = L.circle([defaultLat, defaultLng], {
           radius: maxRadiusKm * 1000,
-          color: '#1D9E75',
+          color: '#22A447',
           fillColor: '#fbbf24',
           fillOpacity: 0.12,
           weight: 2,
@@ -198,7 +198,7 @@ export default function MapPicker({
       if (showRadiusCircle) {
         const circle = L.circle([defaultLat, defaultLng], {
           radius: maxRadiusKm * 1000,
-          color: '#1D9E75',
+          color: '#22A447',
           fillColor: '#fbbf24',
           fillOpacity: 0.12,
           weight: 2,

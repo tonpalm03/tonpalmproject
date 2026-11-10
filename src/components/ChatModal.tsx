@@ -613,12 +613,21 @@ export default function ChatModal({
                 )}
 
                 {msg.sticker ? (
-                  <img
-                    src={stickerSrc(msg.sticker)}
-                    alt={findSticker(msg.sticker)?.label || 'สติกเกอร์น้องพุงเด้ง'}
-                    className="w-28 h-28 object-contain select-none"
-                    draggable={false}
-                  />
+                  <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                    <img
+                      src={stickerSrc(msg.sticker)}
+                      alt=""
+                      className="w-28 h-28 object-contain select-none"
+                      draggable={false}
+                    />
+                    <span
+                      className={`-mt-1 px-3 py-1 rounded-full text-xs font-bold shadow-2xs ${
+                        isMe ? 'bg-brand-500 text-white' : 'bg-white border border-gray-200 text-gray-800'
+                      }`}
+                    >
+                      {findSticker(msg.sticker)?.label || 'สติกเกอร์น้องพุงเด้ง'}
+                    </span>
+                  </div>
                 ) : (
                 <div
                   className={`max-w-[85%] p-3 rounded-2xl text-sm shadow-xs break-words ${

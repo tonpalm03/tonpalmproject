@@ -613,19 +613,16 @@ export default function ChatModal({
                 )}
 
                 {msg.sticker ? (
-                  <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                  // The label is drawn on the sticker with a white outline, like a LINE sticker.
+                  <div className="relative w-32 h-32 select-none">
                     <img
                       src={stickerSrc(msg.sticker)}
                       alt=""
-                      className="w-28 h-28 object-contain select-none"
+                      className="w-32 h-32 object-contain"
                       draggable={false}
                     />
-                    <span
-                      className={`-mt-1 px-3 py-1 rounded-full text-xs font-bold shadow-2xs ${
-                        isMe ? 'bg-brand-500 text-white' : 'bg-white border border-gray-200 text-gray-800'
-                      }`}
-                    >
-                      {findSticker(msg.sticker)?.label || 'สติกเกอร์น้องพุงเด้ง'}
+                    <span className="absolute inset-x-0 bottom-0 px-1 text-center text-base font-black leading-tight text-brand-700 -rotate-3 [-webkit-text-stroke:5px_white] [paint-order:stroke_fill] drop-shadow-[0_1px_1px_rgba(0,0,0,0.25)]">
+                      {findSticker(msg.sticker)?.label || 'น้องพุงเด้ง'}
                     </span>
                   </div>
                 ) : (

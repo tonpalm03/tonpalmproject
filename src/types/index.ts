@@ -174,6 +174,8 @@ export interface ChatMessage {
   sender_avatar?: string;
   text?: string;
   image_url?: string;
+  /** id of a น้องพุงเด้ง sticker (see lib/chatStickers) */
+  sticker?: string;
   created_at?: any;
   is_read: boolean;
 }

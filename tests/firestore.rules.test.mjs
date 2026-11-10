@@ -96,6 +96,8 @@ test('chat: forged role, sender and unrelated participant rejected', async () =>
   await allow(setDoc(doc(db('alice'), 'orders/one/messages/new'), data));
   await deny(setDoc(doc(db('alice'), 'orders/one/messages/fake'), { ...data, sender_role: 'admin' }));
   await deny(setDoc(doc(db('bob'), 'orders/one/messages/fake'), { ...data, sender_uid: 'bob' }));
+  await allow(setDoc(doc(db('alice'), 'orders/one/messages/sticker'), { ...data, text: '', sticker: '09-hello' }));
+  await deny(setDoc(doc(db('alice'), 'orders/one/messages/badSticker'), { ...data, text: '', sticker: 'https://evil.example/x.png' }));
 });
 test('donations: donors report their own slip, only admins approve, public list is read-only', async () => {
   const request = { uid: 'bob', display_name: 'Bob', avatar_url: '', amount: 100, message: 'Keep going', is_anonymous: false, hide_amount: false, slip_url: 'data:image/jpeg;base64,x', status: 'pending', created_at: serverTimestamp() };

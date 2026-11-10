@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   X, Send, User, Store, ShieldCheck, Clock, Camera, Maximize2, Loader2,
-  Sparkles, QrCode, Copy, Check, CreditCard, Receipt, FileText, Download, Image as ImageIcon
+  Sparkles, QrCode, Copy, Check, CreditCard, Receipt, FileText, Download, Image as ImageIcon, Smile
 } from 'lucide-react';
 import { ChatMessage, UserRole } from '@/types';
 import { db, functions } from '@/lib/firebase';
@@ -13,6 +13,7 @@ import { soundAlert } from '@/lib/soundAlert';
 import UserAvatar from './UserAvatar';
 import MascotWatermark from './MascotWatermark';
 import WavePattern from './WavePattern';
+import { CUSTOMER_STICKERS, MERCHANT_STICKERS, findSticker, stickerSrc } from '@/lib/chatStickers';
 
 export interface ShopPaymentInfo {
   bank_name?: string;
@@ -114,6 +115,9 @@ export default function ChatModal({
   const [isCompressing, setIsCompressing] = useState(false);
   const [selectedImageForView, setSelectedImageForView] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [showStickers, setShowStickers] = useState(false);
+  // Each side sees its own set first; the other set is one tap away.
+  const [stickerTab, setStickerTab] = useState<'customer' | 'merchant'>(currentUser.role === 'merchant' ? 'merchant' : 'customer');
 
   // Sync draft
   useEffect(() => {
@@ -147,7 +151,7 @@ export default function ChatModal({
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, selectedImage]);
+  }, [messages, selectedImage, showStickers]);
 
   // Clear unread notification on parent order when chat is opened or tab becomes active
   const clearUnreadStatus = () => {
@@ -246,6 +250,7 @@ export default function ChatModal({
             sender_avatar: data.sender_avatar,
             text: data.text,
             image_url: data.image_url,
+            sticker: data.sticker,
             created_at: data.created_at?.toDate ? data.created_at.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'เมื่อสักครู่',
             is_read: data.is_read || false,
           });
@@ -323,7 +328,7 @@ export default function ChatModal({
     }
   };
 
-  const sendMessageDirect = async (textToSend: string, imageToSend?: string) => {
+  const sendMessageDirect = async (textToSend: string, imageToSend?: string, stickerId?: string) => {
     if (isSending) return;
     setIsSending(true);
 
@@ -343,12 +348,19 @@ export default function ChatModal({
     if (imageToSend) {
       newMsg.image_url = imageToSend;
     }
+    if (stickerId) {
+      newMsg.sticker = stickerId;
+    }
+    // What the chat list and push notification show for a message with no text.
+    const preview = stickerId
+      ? `ส่งสติกเกอร์ - ${findSticker(stickerId)?.label || 'น้องพุงเด้ง'}`
+      : 'ส่งรูปภาพ';
 
     try {
       await addDoc(collection(db, 'orders', orderId, 'messages'), newMsg);
 
       const unreadUpdate: Record<string, unknown> = {
-        last_message: textToSend.slice(0, 40) || 'ส่งรูปภาพ',
+        last_message: textToSend.slice(0, 40) || preview,
         last_message_sender: currentUser.role,
         last_message_at: serverTimestamp(),
       };
@@ -365,7 +377,7 @@ export default function ChatModal({
       // Trigger FCM push notification asynchronously if message from customer or admin
       if (currentUser.role === 'customer' || currentUser.role === 'admin') {
         const notifyFn = httpsCallable(functions, 'notifyChatMessage');
-        notifyFn({ orderId, text: textToSend || 'ส่งรูปภาพ', senderName: currentUser.name }).catch((err) => {
+        notifyFn({ orderId, text: textToSend || preview, senderName: currentUser.name }).catch((err) => {
           console.warn('notifyChatMessage callable fallback:', err);
         });
       }
@@ -380,6 +392,7 @@ export default function ChatModal({
         sender_avatar: currentUser.picture_url || undefined,
         text: textToSend,
         image_url: imageToSend || undefined,
+        sticker: stickerId,
         created_at: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         is_read: false,
         is_failed: true,
@@ -396,7 +409,7 @@ export default function ChatModal({
 
   const handleRetrySend = async (failedMsg: ChatMessage & { is_failed?: boolean }) => {
     setMessages((prev) => prev.filter((m) => m.id !== failedMsg.id));
-    await sendMessageDirect(failedMsg.text || '', failedMsg.image_url);
+    await sendMessageDirect(failedMsg.text || '', failedMsg.image_url, failedMsg.sticker);
   };
 
   const handleSend = async (e: React.FormEvent) => {
@@ -409,6 +422,12 @@ export default function ChatModal({
     setInputText('');
     setSelectedImage(null);
     await sendMessageDirect(textToSend, imageToSend || undefined);
+  };
+
+  const handleSendSticker = async (stickerId: string) => {
+    if (isSending) return;
+    setShowStickers(false);
+    await sendMessageDirect('', undefined, stickerId);
   };
 
   const handleSendPaymentInfo = async () => {
@@ -593,7 +612,14 @@ export default function ChatModal({
                   </div>
                 )}
 
-                {/* Bubble */}
+                {msg.sticker ? (
+                  <img
+                    src={stickerSrc(msg.sticker)}
+                    alt={findSticker(msg.sticker)?.label || 'สติกเกอร์น้องพุงเด้ง'}
+                    className="w-28 h-28 object-contain select-none"
+                    draggable={false}
+                  />
+                ) : (
                 <div
                   className={`max-w-[85%] p-3 rounded-2xl text-sm shadow-xs break-words ${
                     isMe
@@ -686,6 +712,7 @@ export default function ChatModal({
                     );
                   })()}
                 </div>
+                )}
 
                 {/* Timestamp & Status */}
                 <div className="text-xs text-gray-400 mt-0.5 px-1 flex items-center gap-1.5">
@@ -712,8 +739,8 @@ export default function ChatModal({
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Action Bar / Quick Suggestions */}
-        <div className="px-3 py-2 bg-white border-t border-gray-100 shrink-0">
+        {/* Action Bar / Quick Suggestions (hidden while the sticker panel takes the space) */}
+        <div className={`px-3 py-2 bg-white border-t border-gray-100 shrink-0 ${showStickers ? 'hidden' : ''}`}>
           <div className="flex items-center justify-between gap-1.5 mb-1.5">
             <div className="flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-brand-600" />
@@ -811,6 +838,21 @@ export default function ChatModal({
             )}
           </button>
 
+          <button
+            type="button"
+            onClick={() => setShowStickers((v) => !v)}
+            disabled={isSending}
+            aria-pressed={showStickers}
+            className={`w-10 h-10 rounded-2xl flex items-center justify-center transition active:scale-95 border shrink-0 ${
+              showStickers
+                ? 'bg-brand-500 text-white border-brand-500'
+                : 'bg-gray-100 hover:bg-brand-100 text-gray-600 hover:text-brand-700 border-gray-200'
+            }`}
+            title="ส่งสติกเกอร์น้องพุงเด้ง"
+          >
+            <Smile className="w-5 h-5" />
+          </button>
+
           <input
             type="text"
             placeholder={
@@ -838,6 +880,39 @@ export default function ChatModal({
             )}
           </button>
         </form>
+
+        {showStickers && (
+          <div className="bg-white border-t border-gray-100 shrink-0 animate-in slide-in-from-bottom-4 duration-150">
+            <div className="grid grid-cols-2 gap-1.5 px-3 pt-2">
+              {([['customer', 'สำหรับลูกค้า'], ['merchant', 'สำหรับร้าน']] as const).map(([tab, label]) => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setStickerTab(tab)}
+                  className={`py-1.5 rounded-full text-xs transition ${
+                    stickerTab === tab ? 'bg-brand-100 text-brand-700 font-black' : 'bg-gray-100 text-gray-500 font-semibold'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div className="grid grid-cols-4 gap-1 p-2 max-h-56 overflow-y-auto">
+              {(stickerTab === 'merchant' ? MERCHANT_STICKERS : CUSTOMER_STICKERS).map((st) => (
+                <button
+                  key={st.id}
+                  type="button"
+                  disabled={isSending}
+                  onClick={() => handleSendSticker(st.id)}
+                  className="flex flex-col items-center gap-0.5 py-1 rounded-xl hover:bg-brand-50 active:bg-brand-100 active:scale-95 transition disabled:opacity-50"
+                >
+                  <img src={stickerSrc(st.id)} alt="" className="w-16 h-16 object-contain" loading="lazy" draggable={false} />
+                  <span className="text-xs text-gray-600 leading-tight text-center">{st.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
       </div>
 

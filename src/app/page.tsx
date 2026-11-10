@@ -51,6 +51,8 @@ export default function HomePage() {
   const [trackingOrders, setTrackingOrders] = useState<Order[]>([]);
   const [showTrackingModal, setShowTrackingModal] = useState(false);
   const [autoOpenChatInTracking, setAutoOpenChatInTracking] = useState(false);
+  // Order a chat link points at; restoring orders reorders the list, so the newest one is not always it.
+  const [trackingFocusId, setTrackingFocusId] = useState<string | null>(null);
 
   // Active view mode for merchant/admin
   const [viewMode, setViewMode] = useState<'customer' | 'merchant' | 'admin'>('customer');
@@ -265,6 +267,7 @@ export default function HomePage() {
               }
               return [orderData, ...prev];
             });
+            setTrackingFocusId(targetOrderId);
             if (openChat === '1' || openChat === 'true') {
               setAutoOpenChatInTracking(true);
             }
@@ -1082,7 +1085,7 @@ export default function HomePage() {
       {/* Order Status Tracking Modal */}
       {showTrackingModal && trackingOrders.length > 0 && (
         <OrderStatusModal
-          orderId={trackingOrders[0].id}
+          orderId={trackingOrders.find((o) => o.id === trackingFocusId)?.id || trackingOrders[0].id}
           initialOrder={trackingOrders[0]}
           initialOrders={trackingOrders}
           currentUser={user || {
@@ -1094,6 +1097,7 @@ export default function HomePage() {
           onClose={() => {
             setShowTrackingModal(false);
             setAutoOpenChatInTracking(false);
+            setTrackingFocusId(null);
           }}
           onDismissOrder={handleDismissOrder}
           onDismissAllCompleted={handleDismissAllCompleted}
